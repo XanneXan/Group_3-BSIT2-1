@@ -5,8 +5,9 @@ public class Student_Management_System {
 
     public static void main(String[] args) {
       
-        Menu run = new Menu ();
+        Login run = new  Login ();
         run.setVisible (true);
+        
         
     }
 }
