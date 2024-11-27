@@ -15,7 +15,11 @@ public class Student_Management_System {
         run.setVisible(true);
       
 
+        Course_Class run = new  Course_Class ();
+
+
         Menu run = new  Menu ();
+
         run.setVisible (true);
         
     }
