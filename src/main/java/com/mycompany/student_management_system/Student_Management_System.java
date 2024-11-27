@@ -5,7 +5,7 @@ public class Student_Management_System {
 
     public static void main(String[] args) {
       
-        Grade_Class run = new Grade_Class ();
+        Student_Class run = new Student_Class ();
         run.setVisible (true);
         
     }

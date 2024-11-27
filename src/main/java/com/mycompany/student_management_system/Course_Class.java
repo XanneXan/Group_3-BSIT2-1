@@ -26,12 +26,12 @@ public class Course_Class extends JFrame implements ActionListener{
      
     Course_Class (){
         
+            //set up the frame and cuztomize each components
             setTitle("Student Management System");
             setExtendedState(MAXIMIZED_BOTH);     
             setLayout(null);
             setResizable(false);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
         
             lblTitle = new JLabel ("Student Management System");
             lblTitle.setBounds(30, 20, 350, 30);setExtendedState(MAXIMIZED_BOTH);     

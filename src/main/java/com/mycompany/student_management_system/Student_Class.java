@@ -24,7 +24,7 @@ public class Student_Class extends JFrame implements ActionListener {
     private JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch;
     private JTextField txtName, txtId, txtSearch;
     private JComboBox<String> cmbSem, cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8;
-    private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnAttendance, btnSearch, btnRefresh, btnMenu;
+    private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu;
     private JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
@@ -158,12 +158,12 @@ public class Student_Class extends JFrame implements ActionListener {
         btnDelete.setBackground(Color.BLUE);
         add(btnDelete);
 
-        btnAttendance = new JButton("Attendance");
-        btnAttendance.setBounds(145, 560, 120, 40);
-        btnAttendance.setFocusable(false);
-        btnAttendance.setForeground(Color.WHITE);
-        btnAttendance.setBackground(Color.BLUE);
-        add(btnAttendance);
+        btnEditRow = new JButton("Edit Row");
+        btnEditRow.setBounds(145, 560, 120, 40);
+        btnEditRow.setFocusable(false);
+        btnEditRow.setForeground(Color.WHITE);
+        btnEditRow.setBackground(Color.BLUE);
+        add(btnEditRow);
 
         btnClear = new JButton("Clear");
         btnClear.setBounds(285, 560, 120, 40);
@@ -184,7 +184,6 @@ public class Student_Class extends JFrame implements ActionListener {
         pane.setBounds(600, 150, 720, 450);
         pane.getViewport().setBackground(Color.lightGray);
         add(pane);
-        clickOnTable();
 
         //When table refreshed it will revert the table or column section format to original
         originalColumnFormat = new int[columnList.length];
@@ -231,13 +230,14 @@ public class Student_Class extends JFrame implements ActionListener {
         btnAdd.addActionListener(this);
         btnUpdate.addActionListener(this);
         btnDelete.addActionListener(this);
-        btnAttendance.addActionListener(this);
+        btnEditRow.addActionListener(this);
         btnClear.addActionListener(this);
         btnSearch.addActionListener(this);
         btnRefresh.addActionListener(this);
 
     }
     
+    //the format for each column of the table
     private TableColumnModel columnModel(){
         TableColumnModel columnModel = studList.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(80); 
@@ -263,13 +263,15 @@ public class Student_Class extends JFrame implements ActionListener {
         return columnModel;
     }
     
-    private JComboBox<String>[] getComboBoxs() {
+    //method for easy manipulation of the comboboxes
+    private JComboBox<String>[] getComboBoxes() {
         return new JComboBox[]{cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8};
     }
     
+    //method responsible for getting the info in each comboBoxes
     private ArrayList<String> getCourse() {
         ArrayList<String> selectedCourses = new ArrayList<>();
-        for (JComboBox<String> cmb : getComboBoxs()) {
+        for (JComboBox<String> cmb : getComboBoxes()) {
             String selected = (String) cmb.getSelectedItem();
             if (selected != null && !selected.isEmpty() && !selected.equals("N/A or Vacant")) {
                 selectedCourses.add(selected);
@@ -277,7 +279,8 @@ public class Student_Class extends JFrame implements ActionListener {
         }
         return selectedCourses;
     }
-
+    
+    //method for setting the layout for all cmboxes
     private JComboBox<String> comboBoxLayoutBox(int x, int y) {
         JComboBox<String> comboBoxLayoutBox = new JComboBox<>(courses);
         comboBoxLayoutBox.setBounds(x, y, 150, 20);
@@ -286,9 +289,9 @@ public class Student_Class extends JFrame implements ActionListener {
         //selected item will be excluded
         comboBoxLayoutBox.addActionListener((ActionEvent e) -> {
             ArrayList<String> selectedCourses = getCourse();
-            for (JComboBox<String> combo : getComboBoxs()) {
+            for (JComboBox<String> combo : getComboBoxes()) {
             combo.setEnabled(true);
-            combo.removeAll();
+            combo.removeAll();//this method results in some form of shifting of the comboBox layout, but still usable
             for (String course : courses) {
                 boolean isSelected = selectedCourses.contains(course);
                 if (isSelected && !course.equals(combo.getSelectedItem())) {
@@ -302,6 +305,7 @@ public class Student_Class extends JFrame implements ActionListener {
         return comboBoxLayoutBox;
     }
      
+    //responsible for the user to click or select a specific row or column in the table
     private void clickOnTable() {
         studList.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -320,42 +324,25 @@ public class Student_Class extends JFrame implements ActionListener {
         txtName.setText((String) model.getValueAt(selectedRow, 1));
         cmbSem.setSelectedItem((String) model.getValueAt(selectedRow, 2));
 
-        JComboBox<String>[] courseBoxes = getComboBoxs();
+        JComboBox<String>[] courseBoxes = getComboBoxes();
         for (int i = 0; i < courseBoxes.length; i++) {
             courseBoxes[i].setSelectedItem((String) model.getValueAt(selectedRow, 3 + i * 2));
         }
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        try {
-            if (e.getSource() == btnAdd) {
-                addStudent();
-            } else if (e.getSource() == btnUpdate) {
-                updateStudent();
-            } else if (e.getSource() == btnDelete) {
-                deleteStudent();
-            } else if (e.getSource() == btnClear) {
-                clearFields();
-            } else if (e.getSource() == btnSearch) {
-                searchStudent();
-            } else if (e.getSource() == btnRefresh) {  
-                refreshTable();
-            }
-
-        } catch (Exception e1) {
-            JOptionPane.showMessageDialog(this, "There is something wrong.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
+    //method to add student in the table
     private void addStudent() {
         String grade = "N/A";
         String ID = txtId.getText().trim();
         String studName = txtName.getText().trim();
         String sem = (String) cmbSem.getSelectedItem();
         ArrayList<String> selectedCourses = getCourse();
+        clearFields();
+        
+        int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to add student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-        if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty()) {
+        if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
+            //instead of array use Object, to manipulate different data types
             Object[] rowData = new Object[columnList.length];
             rowData[0] = ID;
             rowData[1] = studName;
@@ -377,7 +364,8 @@ public class Student_Class extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Please fill in all required information.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    //methpd for updating student info
     private void updateStudent() {
         int selectedRow = studList.getSelectedRow();
         if (selectedRow != -1) {
@@ -385,8 +373,12 @@ public class Student_Class extends JFrame implements ActionListener {
             String studName = txtName.getText().trim();
             String sem = (String) cmbSem.getSelectedItem();
             ArrayList<String> selectedCourses = getCourse();
+            clearFields();
+            
+            int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to update the selected student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-            if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty()) {
+            if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
+                //instead of array use Object, to manipulate different data types
                 Object[] updatedRow = new Object[columnList.length];
                 updatedRow[0] = ID;
                 updatedRow[1] = studName;
@@ -415,9 +407,11 @@ public class Student_Class extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Please select a student to update.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    //method for deleting student 
     private void deleteStudent() {
         int selectedRow = studList.getSelectedRow();
+        clearFields();
         if (selectedRow != -1) {
             int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected student?", "Confirmation", JOptionPane.YES_NO_OPTION);
             if (confirmation == JOptionPane.YES_OPTION) {
@@ -429,17 +423,19 @@ public class Student_Class extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Please select a student to delete.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    //mehthod to clear info from textfields and cmboxess
     private void clearFields() {
         txtId.setText("");
         txtName.setText("");
         cmbSem.setSelectedIndex(0);
-        for (JComboBox<String> cmb : getComboBoxs()) {
+        for (JComboBox<String> cmb : getComboBoxes()) {
             cmb.setSelectedIndex(0);
         }
         studList.clearSelection();
     }
-
+    
+    //method to use to search student in the table
     private void searchStudent() {
         String searchName = txtSearch.getText().trim().toLowerCase();
         if (searchName.isEmpty()) {
@@ -460,7 +456,8 @@ public class Student_Class extends JFrame implements ActionListener {
         studList.setModel(searchModel);
         studList.setColumnModel(columnModel());
     }
-
+    
+    //method to use to refresh the table on it's original state
     private void refreshTable() {
         studList.setModel(model);
         TableColumnModel columnModel = columnModel();
@@ -473,5 +470,30 @@ public class Student_Class extends JFrame implements ActionListener {
 
         JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
     }
+     
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            if (e.getSource() == btnAdd) {
+                addStudent();
+            } else if (e.getSource() == btnUpdate) {
+                updateStudent();
+            } else if (e.getSource() == btnDelete) {
+                deleteStudent();
+            } else if (e.getSource() == btnClear) {
+                clearFields();
+            } else if (e.getSource() == btnEditRow) {  
+                clickOnTable();    
+            } else if (e.getSource() == btnSearch) {
+                searchStudent();
+            } else if (e.getSource() == btnRefresh) {
+                refreshTable();
+            }
+
+        } catch (Exception e1) {
+            JOptionPane.showMessageDialog(this, "There is something wrong.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
 }
 
