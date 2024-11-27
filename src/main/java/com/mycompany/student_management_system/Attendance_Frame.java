@@ -6,21 +6,15 @@ import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.*;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SpinnerDateModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 
-public class AttendanceFunctionality extends JFrame implements ActionListener{
+public class Attendance_Frame extends JFrame implements ActionListener{
     private JLabel lblTitle, lblSearch, lblDate;
     private JSpinner dateSpinner;
     private JTextField txtSearch;
@@ -29,7 +23,7 @@ public class AttendanceFunctionality extends JFrame implements ActionListener{
     private JScrollPane scrollPane;
     private DefaultTableModel model;
 
-    public AttendanceFunctionality(){
+    public Attendance_Frame(){
         setTitle("Student Management System");
         setExtendedState(MAXIMIZED_BOTH);
         setLayout(null);
@@ -90,7 +84,7 @@ public class AttendanceFunctionality extends JFrame implements ActionListener{
         cancelbtn.setBackground(Color.BLUE);
         add(cancelbtn);
         
-        backbtn = new JButton("Back");
+        backbtn = new JButton("Menu");
         backbtn.setBounds(1165, 650, 120, 40);
         backbtn.setFont(new Font("Arial", 0, 10));
         backbtn.setForeground(Color.WHITE);
@@ -110,46 +104,40 @@ public class AttendanceFunctionality extends JFrame implements ActionListener{
         cancelbtn.addActionListener((ActionListener) this);
         backbtn.addActionListener((ActionListener) this);
     }
-    @Override // Method to Handle Button Actions
+    @Override 
+    
+    // Method to Handle Button Actions
     public void actionPerformed(ActionEvent event){
-        if (event.getSource() == btnSearch){ // If seach Button is Clicked
-        String searchText = txtSearch.getText().toLowerCase();// Get search text
-        TableRowSorter<DefaultTableModel>sorter = new TableRowSorter<>(model);
-        attendanceTable.setRowSorter(sorter);
+
+        if (event.getSource() == btnSearch){
+        //no function as of now
         
-        if (searchText.trim().isEmpty()){ // if search box is Empty
-            sorter.setRowFilter(null); // show all rows
-        } else {
-            sorter.setRowFilter(RowFilter.regexFilter(("?i")+ searchText, 1));
-            
-        }
         }else if(event.getSource() == btnRefresh) {
-            txtSearch.setText("");
-            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-            attendanceTable.setRowSorter(sorter);
-            sorter.setRowFilter(null);
-        } else if (event. getSource() == submitbtn){
+        //no function as of now
+        
+        } else if (event. getSource() == submitbtn){ //Submitting Attendance Function
             int option = JOptionPane.showConfirmDialog(this,"Submit Attendance?","Confirm",JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION){
                 JOptionPane.showMessageDialog(this, "Attendance Submitted");
             }
-        }else if (event.getSource() == cancelbtn) {
+            
+        }else if (event.getSource() == cancelbtn) { //Cancel button function
             int option = JOptionPane.showConfirmDialog(this,"Are you sure you want to cancel?","Confirm",JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION){
                 JOptionPane.showMessageDialog(this, "Attendance Canceled");
             }
         }else if (event.getSource() == backbtn) {
+            new Menu_Frame().setVisible(true);
             dispose();
         }
     }
-    public static void main(String[] args) {
-        new AttendanceFunctionality().setVisible(true);
-    }
+    
+}
         
             
             
             
             
-        }
+        
             
             

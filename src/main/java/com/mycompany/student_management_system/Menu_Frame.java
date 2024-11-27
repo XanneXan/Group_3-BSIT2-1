@@ -14,11 +14,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
-public class Menu extends JFrame implements ActionListener{
+public class Menu_Frame extends JFrame implements ActionListener{
 private JLabel lblTitle,Students,Course,Grades,Logout,Attendance,PerformanceReports;
 private JButton btnStudents, btnCourse, btnGrades, btnLogout, btnAttendance, btnPerformanceReports;
 
-public Menu(){
+public Menu_Frame(){
     setTitle("Student Management System");
     setSize(700, 600);
     setLayout(null);
@@ -66,7 +66,6 @@ public Menu(){
     btnAttendance.addActionListener(this);
     add(btnAttendance);
     
-    
     btnPerformanceReports = new JButton(" PERFORMANCE REPORT");
     btnPerformanceReports.setBounds(225, 430, 240, 60);//also this one i orderly change each 
     btnPerformanceReports.setFont(new Font("Arial",Font.PLAIN,16));
@@ -74,9 +73,6 @@ public Menu(){
     btnPerformanceReports.setForeground(Color.white);
     btnPerformanceReports.addActionListener(this);
     add(btnPerformanceReports);
-    
-    
-    
     
     btnLogout = new JButton("Logout");
     btnLogout.setBounds(580, 500, 80, 30);//in this part just adjust te first number
@@ -90,38 +86,30 @@ public Menu(){
   
     @Override
   public void actionPerformed(ActionEvent e) {
- 
+    //Buttons function
     if(e.getSource()==btnStudents){
         new Student_Class ().setVisible(true);
         dispose();
 
     } else if(e.getSource()==btnCourse){
         new Course_Class().setVisible(true);
-
         dispose();    
     
-  } else if(e.getSource()==btnGrades){
-
-        dispose();
-     
-    
     } else if(e.getSource()==btnGrades){
-
         new Grade_Class().setVisible(true);
         dispose();
-     
     
+    }else if(e.getSource()==btnAttendance){
+            new Attendance_Frame().setVisible(true);
+            dispose();
+            
+    } else if(e.getSource()==btnPerformanceReports){
+            new Performance_Reports().setVisible(true);
+            dispose();
 
-}else if(e.getSource()==btnAttendance){
-        new Attendance().setVisible(true);
+    } else if(e.getSource()==btnLogout){
         dispose();
-//else if(e.getSource()==btnPerformanceReports){
-       // new PerformanceReports().setVisible(true);
-       // dispose();//
-
-
-}
-}
-
         }
+    }
+}
     

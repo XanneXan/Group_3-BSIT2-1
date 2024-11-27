@@ -207,7 +207,8 @@ public class Course_Class extends JFrame implements ActionListener{
                 refreshTbl();
             } 
         else if (e.getSource() == btnMenu){
-                menuPlay();
+            new Menu_Frame().setVisible(true);
+            dispose();
             }
     }
 
@@ -235,7 +236,7 @@ public class Course_Class extends JFrame implements ActionListener{
                 JOptionPane.showMessageDialog(this, "Please input both!");
                 
             }
-            }
+        }
     private void updateCourse() {
          if (mdl.getRowCount() == 0) {
         JOptionPane.showMessageDialog(this, "There are no courses to update.", "No Data", JOptionPane.WARNING_MESSAGE);
@@ -269,7 +270,8 @@ public class Course_Class extends JFrame implements ActionListener{
     } else {
         JOptionPane.showMessageDialog(this, "No row selected for editing.", "Error", JOptionPane.ERROR_MESSAGE);
     }
-    }
+}
+    
         private void deleteCourse() {
              if (mdl.getRowCount() == 0) {
         JOptionPane.showMessageDialog(this, "There are no courses to delete.", "No Data", JOptionPane.WARNING_MESSAGE);
@@ -332,9 +334,7 @@ public class Course_Class extends JFrame implements ActionListener{
         tbl.clearSelection();
     }
 
-    private void menuPlay() {
-        this.dispose();
-    }
+    
     
     
     }
