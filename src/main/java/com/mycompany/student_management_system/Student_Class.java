@@ -351,7 +351,7 @@ public class Student_Class extends JFrame implements ActionListener {
         String cmb8 = (String) cmbC8.getSelectedItem();
         
         ArrayList<String> selectedCourses = getCourse();
-        clearFields();
+        clearFieldsAndCmBoxes();
         
         int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to add student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
@@ -391,7 +391,7 @@ public class Student_Class extends JFrame implements ActionListener {
             String cmb8 = (String) cmbC8.getSelectedItem();
             
             ArrayList<String> selectedCourses = getCourse();
-            clearFields();
+            clearFieldsAndCmBoxes();
             
             int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to update the selected student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
@@ -433,7 +433,7 @@ public class Student_Class extends JFrame implements ActionListener {
     //method for deleting student 
     private void deleteStudent() {
         int selectedRow = studList.getSelectedRow();
-        clearFields();
+        clearFieldsAndCmBoxes();
         if (selectedRow != -1) {
             int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected student?", "Confirmation", JOptionPane.YES_NO_OPTION);
             if (confirmation == JOptionPane.YES_OPTION) {
@@ -447,7 +447,7 @@ public class Student_Class extends JFrame implements ActionListener {
     }
     
     //mehthod to clear info from textfields and cmboxess
-    private void clearFields() {
+    private void clearFieldsAndCmBoxes() {
         txtId.setText("");
         txtName.setText("");
         cmbSem.setSelectedIndex(0);
@@ -487,6 +487,7 @@ public class Student_Class extends JFrame implements ActionListener {
         for (int i = 0; i < columnList.length; i++) {
             studList.getColumnModel().getColumn(i).setPreferredWidth(originalColumnFormat[i]);
         }
+        
         txtSearch.setText("");
         studList.clearSelection();
 
@@ -503,15 +504,17 @@ public class Student_Class extends JFrame implements ActionListener {
             } else if (e.getSource() == btnDelete) {
                 deleteStudent();
             } else if (e.getSource() == btnClear) {
-                clearFields();
+                clearFieldsAndCmBoxes();
             } else if (e.getSource() == btnEditRow) {  
                 updateFields();    
             } else if (e.getSource() == btnSearch) {
                 searchStudent();
             } else if (e.getSource() == btnRefresh) {
                 refreshTable();
+            } else if (e.getSource() == btnMenu) {
+                dispose();//proxy
             }
-
+                
         } catch (Exception e1) {
             JOptionPane.showMessageDialog(this, "There is something wrong.", "Error", JOptionPane.ERROR_MESSAGE);
         }
