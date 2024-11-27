@@ -30,9 +30,6 @@ public class Student_Class extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
-        
-        
-    
     lblTitle = new JLabel ("Student Management System");
     lblTitle.setBounds(30, 20, 350, 30);
     lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
