@@ -28,14 +28,21 @@ public class Grade_Class extends JFrame implements ActionListener{
     private JTextField txtName, txtId, midGrade, finGrade, txtSearch, txtTerm, txtSem, txtC1, txtC2, txtC5, 
             txtC3, txtC4, txtC6, txtC7, txtC8, txtG1, txtG2, txtG3, txtG4, txtG5, txtG6, txtG7, txtG8;
     private JComboBox cmbTerm;
-    private JButton btnAdd, btnDelete, btnUpdate, btnAttendance, btnSearch, btnRefresh, btnMenu, btnClear, btnSearch2;
+    private JButton btnAdd, btnDelete, btnUpdate, btnEdit, btnSearch, btnRefresh, btnMenu, btnClear, btnSearch2;
     private JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
+    private int editingRowIndex = -1;  // Stores the index of the row being edited
     
-    private String [] tblColumn = {"Student's ID", "Student's Name", "Semester", "Term", "Course 1", "Course 2", 
-                                    "Course 3", "Course 4", "Course 5", "Course 6", "Course 7", "Course 8", "Midterm", "Finals", "GWA"};
+    // Array of column headers for the table
+    private String [] tblColumn = {"Student's ID", "Student's Name", "Semester", "Term", "Course 1", "Grade", "Course 2","Grade", 
+                                    "Course 3","Grade", "Course 4","Grade", "Course 5", "Grade", "Course 6", "Grade", "Course 7",
+                                    "Grade", "Course 8","Grade", "Midterm", "Finals", "GWA"};
+    
+    // Array list to store the data rows for the table
     private ArrayList<Object[]> dataRows = new ArrayList<>();
+    
+    // Array for ComboBox options (Terms)
     private String [] term = {"Midterm","Finals"};
 
     Grade_Class (){
@@ -70,6 +77,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     lblTerm.setFont(new Font("Arial", 1, 16));
     add (lblTerm );
     
+    //TextField for user input in Student ID and Name
     txtId = new JTextField ();
     txtId.setBounds(170, 155, 250, 25);
     add(txtId);
@@ -77,21 +85,23 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtName = new JTextField ();
     txtName.setBounds(190, 225, 250, 25);
     txtName.setBackground(Color.LIGHT_GRAY);
-//    txtName.setEditable(false);
     add (txtName);
     
+    //The semester will automatically appear here. It is set to non-editable
     txtSem = new JTextField ();
     txtSem.setBounds(160, 275, 70, 25);
     txtSem.setBackground(Color.LIGHT_GRAY);
-    txtSem.setEditable(false);
+    //txtSem.setEditable(false);
     add (txtSem);
     
     cmbTerm = new JComboBox(term);
     cmbTerm.setBounds(370, 275, 80, 25);
     add (cmbTerm);
     
-    //Courses
     
+    // User inputs for grades. The course names will automatically appear in non-editable text fields.
+    
+    //Course 1 Components
     lblC1 = new JLabel ("Course 1");
     lblC1.setBounds(50, 330, 150, 40);
     lblC1.setFont(new Font("Arial", 1, 12));
@@ -100,7 +110,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtC1 = new JTextField ();
     txtC1.setBounds(110, 340, 135, 20);
     txtC1.setBackground(Color.LIGHT_GRAY);
-//    txtC1.setEditable(false);
+    txtC1.setEditable(false);
     add (txtC1);
     
     txtG1 = new JTextField ();
@@ -108,6 +118,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG1.setBackground(Color.CYAN);
     add (txtG1);
     
+    //Course 2 Components
     lblC2 = new JLabel ("Course 2");
     lblC2.setBounds(50, 370, 150, 40);
     lblC2.setFont(new Font("Arial", 1, 12));
@@ -125,7 +136,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG2.setBackground(Color.CYAN);
     add (txtG2);
     
-    
+    //Course 3 Components
     lblC3 = new JLabel ("Course 3");
     lblC3.setBounds(50, 410, 150, 40);
     lblC3.setFont(new Font("Arial", 1, 12));
@@ -143,8 +154,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG3.setText("0.75");
     add (txtG3);
     
-    
-    
+    //Course 4 Components
     lblC4 = new JLabel ("Course 4");
     lblC4.setBounds(50, 450, 150, 40);
     lblC4.setFont(new Font("Arial", 1, 12));
@@ -161,7 +171,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG4.setBackground(Color.CYAN);
     add (txtG4);
     
-    
+    //Course 5 Components
     lblC5 = new JLabel ("Course 5");
     lblC5.setBounds(320, 330, 150, 40);
     lblC5.setFont(new Font("Arial", 1, 12));
@@ -178,7 +188,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG5.setBackground(Color.CYAN);
     add (txtG5);
     
-    
+    //Course 6 Components
     lblC6 = new JLabel ("Course 6");
     lblC6.setBounds(320, 370, 150, 40);
     lblC6.setFont(new Font("Arial", 1, 12));
@@ -195,7 +205,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG6.setBackground(Color.CYAN);
     add (txtG6);
     
-    
+    //Course 7 Components
     lblC7 = new JLabel ("Course 7");
     lblC7.setBounds(320, 410, 150, 40);
     lblC7.setFont(new Font("Arial", 1, 12));
@@ -212,7 +222,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtG7.setBackground(Color.CYAN);
     add (txtG7);
     
-    
+    //Course 8 Components
     lblC8 = new JLabel ("Course 8");
     lblC8.setBounds(320, 450, 150, 40);
     lblC8.setFont(new Font("Arial", 1, 12));
@@ -230,8 +240,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     add (txtG8);
    
     
-    //Buttons
-    
+    //All Buttons
     btnAdd = new JButton ("Add");
     btnAdd.setBounds(70, 530, 120, 40);
     btnAdd.setFocusable(false);
@@ -253,12 +262,12 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnDelete.setBackground(Color.BLUE);
     add(btnDelete);
     
-    btnAttendance = new JButton ("Attendance");
-    btnAttendance.setBounds(145, 590, 120, 40);
-    btnAttendance.setFocusable(false);
-    btnAttendance.setForeground(Color.WHITE);
-    btnAttendance.setBackground(Color.BLUE);
-    add (btnAttendance);
+    btnEdit = new JButton ("Edit Row");
+    btnEdit.setBounds(145, 590, 120, 40);
+    btnEdit.setFocusable(false);
+    btnEdit.setForeground(Color.WHITE);
+    btnEdit.setBackground(Color.BLUE);
+    add (btnEdit);
     
     btnClear = new JButton ("Clear");
     btnClear.setBounds(285, 590, 120, 40);
@@ -267,35 +276,63 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnClear.setBackground(Color.BLUE);
     add (btnClear);
     
-    // Table where the information will appear
+    /* Table where the information will appear
+       Initializing the table model with no rows (null) and predefined column headers (tblColumn)
+       Setting the rows to null so the table starts empty and will be populated based on user inputs */
     model = new DefaultTableModel(null,tblColumn );
     studList = new JTable (model);
     studList.getTableHeader().setReorderingAllowed(false);
     studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    
+   
 
-    // Column Size
+    // Adjusting column sizes for the JTable to enhance readability and proper alignment
      int preferredWidth = 200; 
         for (int i = 0; i < studList.getColumnCount(); i++) {
             studList.getColumnModel().getColumn(i).setPreferredWidth(preferredWidth);
             studList.getColumnModel().getColumn(i).setResizable(false); 
         }
-    
+
     TableColumn columnId = studList.getColumnModel().getColumn(0);
         columnId.setPreferredWidth(100);
-              
+        
     TableColumn ColumnSem = studList.getColumnModel().getColumn(2);
         ColumnSem.setPreferredWidth(70);
     
     TableColumn ColumnTerm = studList.getColumnModel().getColumn(3);
     ColumnTerm.setPreferredWidth(70);
+    
+    TableColumn columnG1 = studList.getColumnModel().getColumn(5);
+        columnG1.setPreferredWidth(70);
+    
+    TableColumn columnG2 = studList.getColumnModel().getColumn(7);
+        columnG2.setPreferredWidth(70);
         
-    TableColumn ColumnMid = studList.getColumnModel().getColumn(11);
+    TableColumn columnG3 = studList.getColumnModel().getColumn(9);
+        columnG3.setPreferredWidth(70);
+        
+    TableColumn columnG4 = studList.getColumnModel().getColumn(11);
+        columnG4.setPreferredWidth(70); 
+        
+    TableColumn columnG5 = studList.getColumnModel().getColumn(13);
+        columnG5.setPreferredWidth(70); 
+        
+    TableColumn columnG6 = studList.getColumnModel().getColumn(15);
+        columnG6.setPreferredWidth(70);    
+    
+    TableColumn columnG7 = studList.getColumnModel().getColumn(17);
+        columnG7.setPreferredWidth(70);    
+    
+    TableColumn columnG8 = studList.getColumnModel().getColumn(19);
+        columnG8.setPreferredWidth(70);  
+        
+    TableColumn ColumnMid = studList.getColumnModel().getColumn(20);
         ColumnMid.setPreferredWidth(70); 
     
-    TableColumn ColumnFin = studList.getColumnModel().getColumn(12);
+    TableColumn ColumnFin = studList.getColumnModel().getColumn(21);
         ColumnFin.setPreferredWidth(70); 
         
-    TableColumn ColumnGwa = studList.getColumnModel().getColumn(13);
+    TableColumn ColumnGwa = studList.getColumnModel().getColumn(22);
         ColumnGwa.setPreferredWidth(70); 
    
         
@@ -307,7 +344,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     add(pane);
     
     
-    //Search Function
+    //Search Components
     lblSearch = new JLabel ("Search Student: ");
     lblSearch.setBounds(600, 110, 150, 40);
     lblSearch.setFont(new Font("Arial", 1, 14));
@@ -317,6 +354,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     txtSearch.setBounds(730, 115, 400, 25);
     add (txtSearch);
     
+    // "Search" button to trigger the search operation
     btnSearch = new JButton ("Search");
     btnSearch.setBounds(1170, 115, 70, 25);
     btnSearch.setFocusable(false);
@@ -325,6 +363,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnSearch.setBackground(Color.BLUE);
     add (btnSearch);
     
+    // "Refresh" button to reload or reset the data in the table
     btnRefresh = new JButton ("Refresh");
     btnRefresh.setBounds(1250, 115, 70, 25);
     btnRefresh.setFocusable(false);
@@ -333,8 +372,8 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnRefresh.setBackground(Color.BLUE);
     add (btnRefresh);
     
-    //back to menu
-    
+
+    // "Menu" button to navigate back to the main menu
     btnMenu = new JButton ("Menu");
     btnMenu.setBounds(1250, 650, 70, 25);
     btnMenu.setFocusable(false);
@@ -343,8 +382,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnMenu.setBackground(Color.BLUE);
     add (btnMenu);
     
-    //SearchStudentID
-    
+    // Additional Search Button for Student ID 
     btnSearch2 = new JButton ("Search");
     btnSearch2.setBounds(450, 155, 70, 25);
     btnSearch2.setFocusable(false);
@@ -356,7 +394,9 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnAdd.addActionListener(this);
     btnDelete.addActionListener(this);
     btnUpdate.addActionListener(this);
+    btnEdit.addActionListener(this);
     btnClear.addActionListener(this);
+    btnMenu.addActionListener(this);
             
     
     
@@ -364,84 +404,228 @@ public class Grade_Class extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        
+ 
        if (e.getSource () == btnAdd){
-           String studId = txtId.getText();
-           String studName = txtName.getText();
-           String sem = txtSem.getText();
-           String term = cmbTerm.getSelectedItem().toString();
-           String c1 = txtC1.getText();
-           String g1 = txtG1.getText();
-           
-           if (!studId.isEmpty()&& !term.isEmpty()){
-               
-               Object[] tblRow = {studId,studName,sem,term,c1,g1};
-               
-               dataRows.add(tblRow);
-               model.addRow(tblRow);
-               
-            txtId.setText("");
-            txtName.setText("");
-            txtSem.setText("");
-            txtC1.setText("");
-            txtG1.setText("");
+            addStudent();
             
-           }else {
-               JOptionPane.showMessageDialog(this, "Please fill in all required fields.");
-           }
+       } else if (e.getSource()==btnDelete){
+            removeRow ();
+            
+        
+       } else if (e.getSource() == btnUpdate) {
+            updateRow();
+        
+       } else if (e.getSource() == btnClear) {
+            clearFields();
+        
+       } else if (e.getSource()==btnEdit){
+            loadSelectedRowData();
+  
+      }  else if (e.getSource()==btnMenu){
+            new Menu().setVisible(true);
+            dispose();
        }
+    }
+     // Method to add a student
+     private void addStudent() {
+         
+        // Collecting input values
+        String studId = txtId.getText().trim();
+        String studName = txtName.getText().trim();
+        String sem = txtSem.getText().trim();
+        String term = cmbTerm.getSelectedItem().toString();
+        String c1 = txtC1.getText().trim();
+        String g1 = txtG1.getText().trim();
+        String c2 = txtC2.getText().trim();
+        String g2 = txtG2.getText().trim();
+        String c3 = txtC3.getText().trim();
+        String g3 = txtG3.getText().trim();
+        String c4 = txtC4.getText().trim();
+        String g4 = txtG4.getText().trim();
+        String c5 = txtC5.getText().trim();
+        String g5 = txtG5.getText().trim();
+        String c6 = txtC6.getText().trim();
+        String g6 = txtG6.getText().trim();
+        String c7 = txtC7.getText().trim();
+        String g7 = txtG7.getText().trim();
+        String c8 = txtC8.getText().trim();
+        String g8 = txtG8.getText().trim();
            
-        if (e.getSource()==btnDelete){
+             
+        if (!studId.isEmpty() && !studName.isEmpty() && !sem.isEmpty() && !term.isEmpty() ){
+                  // && !g1.isEmpty() && !g2.isEmpty() && !g3.isEmpty() && !g4.isEmpty()
+                  // && !g5.isEmpty() && !g6.isEmpty() && !g7.isEmpty() && !g8.isEmpty()) {
+
+              // Adding data to the table and model
+            Object[] tblRow = {
+                  studId, studName, sem, term,
+                  c1, g1, c2, g2, c3, g3, c4, g4,
+                  c5, g5, c6, g6, c7, g7, c8, g8 };
+
+              dataRows.add(tblRow); // Save row to ArrayList for data persistence
+              model.addRow(tblRow); // Display row in the table
+
+             
+          clearFields(); // Clearing input fields after successful addition
+          JOptionPane.showMessageDialog(this, "Grades added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+              
+          } else {
+              JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+          }
+     } 
+     //Methods for removing rows
+     private void removeRow (){
+          
+         int selectRow = studList.getSelectedRow();
+         if (selectRow !=-1) {
             
-            int selectRow = studList.getSelectedRow();
-            
-            if (selectRow !=-1) {
+            int confirmation = JOptionPane.showConfirmDialog(this, 
+            "Are you sure you want to delete the selected rows?", 
+            "Delete Confirmation", JOptionPane.YES_NO_OPTION);
+                
+                
+            if (confirmation == JOptionPane.YES_OPTION){
                 dataRows.remove(selectRow);
                 model.removeRow(selectRow);
-                
             }
+                
+         } else {
+           JOptionPane.showMessageDialog(this, "Please Select a Row to be Deleted.", "Input Error", JOptionPane.ERROR_MESSAGE);
+          
+           }
+     }
+     
+     //For Clearing all fields 
+     private void clearFields() {
+    
+            txtId.setText("");
+            txtName.setText("");
+            txtSem.setText("");
+            cmbTerm.setSelectedIndex(0);
+            txtG1.setText("");
+            txtG2.setText("");
+            txtG3.setText("");
+            txtG4.setText("");
+            txtG5.setText("");
+            txtG6.setText("");
+            txtG7.setText("");
+            txtG8.setText("");
+            txtC1.setText("");
+            txtC2.setText("");
+            txtC3.setText("");
+            txtC4.setText("");
+            txtC5.setText("");
+            txtC6.setText("");
+            txtC7.setText("");
+            txtC8.setText("");
+     
+     }
+     
+     private void updateRow() {
+        if (editingRowIndex != -1) { // Ensure a row is selected for editing
+            
+            // Get updated data from text fields
+            String studId = txtId.getText().trim();
+            String studName = txtName.getText().trim();
+            String sem = txtSem.getText().trim();
+            String term = cmbTerm.getSelectedItem().toString();
+            String c1 = txtC1.getText().trim();
+            String g1 = txtG1.getText().trim();
+            String c2 = txtC2.getText().trim();
+            String g2 = txtG2.getText().trim();
+            String c3 = txtC3.getText().trim();
+            String g3 = txtG3.getText().trim();
+            String c4 = txtC4.getText().trim();
+            String g4 = txtG4.getText().trim();
+            String c5 = txtC5.getText().trim();
+            String g5 = txtG5.getText().trim();
+            String c6 = txtC6.getText().trim();
+            String g6 = txtG6.getText().trim();
+            String c7 = txtC7.getText().trim();
+            String g7 = txtG7.getText().trim();
+            String c8 = txtC8.getText().trim();
+            String g8 = txtG8.getText().trim();
         
-        }
-           
-    if (e.getSource() == btnUpdate) {
-        int selectRow = studList.getSelectedRow();
+        
 
-        if (selectRow != -1) {
-            // Get updated values from the text fields
-            String updatedStudId = txtId.getText();
-            String updatedStudName = txtName.getText();
-            String updatedSem = txtSem.getText();
-            String updatedTerm = cmbTerm.getSelectedItem().toString();
-            String updatedC1 = txtC1.getText();
-            String updatedG1 = txtG1.getText();
+        // Validate inputs
+        if (!studId.isEmpty() && !studName.isEmpty() && !sem.isEmpty() && !term.isEmpty()) {
+            
+            int confirmation = JOptionPane.showConfirmDialog(this, 
+            "Are you sure you want to update the selected rows?", 
+            "Update Confirmation", JOptionPane.YES_NO_OPTION);
+                
+                
+            if (confirmation == JOptionPane.YES_OPTION){
+            // Update data in the table model
+            model.setValueAt(studId, editingRowIndex, 0);
+            model.setValueAt(studName, editingRowIndex, 1);
+            model.setValueAt(sem, editingRowIndex, 2);
+            model.setValueAt(term, editingRowIndex, 3);
+            model.setValueAt(c1, editingRowIndex, 4);
+            model.setValueAt(g1, editingRowIndex, 5);
+            model.setValueAt(c2, editingRowIndex, 6);
+            model.setValueAt(g2, editingRowIndex, 7);
+            model.setValueAt(c3, editingRowIndex, 8);
+            model.setValueAt(g3, editingRowIndex, 9);
+            model.setValueAt(c4, editingRowIndex, 10);
+            model.setValueAt(g4, editingRowIndex, 11);
+            model.setValueAt(c5, editingRowIndex, 12);
+            model.setValueAt(g5, editingRowIndex, 13);
+            model.setValueAt(c6, editingRowIndex, 14);
+            model.setValueAt(g6, editingRowIndex, 15);
+            model.setValueAt(c7, editingRowIndex, 16);
+            model.setValueAt(g7, editingRowIndex, 17);
+            model.setValueAt(c8, editingRowIndex, 18);
+            model.setValueAt(g8, editingRowIndex, 19);
+            
+            
 
-            // Update the table model with the new values
-            model.setValueAt(updatedStudId, selectRow, 0);
-            model.setValueAt(updatedStudName, selectRow, 1);
-            model.setValueAt(updatedSem, selectRow, 2);
-            model.setValueAt(updatedTerm, selectRow, 3);
-            model.setValueAt(updatedC1, selectRow, 4);
-            model.setValueAt(updatedG1, selectRow, 5);
-
-            // Clear the text fields after updating
-            txtId.setText("");
-            txtName.setText("");
-            txtSem.setText("");
-            txtC1.setText("");
-            txtG1.setText("");
-
-            JOptionPane.showMessageDialog(this, "Record updated successfully.");
+            JOptionPane.showMessageDialog(this, "Row updated successfully.", "Update Successful", JOptionPane.INFORMATION_MESSAGE);
+            
+            clearFields();
+            editingRowIndex = -1; // Reset the editing row index
+            }  
         } else {
-            JOptionPane.showMessageDialog(this, "Please select a row to update.");
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-    
-    if (e.getSource() == btnClear) {
-            txtId.setText("");
-            txtName.setText("");
-            txtSem.setText("");
-            txtC1.setText("");
-            txtG1.setText("");
-    }
-    
+    } else {
+        JOptionPane.showMessageDialog(this, "No row selected for editing.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
+     
+    private void loadSelectedRowData() {
+    int selectedRow = studList.getSelectedRow();
+    
+        if (selectedRow != -1) {
+            editingRowIndex = selectedRow;
+            // Populate the text fields with the data from the selected row
+            txtId.setText(model.getValueAt(selectedRow, 0).toString());
+            txtName.setText(model.getValueAt(selectedRow, 1).toString());
+            txtSem.setText(model.getValueAt(selectedRow, 2).toString());
+            cmbTerm.setSelectedItem(model.getValueAt(selectedRow, 3).toString());
+            txtC1.setText(model.getValueAt(selectedRow, 4).toString());
+            txtG1.setText(model.getValueAt(selectedRow, 5).toString());
+            txtC2.setText(model.getValueAt(selectedRow, 6).toString());
+            txtG2.setText(model.getValueAt(selectedRow, 7).toString());
+            txtC3.setText(model.getValueAt(selectedRow, 8).toString());
+            txtG3.setText(model.getValueAt(selectedRow, 9).toString());
+            txtC4.setText(model.getValueAt(selectedRow, 10).toString());
+            txtG4.setText(model.getValueAt(selectedRow, 11).toString());
+            txtC5.setText(model.getValueAt(selectedRow, 12).toString());
+            txtG5.setText(model.getValueAt(selectedRow, 13).toString());
+            txtC6.setText(model.getValueAt(selectedRow, 14).toString());
+            txtG6.setText(model.getValueAt(selectedRow, 15).toString());
+            txtC7.setText(model.getValueAt(selectedRow, 16).toString());
+            txtG7.setText(model.getValueAt(selectedRow, 17).toString());
+            txtC8.setText(model.getValueAt(selectedRow, 18).toString());
+            txtG8.setText(model.getValueAt(selectedRow, 19).toString());
+        
+        }else{
+             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+          }
+        
+        }
+    }
+

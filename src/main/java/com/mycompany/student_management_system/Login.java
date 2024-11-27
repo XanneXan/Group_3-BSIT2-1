@@ -80,9 +80,13 @@ import javax.swing.JTextField;
             new register ().setVisible (true);
             dispose();
             
-        }else if (e.getSource()== btnlogin){
+        }if (e.getSource()== btnlogin){
+            new Menu().setVisible(true);
+            dispose();
+            
             String txt=txtInput.getText().trim();
             String field=new String(passField.getPassword()).trim();
+            
             if(txt.isEmpty()&& field.isEmpty()){
                 JOptionPane.showMessageDialog(this, "PLEASE INPUT A PASSWORD AND NAME", "ERROR", JOptionPane.ERROR_MESSAGE);
             }else if(field.isEmpty()){
@@ -93,6 +97,6 @@ import javax.swing.JTextField;
                 JOptionPane.showMessageDialog(this, "INCORRECT NAME OR PASSWORD", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
                 
+           }
+        }
     }
-    }
-     }
