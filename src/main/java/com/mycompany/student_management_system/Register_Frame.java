@@ -13,14 +13,14 @@ import javax.swing.*;
  *
  * @author Admin
  */
-public class register extends JFrame implements ActionListener {
+public class Register_Frame extends JFrame implements ActionListener {
     private JLabel lblpassword, lblpass, lblrpass, lbltitle, lblname;
     private JTextField txtInput;
     private JPasswordField passField,rpassField;
     private JButton btnlogin, btnconfirm;
     
             
-    register (){
+    Register_Frame (){
      
         setSize(500, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -108,7 +108,7 @@ public class register extends JFrame implements ActionListener {
             
             }
         }else if(e.getSource()==btnlogin){
-            new Login();
+            new Login_Frame();
         }       
       }
     }

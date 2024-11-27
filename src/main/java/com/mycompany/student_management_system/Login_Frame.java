@@ -20,14 +20,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-     public class Login extends JFrame implements ActionListener {
+     public class Login_Frame extends JFrame implements ActionListener {
          private JTextField txtInput;
          private JPasswordField passField;
          private JLabel lblname,lbl, passJLabel;
          private JButton btnlogin, btnregister;
          
          
-    Login (){
+    Login_Frame (){
       
         setSize(500, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,11 +77,11 @@ import javax.swing.JTextField;
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()== btnregister){
-            new register ().setVisible (true);
+            new Register_Frame ().setVisible (true);
             dispose();
             
         }if (e.getSource()== btnlogin){
-            new Menu().setVisible(true);
+            new Menu_Frame().setVisible(true);
             dispose();
             
             String txt=txtInput.getText().trim();
