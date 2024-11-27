@@ -410,7 +410,7 @@ public class Course_Class extends JFrame implements ActionListener{
 
             
         }
-
+// buttons' functionalities
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource()== searchbtn){
