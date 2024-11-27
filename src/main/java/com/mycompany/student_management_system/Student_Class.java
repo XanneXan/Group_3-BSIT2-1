@@ -490,7 +490,7 @@ public class Student_Class extends JFrame implements ActionListener {
         
         txtSearch.setText("");
         studList.clearSelection();
-
+        
         JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
     }
      
