@@ -28,6 +28,7 @@ public class Student_Class extends JFrame implements ActionListener {
     private JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
+    private int editingRowIndex = -1;//
     
     // Original format for column in the table
     private int[] originalColumnFormat;
@@ -35,6 +36,8 @@ public class Student_Class extends JFrame implements ActionListener {
     private ArrayList<Object[]> storeStudent = new ArrayList<>();
     
     String[] semester = {"1", "2"};
+    
+    //tentative list of courses, will be inputed as proxy
     String[] courses = { "N/A or Vacant", "Introduction to Computing", "Computer Programming 1",
                         "Computer Programming 2", "Data Structures and Algorithm",
                         "Structured Programming", "Object-Oriented Programming",
@@ -188,7 +191,7 @@ public class Student_Class extends JFrame implements ActionListener {
         //When table refreshed it will revert the table or column section format to original
         originalColumnFormat = new int[columnList.length];
         for (int i = 0; i < columnList.length; i++) {
-            originalColumnFormat[i] = studList.getColumnModel().getColumn(i).getPreferredWidth();
+           originalColumnFormat[i] = studList.getColumnModel().getColumn(i).getPreferredWidth();
         }
 
         //Searching 
@@ -286,48 +289,50 @@ public class Student_Class extends JFrame implements ActionListener {
         comboBoxLayoutBox.setBounds(x, y, 150, 20);
         comboBoxLayoutBox.setSelectedIndex(0);
       
-        //selected item will be excluded
-        comboBoxLayoutBox.addActionListener((ActionEvent e) -> {
-            ArrayList<String> selectedCourses = getCourse();
-            for (JComboBox<String> combo : getComboBoxes()) {
-            combo.setEnabled(true);
-            combo.removeAll();//this method results in some form of shifting of the comboBox layout, but still usable
-            for (String course : courses) {
-                boolean isSelected = selectedCourses.contains(course);
-                if (isSelected && !course.equals(combo.getSelectedItem())) {
-                    combo.removeItem(course); 
+        //selected item in the cmbBoxes will be excluded
+        comboBoxLayoutBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<String> selectedCourses = getCourse();
+                for (JComboBox<String> combo : getComboBoxes()) {
+                    combo.setEnabled(true);
+                    combo.removeAll();// This method results in some form of shifting of the comboBox layout, but still usable
+
+                    for (String course : courses) {
+                        boolean isSelected = selectedCourses.contains(course);
+                        if (isSelected && !course.equals(combo.getSelectedItem())) {
+                            combo.removeItem(course);
+                        }
+                    }
                 }
             }
-        }
         });
       
         add(comboBoxLayoutBox);
         return comboBoxLayoutBox;
     }
-     
-    //responsible for the user to click or select a specific row or column in the table
-    private void clickOnTable() {
-        studList.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int selectedRow = studList.getSelectedRow();
-                if (selectedRow != -1) {
-                    updateFields(selectedRow);
-                }
-            }
-        });
-    } 
     
-    //when clickOnTable is used, it will use this methpd to update the fields based on the selected row
-    private void updateFields(int selectedRow) {
-        txtId.setText((String) model.getValueAt(selectedRow, 0));
-        txtName.setText((String) model.getValueAt(selectedRow, 1));
-        cmbSem.setSelectedItem((String) model.getValueAt(selectedRow, 2));
-
-        JComboBox<String>[] courseBoxes = getComboBoxes();
-        for (int i = 0; i < courseBoxes.length; i++) {
-            courseBoxes[i].setSelectedItem((String) model.getValueAt(selectedRow, 3 + i * 2));
-        }
+    //this method will populate the text fields and cmBoxes with the data from the selected row
+    private void updateFields() {
+        int selectedRow = studList.getSelectedRow();
+        if (selectedRow != -1) {
+            editingRowIndex = selectedRow;
+    
+            txtId.setText(model.getValueAt(selectedRow, 0).toString());
+            txtName.setText(model.getValueAt(selectedRow, 1).toString());
+            cmbSem.setSelectedItem(model.getValueAt(selectedRow, 2).toString());
+            cmbC1.setSelectedItem(model.getValueAt(selectedRow, 3).toString());
+            cmbC2.setSelectedItem(model.getValueAt(selectedRow, 5).toString());
+            cmbC3.setSelectedItem(model.getValueAt(selectedRow, 7).toString());
+            cmbC4.setSelectedItem(model.getValueAt(selectedRow, 9).toString());
+            cmbC5.setSelectedItem(model.getValueAt(selectedRow, 11).toString());
+            cmbC6.setSelectedItem(model.getValueAt(selectedRow, 13).toString());
+            cmbC7.setSelectedItem(model.getValueAt(selectedRow, 15).toString());
+            cmbC8.setSelectedItem(model.getValueAt(selectedRow, 17).toString());
+            
+        }else{
+             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+          }
     }
     
     //method to add student in the table
@@ -336,31 +341,34 @@ public class Student_Class extends JFrame implements ActionListener {
         String ID = txtId.getText().trim();
         String studName = txtName.getText().trim();
         String sem = (String) cmbSem.getSelectedItem();
+        String cmb1 = (String) cmbC1.getSelectedItem();
+        String cmb2 = (String) cmbC2.getSelectedItem();
+        String cmb3 = (String) cmbC3.getSelectedItem();
+        String cmb4 = (String) cmbC4.getSelectedItem();
+        String cmb5 = (String) cmbC5.getSelectedItem();
+        String cmb6 = (String) cmbC6.getSelectedItem();
+        String cmb7 = (String) cmbC7.getSelectedItem();
+        String cmb8 = (String) cmbC8.getSelectedItem();
+        
         ArrayList<String> selectedCourses = getCourse();
         clearFields();
         
         int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to add student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
         if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
-            //instead of array use Object, to manipulate different data types
-            Object[] rowData = new Object[columnList.length];
-            rowData[0] = ID;
-            rowData[1] = studName;
-            rowData[2] = sem;
-            int course = 3;
-            for (int i = 0; i < selectedCourses.size() && i < 8; i++) {
-                rowData[course++] = selectedCourses.get(i);
-                rowData[course++] = grade;
-            } while (course < columnList.length - 1) {
-                rowData[course++] = "N/A or Vacant";
-                rowData[course++] = "N/A";
-            }
-            rowData[columnList.length - 1] = grade;
-            storeStudent.add(rowData);
+
+            Object[] rowData = {ID, studName, sem, 
+                cmb1, grade, cmb2, grade, cmb3, grade, cmb4, grade, 
+                cmb5, grade, cmb6, grade, cmb7, grade, cmb8, grade, grade};
+ 
+            storeStudent.add(rowData);//save to arrayList
             model.addRow(rowData);
 
             JOptionPane.showMessageDialog(this, "Student Added.", "Succesful.", JOptionPane.INFORMATION_MESSAGE);
-        } else {
+            
+        }else if(confirmation == JOptionPane.NO_OPTION){
+           //it will not show anything
+        }else {
             JOptionPane.showMessageDialog(this, "Please fill in all required information.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -369,38 +377,52 @@ public class Student_Class extends JFrame implements ActionListener {
     private void updateStudent() {
         int selectedRow = studList.getSelectedRow();
         if (selectedRow != -1) {
+            String grade = "N/A";
             String ID = txtId.getText().trim();
             String studName = txtName.getText().trim();
             String sem = (String) cmbSem.getSelectedItem();
+            String cmb1 = (String) cmbC1.getSelectedItem();
+            String cmb2 = (String) cmbC2.getSelectedItem();
+            String cmb3 = (String) cmbC3.getSelectedItem();
+            String cmb4 = (String) cmbC4.getSelectedItem();
+            String cmb5 = (String) cmbC5.getSelectedItem();
+            String cmb6 = (String) cmbC6.getSelectedItem();
+            String cmb7 = (String) cmbC7.getSelectedItem();
+            String cmb8 = (String) cmbC8.getSelectedItem();
+            
             ArrayList<String> selectedCourses = getCourse();
             clearFields();
             
             int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to update the selected student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
             if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
-                //instead of array use Object, to manipulate different data types
-                Object[] updatedRow = new Object[columnList.length];
-                updatedRow[0] = ID;
-                updatedRow[1] = studName;
-                updatedRow[2] = sem;
-                int course = 3;
-                for (int i = 0; i < selectedCourses.size() && i < 8; i++) { 
-                    updatedRow[course++] = selectedCourses.get(i);
-                    updatedRow[course++] = "N/A";
-                } while (course < columnList.length - 1) { 
-                    updatedRow[course++] = "N/A or Vacant";
-                    updatedRow[course++] = "N/A";
-                }
-                updatedRow[columnList.length - 1] = "N/A"; 
+                
+            model.setValueAt(ID, editingRowIndex, 0);
+            model.setValueAt(studName, editingRowIndex, 1);
+            model.setValueAt(sem, editingRowIndex, 2);
+            model.setValueAt(cmb1, editingRowIndex, 3);
+            model.setValueAt(grade, editingRowIndex, 4);
+            model.setValueAt(cmb2, editingRowIndex, 5);
+            model.setValueAt(grade, editingRowIndex, 6);
+            model.setValueAt(cmb3, editingRowIndex, 7);
+            model.setValueAt(grade, editingRowIndex, 8);
+            model.setValueAt(cmb4, editingRowIndex, 9);
+            model.setValueAt(grade, editingRowIndex, 10);
+            model.setValueAt(cmb5, editingRowIndex, 11);
+            model.setValueAt(grade, editingRowIndex, 12);
+            model.setValueAt(cmb6, editingRowIndex, 13);
+            model.setValueAt(grade, editingRowIndex, 14);
+            model.setValueAt(cmb7, editingRowIndex, 15);
+            model.setValueAt(grade, editingRowIndex, 16);
+            model.setValueAt(cmb8, editingRowIndex, 17);
+            model.setValueAt(grade, editingRowIndex, 18);
+            model.setValueAt(grade, editingRowIndex, 19);
 
-                storeStudent.set(selectedRow, updatedRow);
-
-                for (int i = 0; i < columnList.length; i++) {
-                    model.setValueAt(updatedRow[i], selectedRow, i);
-                }
-
-                JOptionPane.showMessageDialog(this, "Student updated successfully.", "Successful", JOptionPane.INFORMATION_MESSAGE);
-            } else {
+            JOptionPane.showMessageDialog(this, "Student updated successfully.", "Successful", JOptionPane.INFORMATION_MESSAGE);
+                
+            }else if(confirmation == JOptionPane.NO_OPTION){
+             //it will not show anything
+            }else {
                 JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
@@ -483,7 +505,7 @@ public class Student_Class extends JFrame implements ActionListener {
             } else if (e.getSource() == btnClear) {
                 clearFields();
             } else if (e.getSource() == btnEditRow) {  
-                clickOnTable();    
+                updateFields();    
             } else if (e.getSource() == btnSearch) {
                 searchStudent();
             } else if (e.getSource() == btnRefresh) {
