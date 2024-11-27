@@ -17,6 +17,7 @@ public class register extends JFrame implements ActionListener {
     private JLabel lblpassword, lblpass, lblrpass, lbltitle, lblname;
     private JTextField txtInput;
     private JPasswordField passField,rpassField;
+    private JButton btnlogin, btnconfirm;
     
             
     register (){
@@ -63,23 +64,52 @@ public class register extends JFrame implements ActionListener {
         rpassField.setBounds(165, 320, 265, 50);
         add(rpassField);
         
-        JButton btnlogin = new JButton("LOG IN");
+        //Buttons
+        
+        btnlogin = new JButton("LOG IN");
         btnlogin.setBounds(50,400,120,60);
         btnlogin.setFont(new Font("Arial Black",Font.BOLD,13));
         add(btnlogin);
         
-       JButton btnconfirm = new JButton("CONFIRM");
+        btnconfirm = new JButton("CONFIRM");
         btnconfirm.setBounds(310,400,120,60);
         btnconfirm.setFont(new Font("Arial Black",Font.BOLD,13));
         add(btnconfirm);
-       
+        
+        
+        btnlogin.addActionListener(this);
+        btnconfirm.addActionListener(this);
         
     }
 
+    //Button function
+    
     @Override
     public void actionPerformed(ActionEvent e) {
-       
-    
-    }
-}
+        if (e.getSource()==btnconfirm) { //if the confirm button was clicked
+            String txt=txtInput.getText().trim(); //get the text input from the txtInput field
+            String field=new String(passField.getPassword()).trim(); //get the password entered in the passField
+            String rfield=new String(rpassField.getPassword()).trim(); //get the password entered in the rpassField
             
+            if(txt.isEmpty()&& field.isEmpty()&& rfield.isEmpty()){
+                JOptionPane.showMessageDialog(this, "PLEASE FILL ALL FIELD", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }else if(field.isEmpty()){
+                JOptionPane.showMessageDialog(this, "PLEASE INPUT A PASSWORD", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }else if(txt.isEmpty()) {
+                 JOptionPane.showMessageDialog(this, "PLEASE INPUT A NAME", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }else if(!field.equals(rfield)){
+                JOptionPane.showMessageDialog(this, "PASSWORD DO NOT MATCH", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(this, "SUCCESSFULLY REGISTERED");
+                txtInput.setText("");
+                passField.setText("");
+                rpassField.setText("");
+                
+            
+            }
+        }else if(e.getSource()==btnlogin){
+            new Login();
+        }       
+      }
+    }
+    
