@@ -4,6 +4,8 @@
  */
 package com.mycompany.student_management_system;
 
+import javax.security.auth.login.LoginContext;
+
 /**
  *
  * @author Sebastian Rafael
@@ -11,7 +13,7 @@ package com.mycompany.student_management_system;
 public class Student_Management_System {
     public static void main(String[] args) {
 
-        Grade_Class run = new  Grade_Class();
+        Login_Frame run = new  Login_Frame();
         run.setVisible (true);
         
     }
