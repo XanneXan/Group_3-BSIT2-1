@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.student_management_system;
 
 import java.awt.Color;
@@ -13,6 +10,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -21,13 +23,13 @@ import java.awt.event.ActionListener;
 
 public class Student_Class extends JFrame implements ActionListener {
     
-    private JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch;
-    private JTextField txtName, txtId, txtSearch;
-    private JComboBox<String> cmbSem, cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8;
-    private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu;
-    private JTable studList;
-    private JScrollPane pane;
-    private DefaultTableModel model;
+    private final JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch;
+    private final JTextField txtName, txtId, txtSearch;
+    private final JComboBox<String> cmbSem, cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8;
+    private final JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu;
+    private final JTable studList;
+    private final JScrollPane pane;
+    private final DefaultTableModel model;
     private int editingRowIndex = -1;//
     
     // Original format for column in the table
@@ -38,7 +40,7 @@ public class Student_Class extends JFrame implements ActionListener {
     String[] semester = {"1", "2"};
     
     //tentative list of courses, will be inputed as proxy
-    String[] courses = { "N/A or Vacant", "Introduction to Computing", "Computer Programming 1",
+    String[] courses = { "Vacant", "Introduction to Computing", "Computer Programming 1",
                         "Computer Programming 2", "Data Structures and Algorithm",
                         "Structured Programming", "Object-Oriented Programming",
                         "Networking and Data Communications", "Web Development"};
@@ -237,6 +239,13 @@ public class Student_Class extends JFrame implements ActionListener {
         btnClear.addActionListener(this);
         btnSearch.addActionListener(this);
         btnRefresh.addActionListener(this);
+        btnMenu.addActionListener(this);
+        
+        //add action listener for textfield
+        txtId.addActionListener(this);
+        
+        //call the method to establish mysql
+        connectionMySql();
 
     }
     
@@ -276,7 +285,7 @@ public class Student_Class extends JFrame implements ActionListener {
         ArrayList<String> selectedCourses = new ArrayList<>();
         for (JComboBox<String> cmb : getComboBoxes()) {
             String selected = (String) cmb.getSelectedItem();
-            if (selected != null && !selected.isEmpty() && !selected.equals("N/A or Vacant")) {
+            if (selected != null && !selected.isEmpty() && !selected.equals("Vacant")) {
                 selectedCourses.add(selected);
             }
         }
@@ -353,24 +362,63 @@ public class Student_Class extends JFrame implements ActionListener {
         ArrayList<String> selectedCourses = getCourse();
         clearFieldsAndCmBoxes();
         
+        // Validqtion, 6 digits)
+        if (!ID.matches("\\d{6}")) {
+            JOptionPane.showMessageDialog(this, "Invalid ID. Please enter a number with up to 6 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+            return; 
+        }
+        
         int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to add student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-        if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
-
-            Object[] rowData = {ID, studName, sem, 
-                cmb1, grade, cmb2, grade, cmb3, grade, cmb4, grade, 
-                cmb5, grade, cmb6, grade, cmb7, grade, cmb8, grade, grade};
- 
-            storeStudent.add(rowData);//save to arrayList
-            model.addRow(rowData);
-
-            JOptionPane.showMessageDialog(this, "Student Added.", "Succesful.", JOptionPane.INFORMATION_MESSAGE);
+        if (ID.isEmpty() || studName.isEmpty() || selectedCourses.isEmpty()) {
+             JOptionPane.showMessageDialog(this, "Please fill in all required information.", "Error", JOptionPane.ERROR_MESSAGE);
             
-        }else if(confirmation == JOptionPane.NO_OPTION){
-           //it will not show anything
-        }else {
-            JOptionPane.showMessageDialog(this, "Please fill in all required information.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        }else if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION){
+             try {
+               // Check for duplicate ID
+               pst = con.prepareStatement("SELECT COUNT(*) FROM student_table WHERE ID = ?");
+               pst.setString(1, ID);
+               ResultSet rs = pst.executeQuery();
+               if (rs.next() && rs.getInt(1) > 0) {
+                   JOptionPane.showMessageDialog(this, "ID already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+               }
+                    pst = con.prepareStatement("INSERT INTO student_table (ID, Name, Semester, `Course 1`, `Course 2`,  `Course 3`,  `Course 4`,"
+                            + " `Course 5`,  `Course 6`,  `Course 7`,  `Course 8`) "
+                            + "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+                    
+                    pst.setString(1, ID);
+                    pst.setString(2, studName);
+                    pst.setString(3, sem);
+                    pst.setString(4, cmb1);
+                    pst.setString(5, cmb2);
+                    pst.setString(6, cmb3);
+                    pst.setString(7, cmb4);
+                    pst.setString(8, cmb5);
+                    pst.setString(9, cmb6);
+                    pst.setString(10, cmb7);
+                    pst.setString(11, cmb8);
+
+                    int k = pst.executeUpdate();
+                    
+                    if (k == 1) {
+                        JOptionPane.showMessageDialog(this, "Student added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                        // Add the data to the table model
+                        Object[] rowData = {ID, studName, sem, cmb1, grade, cmb2, grade, cmb3, grade, cmb4, grade, 
+                                            cmb5, grade, cmb6, grade, cmb7, grade, cmb8, grade, grade};
+                        
+                        storeStudent.add(rowData); // Save to ArrayList
+                        model.addRow(rowData);
+                    }
+                    
+               } catch(Exception ex){
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+               }
+             
+           }else {
+             JOptionPane.showMessageDialog(this, "Fill Information.", "Notification", JOptionPane.INFORMATION_MESSAGE);
+        } 
     }
     
     //methpd for updating student info
@@ -393,35 +441,41 @@ public class Student_Class extends JFrame implements ActionListener {
             ArrayList<String> selectedCourses = getCourse();
             clearFieldsAndCmBoxes();
             
+            // Validqtion, 6 digits)
+            if (!ID.matches("\\d{6}")) {
+                JOptionPane.showMessageDialog(this, "Invalid ID. Please enter a number with up to 6 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; 
+            }
+            
             int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to update the selected student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
             if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
                 
-            model.setValueAt(ID, editingRowIndex, 0);
-            model.setValueAt(studName, editingRowIndex, 1);
-            model.setValueAt(sem, editingRowIndex, 2);
-            model.setValueAt(cmb1, editingRowIndex, 3);
-            model.setValueAt(grade, editingRowIndex, 4);
-            model.setValueAt(cmb2, editingRowIndex, 5);
-            model.setValueAt(grade, editingRowIndex, 6);
-            model.setValueAt(cmb3, editingRowIndex, 7);
-            model.setValueAt(grade, editingRowIndex, 8);
-            model.setValueAt(cmb4, editingRowIndex, 9);
-            model.setValueAt(grade, editingRowIndex, 10);
-            model.setValueAt(cmb5, editingRowIndex, 11);
-            model.setValueAt(grade, editingRowIndex, 12);
-            model.setValueAt(cmb6, editingRowIndex, 13);
-            model.setValueAt(grade, editingRowIndex, 14);
-            model.setValueAt(cmb7, editingRowIndex, 15);
-            model.setValueAt(grade, editingRowIndex, 16);
-            model.setValueAt(cmb8, editingRowIndex, 17);
-            model.setValueAt(grade, editingRowIndex, 18);
-            model.setValueAt(grade, editingRowIndex, 19);
+                model.setValueAt(ID, editingRowIndex, 0);
+                model.setValueAt(studName, editingRowIndex, 1);
+                model.setValueAt(sem, editingRowIndex, 2);
+                model.setValueAt(cmb1, editingRowIndex, 3);
+                model.setValueAt(grade, editingRowIndex, 4);
+                model.setValueAt(cmb2, editingRowIndex, 5);
+                model.setValueAt(grade, editingRowIndex, 6);
+                model.setValueAt(cmb3, editingRowIndex, 7);
+                model.setValueAt(grade, editingRowIndex, 8);
+                model.setValueAt(cmb4, editingRowIndex, 9);
+                model.setValueAt(grade, editingRowIndex, 10);
+                model.setValueAt(cmb5, editingRowIndex, 11);
+                model.setValueAt(grade, editingRowIndex, 12);
+                model.setValueAt(cmb6, editingRowIndex, 13);
+                model.setValueAt(grade, editingRowIndex, 14);
+                model.setValueAt(cmb7, editingRowIndex, 15);
+                model.setValueAt(grade, editingRowIndex, 16);
+                model.setValueAt(cmb8, editingRowIndex, 17);
+                model.setValueAt(grade, editingRowIndex, 18);
+                model.setValueAt(grade, editingRowIndex, 19);
 
-            JOptionPane.showMessageDialog(this, "Student updated successfully.", "Successful", JOptionPane.INFORMATION_MESSAGE);
-                
+                JOptionPane.showMessageDialog(this, "Student updated successfully.", "Successful", JOptionPane.INFORMATION_MESSAGE);
+
             }else if(confirmation == JOptionPane.NO_OPTION){
-             //it will not show anything
+                JOptionPane.showMessageDialog(this, "Fill Information.", "Notification", JOptionPane.INFORMATION_MESSAGE);
             }else {
                 JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -493,6 +547,23 @@ public class Student_Class extends JFrame implements ActionListener {
         
         JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
     }
+    
+    PreparedStatement pst;
+    Connection con;
+    
+    public void connectionMySql(){
+        
+        String url = "jdbc:mysql://127.0.0.1:3306/students";
+        String username = "root";
+        String password = "mysqlpasswordg3";
+        
+        try{
+            con = DriverManager.getConnection(url, username, password);
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
      
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -512,13 +583,12 @@ public class Student_Class extends JFrame implements ActionListener {
             } else if (e.getSource() == btnRefresh) {
                 refreshTable();
             } else if (e.getSource() == btnMenu) {
-                dispose();//proxy
+                new Menu_Frame().setVisible(true);
+                dispose();
             }
                 
         } catch (Exception e1) {
             JOptionPane.showMessageDialog(this, "There is something wrong.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
 }
-
