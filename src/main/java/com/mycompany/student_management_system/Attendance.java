@@ -8,6 +8,12 @@ package com.mycompany.student_management_system;
  *
  * @author XANNE
  */
-public class Attendance {
-    
+import javax.swing.*;
+public class Attendance extends JFrame{
+    Attendance(){
+        setExtendedState(MAXIMIZED_BOTH);     
+        setLayout(null);
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 }

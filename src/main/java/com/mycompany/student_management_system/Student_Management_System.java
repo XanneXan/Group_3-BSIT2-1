@@ -13,6 +13,11 @@ public class Student_Management_System {
         
         Student_Class run = new Student_Class();
         run.setVisible(true);
+      
+
+        Menu run = new  Menu ();
+        run.setVisible (true);
+        
     }
   
 }
