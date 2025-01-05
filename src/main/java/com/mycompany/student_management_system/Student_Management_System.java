@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.student_management_system;
 
 /**
@@ -10,12 +7,8 @@ package com.mycompany.student_management_system;
  */
 public class Student_Management_System {
     public static void main(String[] args) {
-        
-        Student_Class run = new Student_Class();
-        run.setVisible(true);
-      
-
-        Menu run = new  Menu ();
+   
+        Menu_Frame run = new  Menu_Frame();
         run.setVisible (true);
         
     }
