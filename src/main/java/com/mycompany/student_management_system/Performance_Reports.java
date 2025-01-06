@@ -160,12 +160,16 @@ Performance_Reports (){
     
     
       btnMenu.addActionListener(this);
+      btnAttendance.addActionListener(this);
    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()==btnMenu){
             new Menu_Frame().setVisible(true);
+            dispose();
+        } else if (e.getSource()==  btnAttendance){
+            new Attendance_Sheet().setVisible(true);
             dispose();
         }
     }

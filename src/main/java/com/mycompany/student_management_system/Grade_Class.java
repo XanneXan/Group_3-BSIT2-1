@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.util.ArrayList;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class Grade_Class extends JFrame implements ActionListener{
     private JLabel lblTitle, lblName, lblId , lblSem, lblTerm, lblC1 , lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, 
@@ -40,8 +41,7 @@ public class Grade_Class extends JFrame implements ActionListener{
                                     "Mid", "Fin", "Course 8","Mid", "Fin", "Midterm Average ", "Final Average", "GWA"};
    
     private ArrayList<Object[]> dataRows = new ArrayList<>(); // Array list to store the data rows for the table
-    private String [] term = {"Midterm","Final"}; // Array for ComboBox options (Terms)
-    
+  
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
     private String pass = "mysqlpasswordg3"; 
@@ -318,6 +318,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     model = new DefaultTableModel(null,tblColumn );
     studList = new JTable (model);
     studList.getTableHeader().setReorderingAllowed(false);
+    studList.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
     studList.setDefaultEditor(Object.class, null);
     studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     
@@ -349,10 +350,15 @@ public class Grade_Class extends JFrame implements ActionListener{
    
     pane = new JScrollPane(studList);
     pane.setBounds(600, 150, 720, 450);
-    pane.getViewport().setBackground(Color.lightGray);
+    pane.getViewport().setBackground(Color.decode("#fdecec"));
     pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     add(pane);
+    
+    DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) studList.getTableHeader().getDefaultRenderer();
+    headerRenderer.setBackground(Color.PINK);
+    studList.getTableHeader().setDefaultRenderer(headerRenderer);
+
     
      
     //All Buttons
