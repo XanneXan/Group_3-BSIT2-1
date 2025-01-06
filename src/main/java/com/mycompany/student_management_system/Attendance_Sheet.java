@@ -14,10 +14,17 @@ import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -30,6 +37,24 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
     private JTable attendanceTable;
     private JButton backButton, searchButton, clearButton;
     private DefaultTableModel tableModel;
+    private ImageIcon logoIcon;
+    private JLabel titleLabel, logoLabel, searchLabel, attendanceLabel;
+    private Image scaledLogo;
+    JScrollPane scrollPane;
+    
+    private String[] columns = {"ID", "Name", "Course", "Presents", "Absents"};
+    private String url = "jdbc:mysql://localhost:3306/student_management_system";
+    private String user = "root"; 
+    private String pass = "mysqlpasswordg3"; 
+    
+    private Connection connectToDatabase() {
+        try {
+            return DriverManager.getConnection(url, user, pass);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database connection failed: ");
+            return null;
+        }
+    }
 
     public Attendance_Sheet() {
         setTitle("Student Management System");
@@ -39,54 +64,66 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         setResizable(false);
 
         // Title label
-        JLabel titleLabel = new JLabel("STUDENT MANAGEMENT");
-        titleLabel.setBounds(100, 30, 400, 40);
+        titleLabel = new JLabel("STUDENT MANAGEMENT SYSTEM");
+        titleLabel.setBounds(150, 30, 600, 40);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setForeground(Color.decode("#7d0504"));
         add(titleLabel);
-
-        // Add a logo
-        ImageIcon logoIcon = new ImageIcon("C:\\Users\\Jasmine\\Downloads\\logo.jpg");
-        Image scaledLogo = logoIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-        JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
-        logoLabel.setBounds(20, 20, 80, 80);
-        add(logoLabel);
-
-        // Search label
-        JLabel searchLabel = new JLabel("Search Student:");
-        searchLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        searchLabel.setBounds(850, 25, 150, 30);
-        add(searchLabel);
-
-        // Search field
-        searchField = new JTextField();
-        searchField.setBounds(970, 25, 230, 30);
-        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(searchField);
-
-        // Search button
-        searchButton = createButton("Search", 1210, 25, 100, 30);
-        add(searchButton);
-
-        // Clear button
-        clearButton = createButton("Clear", 1320, 25, 100, 30);
-        add(clearButton);
-
-        // Attendance sheet label
-        JLabel attendanceLabel = new JLabel("Attendance Sheet");
+        
+        attendanceLabel = new JLabel("Attendance Sheet");
         attendanceLabel.setFont(new Font("Arial", Font.BOLD, 18));
         attendanceLabel.setBounds(50, 100, 200, 30);
         add(attendanceLabel);
 
+        // Add a logo
+        logoIcon = new ImageIcon("C:\\Users\\Jasmine\\Downloads\\logo.jpg");
+        scaledLogo = logoIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+        logoLabel = new JLabel(new ImageIcon(scaledLogo));
+        logoLabel.setBounds(20, 20, 80, 80);
+        add(logoLabel);
+
+        // Search label
+        searchLabel = new JLabel("Search Student:");
+        searchLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        searchLabel.setBounds(750, 100, 150, 30);
+        add(searchLabel);
+
+        // Search field
+        searchField = new JTextField();
+        searchField.setBounds(870, 100, 230, 25);
+        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(searchField);
+        
+        searchButton = new JButton("Search");
+        searchButton.setBounds( 1110, 100, 70, 25);
+        searchButton.setForeground(Color.WHITE);
+        searchButton.setBackground(Color.decode("#7d0504"));
+        searchButton.setFont(new Font("Arial", Font.PLAIN, 11));
+        add(searchButton);
+        
+        clearButton = new JButton("Clear");
+        clearButton.setBounds( 1200, 100, 70, 25);
+        clearButton.setForeground(Color.WHITE);
+        clearButton.setBackground(Color.decode("#7d0504"));
+        clearButton.setFont(new Font("Arial", Font.PLAIN, 11));
+        add(clearButton);
+        
+        backButton = new JButton("Back");
+        backButton.setBounds( 1220, 660, 100, 30); 
+        backButton.setForeground(Color.WHITE);
+        backButton.setBackground(Color.decode("#7d0504"));
+        backButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        add(backButton);
+        
+        
         // Attendance table
-        String[] columns = {"ID", "Name", "Course", "Status"};
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(null, columns);
         attendanceTable = new JTable(tableModel);
         attendanceTable.setFont(new Font("Arial", Font.PLAIN, 14));
         attendanceTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
 
         // Customize table appearance
-        JScrollPane scrollPane = new JScrollPane(attendanceTable);
+        scrollPane = new JScrollPane(attendanceTable);
         scrollPane.setBounds(50, 140, 1250, 500);
         scrollPane.getViewport().setBackground(Color.decode("#fdecec"));
         add(scrollPane);
@@ -95,56 +132,49 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         headerRenderer.setBackground(Color.PINK);
         attendanceTable.getTableHeader().setDefaultRenderer(headerRenderer);
 
-        // Back button
-        backButton = createButton("Back", 1320, 660, 100, 30); 
-        add(backButton);
 
         // Add action listeners
         searchButton.addActionListener(this);
         clearButton.addActionListener(this);
         backButton.addActionListener(this);
-    }
-
-    private JButton createButton(String text, int x, int y, int width, int height) {
-        JButton button = new JButton(text);
-        button.setBounds(x, y, width, height);
-        button.setFont(new Font("Arial", Font.PLAIN, 14));
-        button.setBackground(Color.decode("#7d0504"));
-        button.setForeground(Color.WHITE);
-        return button;
+        
+        loadStudentsFromDB();
+    
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == searchButton) {
             String searchText = searchField.getText().trim();
-            if (!searchText.isEmpty()) {
-                // Search for students in the table
-                searchStudent(searchText);
-            } else {
-                System.out.println("Search field is empty!");
-            }
+            
         } else if (e.getSource() == clearButton) {
-            // Clear the search field and reset the table
-            searchField.setText("");
-            resetTable();
+            
         } else if (e.getSource() == backButton) {
-            System.out.println("Returning to previous menu...");
+            new Performance_Reports().setVisible(true);
             dispose();
         }
     }
 
-    private void searchStudent(String searchText) {
+    private void loadStudentsFromDB() {
+       try (Connection conn = connectToDatabase();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT * FROM attendance_sheet")) {
         
-        tableModel.setRowCount(0); // Clear the table first
-        tableModel.addRow(new Object[]{"", "", "", ""}); // Example row
-        tableModel.addRow(new Object[]{"", "", "", ""});
-        System.out.println("Search performed for: " + searchText);
-    }
+        // Clear existing rows in the table model
+        tableModel.setRowCount(0);
 
-    private void resetTable() {
-        // Reset the table to its original state
-        tableModel.setRowCount(0); // Clear all rows
-    }
+        while (rs.next()) {
+            Object[] row = { rs.getString("studId"), rs.getString("name"), rs.getString("course"),
+             rs.getString("presents"),  rs.getString("absents")};
 
+            // Add the row to the table model
+            tableModel.addRow(row);
+         
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    
+    
 }

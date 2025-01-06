@@ -12,8 +12,7 @@ import javax.security.auth.login.LoginContext;
  */
 public class Student_Management_System {
     public static void main(String[] args) {
-
-        Login_Frame run = new  Login_Frame();
+        Attendance_Frame run = new  Attendance_Frame();
         run.setVisible (true);
         
     }
