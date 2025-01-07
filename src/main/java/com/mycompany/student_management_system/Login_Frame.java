@@ -88,13 +88,7 @@ import javax.swing.*;
         add(btnregister);
         
         
-         try {
-            ImgLogo = new URL("https://i.pinimg.com/736x/b0/85/24/b08524b00a9d25ce9d3d9bb9c0bcaa2a.jpg");
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(Login_Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        imgIconLogo = new ImageIcon(ImgLogo);
+         imgIconLogo = new ImageIcon("C:\\Users\\Admin\\Downloads\\download (1).png"); // Update this path to your local image file
         Image imgscaleLogo = imgIconLogo.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         imgnew = new ImageIcon(imgscaleLogo);
 
