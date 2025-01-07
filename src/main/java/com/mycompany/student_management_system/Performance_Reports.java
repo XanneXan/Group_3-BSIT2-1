@@ -28,6 +28,11 @@ public class Performance_Reports extends JFrame implements ActionListener {
         "Course 4", "Course 5", "Course 6", "Course 7", 
          "Course 8", "Midterm", "Finals", "GWA"
     };
+    // Array of column headers for the table
+    private String[] tblColumn = {"Student's ID", "Student's Name", "Semester", "Course 1", 
+                                    "Course 2",  "Course 3",  "Course 4", "Course 5",
+                                     "Course 6", "Course 7",  "Course 8", 
+                                    "Midterm", "Finals", "GWA"};
 
     public Performance_Reports() {
         setExtendedState(MAXIMIZED_BOTH);
