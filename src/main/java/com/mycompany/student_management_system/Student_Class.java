@@ -54,6 +54,7 @@ public class Student_Class extends JFrame implements ActionListener {
         //Labels
         lblTitle = new JLabel("Student Management System");
         lblTitle.setBounds(30, 20, 350, 30);
+        lblTitle.setForeground(new Color(125,5,4));
         lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
         add(lblTitle);
 
