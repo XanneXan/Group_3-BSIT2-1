@@ -108,6 +108,7 @@ public class Register_Frame extends JFrame implements ActionListener {
         btnconfirm.setBackground(new Color(125, 5, 4));
         add(btnconfirm);
         
+
         //call method for mysql
         connectionMySql();
         
@@ -118,6 +119,7 @@ public class Register_Frame extends JFrame implements ActionListener {
         }
 
         imgIconLogo = new ImageIcon(ImgLogo);
+
         Image imgscaleLogo = imgIconLogo.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         imgnew = new ImageIcon(imgscaleLogo);
 
