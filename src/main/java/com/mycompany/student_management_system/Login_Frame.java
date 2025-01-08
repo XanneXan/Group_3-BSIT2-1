@@ -105,7 +105,6 @@ import javax.swing.*;
         lbllogo.setBackground(new Color(220, 220, 220));
         add(lbllogo);
         
-              
         
         
         btnlogin.addActionListener(this);
