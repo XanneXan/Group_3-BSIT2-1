@@ -102,7 +102,7 @@ public class Register_Frame extends JFrame implements ActionListener {
         btnconfirm.setBackground(new Color(125, 5, 4));
         add(btnconfirm);
         
-        imgIconLogo = new ImageIcon("C:\\Users\\Admin\\Downloads\\download (1).png"); // Update this path to your local image file
+        imgIconLogo = new ImageIcon("C:\\Users\\Admin\\Downloads\\download (1).png"); 
         Image imgscaleLogo = imgIconLogo.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         imgnew = new ImageIcon(imgscaleLogo);
 
