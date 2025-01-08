@@ -12,11 +12,11 @@ import javax.security.auth.login.LoginContext;
  */
 public class Student_Management_System {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
 
         Student_Class run = new Student_Class();
         run.setVisible(true);
-        
+
 
     }
 
