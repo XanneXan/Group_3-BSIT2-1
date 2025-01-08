@@ -240,7 +240,7 @@ public class Student_Class extends JFrame implements ActionListener {
         btnSearch.addActionListener(this);
         btnRefresh.addActionListener(this);
         btnMenu.addActionListener(this);
-        
+
         //add action listener for textfield
         txtId.addActionListener(this);
         
@@ -585,6 +585,7 @@ public class Student_Class extends JFrame implements ActionListener {
             } else if (e.getSource() == btnMenu) {
                 new Menu_Frame().setVisible(true);
                 dispose();
+
             }
                 
         } catch (Exception e1) {
