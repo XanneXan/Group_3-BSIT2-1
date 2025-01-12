@@ -11,15 +11,19 @@ package com.mycompany.student_management_system;
 import java.awt.Color;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -62,7 +66,12 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         setLayout(null); // Absolute positioning for components
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
-
+        
+        JLabel lblLogo = new JLabel();
+        lblLogo.setBounds(30, 20, 50, 50); 
+        lblLogo.setIcon(getCircularImageIcon("C:\\Users\\Jasmine\\Documents\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\ADD.jpg", 50));
+        add(lblLogo);
+        
         // Title label
         titleLabel = new JLabel("STUDENT MANAGEMENT SYSTEM");
         titleLabel.setBounds(150, 30, 600, 40);
@@ -140,6 +149,38 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         
         loadStudentsFromDB();
     
+    }
+
+    private JButton createButtonWithIcon(String text, String imagePath, int x, int y) {
+        JButton button = new JButton(text);
+        button.setBounds(x, y, 120, 40);
+        button.setFocusable(false);
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(125, 5, 4)); 
+        try {
+            ImageIcon icon = new ImageIcon(imagePath);
+            button.setIcon(icon);
+        } catch (Exception e) {
+            System.out.println("Error loading image: " + imagePath);
+        }
+        return button;
+    }
+
+    private ImageIcon getCircularImageIcon(String imagePath, int size) {
+        try {
+            BufferedImage image = ImageIO.read(new File(imagePath));
+            BufferedImage circularImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g2 = circularImage.createGraphics();
+            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, size, size));
+            g2.drawImage(image, 0, 0, size, size, null);
+            g2.dispose();
+
+            return new ImageIcon(circularImage);
+        } catch (Exception e) {
+            System.out.println("Error loading circular image: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
