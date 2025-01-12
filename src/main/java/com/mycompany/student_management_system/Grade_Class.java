@@ -8,6 +8,8 @@ package com.mycompany.student_management_system;
 import java.awt.Color;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -60,6 +62,8 @@ public class Grade_Class extends JFrame implements ActionListener{
         setExtendedState(MAXIMIZED_BOTH);     
         setLayout(null);
         setResizable(false);
+        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\grade_icon.jpg");
+        setIconImage(icon);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
         
