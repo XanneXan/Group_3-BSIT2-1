@@ -126,7 +126,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         studList.setDefaultEditor(Object.class, null);
         studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        // Ensure we have the correct number of columns
+        
         for (int i = 0; i < tblColumn.length; i++) {
             studList.getColumnModel().getColumn(i).setPreferredWidth(100);
         }

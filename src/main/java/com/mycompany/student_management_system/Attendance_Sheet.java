@@ -180,7 +180,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM attendance_sheet")) {
 
-            // Clear existing rows in the table model
+            
             tableModel.setRowCount(0);
 
             while (rs.next()) {
