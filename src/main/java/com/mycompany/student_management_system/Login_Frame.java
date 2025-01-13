@@ -88,7 +88,7 @@ import javax.swing.*;
         add(btnregister);
         
         
-        ImageIcon imgIconLogo = new ImageIcon("logo.jpg");
+       ImageIcon imgIconLogo = new ImageIcon("logo.jpg");
         Image scale = imgIconLogo.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         ImageIcon imgnew = new ImageIcon(scale);
 
