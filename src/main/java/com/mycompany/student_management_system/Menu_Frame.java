@@ -26,7 +26,7 @@ public class Menu_Frame extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
-        // Title
+        // Title of the frame
         lblTitle = new JLabel("STUDENT MANAGEMENT");
         lblTitle.setBounds(119, 50, 500, 40);
         lblTitle.setForeground(new Color(125, 5, 4));
@@ -39,7 +39,7 @@ public class Menu_Frame extends JFrame implements ActionListener {
         lblSystem.setFont(new Font("Serif", Font.BOLD, 35));
         add(lblSystem);
 
-        // In this part was thee src or the source codeof the images for it to show as the buttons also 
+        // In this part was thee src or the source code of the images for it to show as the buttons also 
         ImageIcon studentIcon = new ImageIcon("students_icon.jpg");
         Image scale = studentIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
         ImageIcon logoicon = new ImageIcon(scale);
@@ -80,7 +80,7 @@ public class Menu_Frame extends JFrame implements ActionListener {
         btnPerformanceReports.addActionListener(this);
         add(btnPerformanceReports); 
         
-
+        // This part is the labels
         Students = new JLabel("Students");
         Students.setBounds(80, 270, 100, 20);
         Students.setFont(new Font("Arial", Font.BOLD, 15));
