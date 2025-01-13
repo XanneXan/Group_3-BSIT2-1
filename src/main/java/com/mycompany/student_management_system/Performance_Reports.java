@@ -36,25 +36,25 @@ public class Performance_Reports extends JFrame implements ActionListener {
         Image scale = performanIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon logoicon = new ImageIcon(scale);
         
-        // Logo Setup
+        // Logo 
         JLabel lblLogo = new JLabel(logoicon);
         lblLogo.setBounds(30, 20, 50, 50);
         add(lblLogo);
 
-        // Title Setup
+        // Title 
         lblTitle = new JLabel("Student Management System");
         lblTitle.setBounds(90, 30, 350, 30);
         lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
         lblTitle.setForeground(Color.decode("#7d0504"));
         add(lblTitle);
 
-        // Performance Reports Label
+        // Performance Reports 
         lblPer = new JLabel("Performance Reports");
         lblPer.setBounds(850, 100, 350, 30);
         lblPer.setFont(new Font("Serif", Font.BOLD, 25));
         add(lblPer);
 
-        // Student ID Label
+        // Student ID 
         lblId = new JLabel("Student's ID:");
         lblId.setBounds(50, 150, 150, 40);
         lblId.setFont(new Font("Arial", Font.BOLD, 16));

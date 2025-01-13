@@ -45,7 +45,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
     private Image scaledLogo;
     JScrollPane scrollPane;
 
-    private String[] columns = {"ID", "Name", "Course", "Presents", "Absents"};
+    private String[] columns = {"ID", "Name", "Course", "Present", "Absent"};
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
     private String pass = "mysqlpamsswordg3"; 
