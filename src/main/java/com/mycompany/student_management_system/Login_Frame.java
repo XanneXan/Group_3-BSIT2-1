@@ -88,25 +88,24 @@ import javax.swing.*;
         add(btnregister);
         
         
-       ImageIcon imgIconLogo = new ImageIcon("logo.jpg");
-        Image scale = imgIconLogo.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-        ImageIcon imgnew = new ImageIcon(scale);
+        ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
+         Image scale = imgIconLogo.getImage().getScaledInstance(290, 285, Image.SCALE_SMOOTH);
+         ImageIcon imgnew = new ImageIcon(scale);
 
-        lbllogo = new JLabel(imgnew); 
+         lbllogo = new JLabel(imgnew); 
+         lbllogo = new JLabel(imgnew) {
+             @Override
+             protected void paintComponent(Graphics g) {
+                 Shape circle = new Ellipse2D.Double(0, 0, getWidth(), getHeight());
+                 g.setClip(circle);
+                 super.paintComponent(g);
+            }
+         };
+         lbllogo.setBounds(94, 150, 200, 200);
+         lbllogo.setOpaque(true);
+         lbllogo.setBackground(new Color(220, 220, 220));
+         add(lbllogo);
 
-        //lbllogo = new JLabel(imgnew) {
-           // @Override
-            //protected void paintComponent(Graphics g) {
-               // Shape circle = new Ellipse2D.Double(0, 0, getWidth(), getHeight());
-               // g.setClip(circle);
-                //super.paintComponent(g);
-           // }
-       // };
-        lbllogo.setBounds(100, 150, 200, 200);
-        //lbllogo.setOpaque(true);
-        //lbllogo.setBackground(new Color(220, 220, 220));
-        add(lbllogo);
-        
         
         
         btnlogin.addActionListener(this);
