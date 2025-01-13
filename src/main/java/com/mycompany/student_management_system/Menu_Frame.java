@@ -28,15 +28,15 @@ public class Menu_Frame extends JFrame implements ActionListener {
 
         // Title
         lblTitle = new JLabel("STUDENT MANAGEMENT");
-        lblTitle.setBounds(93, 50, 500, 40);
+        lblTitle.setBounds(119, 50, 500, 40);
         lblTitle.setForeground(new Color(125, 5, 4));
-        lblTitle.setFont(new Font("Serif", Font.BOLD, 39));
+        lblTitle.setFont(new Font("Serif", Font.BOLD, 35));
         add(lblTitle);
 
         lblSystem = new JLabel("SYSTEM");
-        lblSystem.setBounds(270, 90, 500, 40);
+        lblSystem.setBounds(268, 90, 500, 40);
         lblSystem.setForeground(new Color(125, 5, 4));
-        lblSystem.setFont(new Font("Serif", Font.BOLD, 39));
+        lblSystem.setFont(new Font("Serif", Font.BOLD, 35));
         add(lblSystem);
 
         // In this part was thee src or the source codeof the images for it to show as the buttons also 
@@ -50,32 +50,32 @@ public class Menu_Frame extends JFrame implements ActionListener {
             
         ImageIcon courseIcon = new ImageIcon("course_icon.jpg");
         Image scale2 = courseIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
-        ImageIcon logoicon2 = new ImageIcon(scale);
-        btnCourse = new JButton (logoicon);
+        ImageIcon logoicon2 = new ImageIcon(scale2);
+        btnCourse = new JButton (logoicon2);
         btnCourse.setBounds(275, 150, 130, 115);
         btnCourse.addActionListener(this);
         add(btnCourse); 
         
         ImageIcon gradeIcon = new ImageIcon("grade_icon.jpg");
         Image scale3 = gradeIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
-        ImageIcon logoicon3 = new ImageIcon(scale);
-        btnGrade = new JButton (logoicon);
+        ImageIcon logoicon3 = new ImageIcon(scale3);
+        btnGrade = new JButton (logoicon3);
         btnGrade.setBounds(480, 150, 130, 115);
         btnGrade.addActionListener(this);
         add(btnGrade); 
         
         ImageIcon attendanceIcon = new ImageIcon("attendance_icon.jpg");
         Image scale4 = attendanceIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
-        ImageIcon logoicon4 = new ImageIcon(scale);
-        btnAttendance = new JButton (logoicon);
+        ImageIcon logoicon4 = new ImageIcon(scale4);
+        btnAttendance = new JButton (logoicon4);
         btnAttendance.setBounds(150, 340, 130, 115);
         btnAttendance.addActionListener(this);
         add(btnAttendance); 
         
         ImageIcon performancereportsIcon = new ImageIcon("performance_icon.jpg");
         Image scale5 = performancereportsIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
-        ImageIcon logoicon5 = new ImageIcon(scale);
-        btnPerformanceReports = new JButton (logoicon);
+        ImageIcon logoicon5 = new ImageIcon(scale5);
+        btnPerformanceReports = new JButton (logoicon5);
         btnPerformanceReports.setBounds(386, 340, 130, 115);
         btnPerformanceReports.addActionListener(this);
         add(btnPerformanceReports); 
