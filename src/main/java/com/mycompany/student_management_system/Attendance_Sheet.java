@@ -11,18 +11,14 @@ package com.mycompany.student_management_system;
 import java.awt.Color;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -48,7 +44,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
     private String[] columns = {"ID", "Name", "Course", "Present", "Absent"};
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
-    private String pass = "mysqlpamsswordg3"; 
+    private String pass = "mysqlpasswordg3"; 
 
     private Connection connectToDatabase() {
         try {
@@ -61,7 +57,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
 
     public Attendance_Sheet() {
         setTitle("Student Management System");
-        setExtendedState(MAXIMIZED_BOTH); // Maximized window
+        setExtendedState(MAXIMIZED_BOTH); 
         setLayout(null); // Absolute positioning for components
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
@@ -137,7 +133,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         headerRenderer.setBackground(Color.PINK);
         attendanceTable.getTableHeader().setDefaultRenderer(headerRenderer);
 
-        // Add action listeners
+        
         searchButton.addActionListener(this);
         clearButton.addActionListener(this);
         backButton.addActionListener(this);
@@ -145,28 +141,13 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         loadStudentsFromDB();
     }
 
-    private ImageIcon getCircularImageIcon(String imagePath, int size) {
-        try {
-            BufferedImage image = ImageIO.read(new File(imagePath));
-            BufferedImage circularImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g2 = circularImage.createGraphics();
-            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, size, size));
-            g2.drawImage(image, 0, 0, size, size, null);
-            g2.dispose();
-
-            return new ImageIcon(circularImage);
-        } catch (Exception e) {
-            System.out.println("Error loading circular image: " + e.getMessage());
-            return null;
-        }
-    }
+   
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == searchButton) {
             String searchText = searchField.getText().trim();
-            // Add search logic here
+            
         } else if (e.getSource() == clearButton) {
             searchField.setText("");
         } else if (e.getSource() == backButton) {
@@ -187,7 +168,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
                 Object[] row = {rs.getString("studId"), rs.getString("name"), rs.getString("course"),
                                 rs.getString("presents"), rs.getString("absents")};
 
-                // Add the row to the table model
+               
                 tableModel.addRow(row);
             }
         } catch (SQLException ex) {

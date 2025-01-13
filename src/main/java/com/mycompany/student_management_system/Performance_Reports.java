@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.util.Arrays;
 
 public class Performance_Reports extends JFrame implements ActionListener {
 
@@ -17,44 +16,41 @@ public class Performance_Reports extends JFrame implements ActionListener {
     private JScrollPane pane;
     private DefaultTableModel model;
 
-    
     private String[] tblColumn = {
         "Student's ID", "Student's Name", "Semester", 
-        "Course 1",  "Course 2","Course 3", 
+        "Course 1", "Course 2", "Course 3", 
         "Course 4", "Course 5", "Course 6", "Course 7", 
-         "Course 8", "Midterm", "Finals", "GWA"
+        "Course 8", "Midterm", "Finals", "GWA"
     };
-    
 
     public Performance_Reports() {
         setExtendedState(MAXIMIZED_BOTH);
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
+        // Logo
         ImageIcon performanIcon = new ImageIcon("ADD.jpg");
         Image scale = performanIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         ImageIcon logoicon = new ImageIcon(scale);
-        
-        // Logo 
         JLabel lblLogo = new JLabel(logoicon);
         lblLogo.setBounds(30, 20, 50, 50);
         add(lblLogo);
 
-        // Title 
+        // Title
         lblTitle = new JLabel("Student Management System");
         lblTitle.setBounds(90, 30, 350, 30);
         lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
         lblTitle.setForeground(Color.decode("#7d0504"));
         add(lblTitle);
 
-        // Performance Reports 
+        // Performance Reports
         lblPer = new JLabel("Performance Reports");
         lblPer.setBounds(850, 100, 350, 30);
         lblPer.setFont(new Font("Serif", Font.BOLD, 25));
         add(lblPer);
 
-        // Student ID 
+        // Student ID
         lblId = new JLabel("Student's ID:");
         lblId.setBounds(50, 150, 150, 40);
         lblId.setFont(new Font("Arial", Font.BOLD, 16));
@@ -126,19 +122,10 @@ public class Performance_Reports extends JFrame implements ActionListener {
         studList.setDefaultEditor(Object.class, null);
         studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        
         for (int i = 0; i < tblColumn.length; i++) {
             studList.getColumnModel().getColumn(i).setPreferredWidth(100);
         }
 
-        
-        studList.getColumnModel().getColumn(0).setPreferredWidth(100); // Student's ID
-        studList.getColumnModel().getColumn(1).setPreferredWidth(200); // Student's Name
-        studList.getColumnModel().getColumn(2).setPreferredWidth(70);  // Semester
-        studList.getColumnModel().getColumn(3).setPreferredWidth(70);  // Term
-        
-
-        
         pane = new JScrollPane(studList);
         pane.setBounds(600, 150, 720, 450);
         pane.getViewport().setBackground(Color.LIGHT_GRAY);
@@ -146,36 +133,61 @@ public class Performance_Reports extends JFrame implements ActionListener {
         pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(pane);
 
-        
         btnMenu.addActionListener(this);
-        btnAttendance.addActionListener(this);
+        btnSearch.addActionListener(this);
     }
 
-    
-    
- 
-        
     private int binarySearch(String id) {
-        int rowCount = model.getRowCount();
-        String[] studentIds = new String[rowCount];
-
-        for (int i = 0; i < rowCount; i++) {
-            studentIds[i] = model.getValueAt(i, 0).toString();
+        int target;
+        try {
+            target = Integer.parseInt(id);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid ID format. Please enter a numerical ID.", "Error", JOptionPane.ERROR_MESSAGE);
+            return -1;
         }
 
-        Arrays.sort(studentIds);
+        int rowCount = model.getRowCount();
+        if (rowCount == 0) {
+            JOptionPane.showMessageDialog(this, "The table is empty. There are no students to search.", "Error", JOptionPane.ERROR_MESSAGE);
+            return -1;
+        }
 
-        int low = 0, high = studentIds.length - 1;
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            int comparison = studentIds[mid].compareTo(id);
+        int[] studentIds = new int[rowCount];
+        int[] originalIndices = new int[rowCount];
 
-            if (comparison == 0) {
-                return mid;
-            } else if (comparison < 0) {
-                low = mid + 1;
+        for (int i = 0; i < rowCount; i++) {
+            try {
+                studentIds[i] = Integer.parseInt(model.getValueAt(i, 0).toString());
+                originalIndices[i] = i;
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Non-numeric ID detected in the table.", "Error", JOptionPane.ERROR_MESSAGE);
+                return -1;
+            }
+        }
+
+        for (int i = 0; i < rowCount - 1; i++) {
+            for (int j = i + 1; j < rowCount; j++) {
+                if (studentIds[i] > studentIds[j]) {
+                    int tempId = studentIds[i];
+                    studentIds[i] = studentIds[j];
+                    studentIds[j] = tempId;
+
+                    int tempIndex = originalIndices[i];
+                    originalIndices[i] = originalIndices[j];
+                    originalIndices[j] = tempIndex;
+                }
+            }
+        }
+
+        int left = 0, right = studentIds.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (studentIds[mid] == target) {
+                return originalIndices[mid];
+            } else if (studentIds[mid] < target) {
+                left = mid + 1;
             } else {
-                high = mid - 1;
+                right = mid - 1;
             }
         }
         return -1;
@@ -196,10 +208,13 @@ public class Performance_Reports extends JFrame implements ActionListener {
             int resultIndex = binarySearch(studentId);
 
             if (resultIndex != -1) {
-                JOptionPane.showMessageDialog(this, "Student found at index: " + resultIndex, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Student found at table row: " + (resultIndex + 1), "Search Result", JOptionPane.INFORMATION_MESSAGE);
+                studList.setRowSelectionInterval(resultIndex, resultIndex);
             } else {
                 JOptionPane.showMessageDialog(this, "Student ID not found.", "Search Result", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 }
+
+    
