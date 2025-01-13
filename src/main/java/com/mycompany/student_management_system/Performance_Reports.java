@@ -1,37 +1,33 @@
 package com.mycompany.student_management_system;
 
 import java.awt.*;
-import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.io.File;
-import javax.imageio.ImageIO;
-import java.util.Arrays;
-import javax.swing.table.TableColumn;
 
 public class Performance_Reports extends JFrame implements ActionListener {
 
     private JLabel lblTitle, lblId, lblPer;
     private JTextField txtId;
-    private JButton btnMenu, btnGrades, btnGWA, btnAttendance, btnClear, btnSearch;
+    private JButton btnMenu, btnGrades, btnGWA, btnAttendance, btnClear, btnSearch, btnSortNames, btnSortCourses;
     private JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
 
-    
     private String[] tblColumn = {
         "Student's ID", "Student's Name", "Semester", 
-        "Course 1",  "Course 2","Course 3", 
+        "Course 1", "Course 2", "Course 3", 
         "Course 4", "Course 5", "Course 6", "Course 7", 
-         "Course 8", "Midterm", "Finals", "GWA"
+        "Course 8", "Midterm", "Finals", "GWA"
     };
-    
 
     public Performance_Reports() {
-        setExtendedState(MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,6 +71,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         btnSearch.setForeground(Color.WHITE);
         btnSearch.setFont(new Font("Arial", Font.PLAIN, 10));
         btnSearch.setBackground(new Color(125, 5, 4));
+        btnSearch.addActionListener(this);
         add(btnSearch);
 
         // Grades Button
@@ -111,6 +108,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         btnMenu.setForeground(Color.WHITE);
         btnMenu.setFont(new Font("Arial", Font.PLAIN, 10));
         btnMenu.setBackground(new Color(125, 5, 4));
+        btnMenu.addActionListener(this);
         add(btnMenu);
 
         // Clear Button
@@ -122,6 +120,26 @@ public class Performance_Reports extends JFrame implements ActionListener {
         btnClear.setBackground(new Color(125, 5, 4));
         add(btnClear);
 
+        // Sort by Names Button
+        btnSortNames = new JButton("Sort by Names");
+        btnSortNames.setBounds(145, 440, 120, 40);
+        btnSortNames.setFocusable(false);
+        btnSortNames.setForeground(Color.WHITE);
+        btnSortNames.setFont(new Font("Arial", Font.PLAIN, 10));
+        btnSortNames.setBackground(new Color(125, 5, 4));
+        btnSortNames.addActionListener(this);
+        add(btnSortNames);
+
+        // Sort by Courses Button
+        btnSortCourses = new JButton("Sort by Courses");
+        btnSortCourses.setBounds(285, 440, 120, 40);
+        btnSortCourses.setFocusable(false);
+        btnSortCourses.setForeground(Color.WHITE);
+        btnSortCourses.setFont(new Font("Arial", Font.PLAIN, 10));
+        btnSortCourses.setBackground(new Color(125, 5, 4));
+        btnSortCourses.addActionListener(this);
+        add(btnSortCourses);
+
         // Table Model Setup
         model = new DefaultTableModel(null, tblColumn);
         studList = new JTable(model);
@@ -129,48 +147,38 @@ public class Performance_Reports extends JFrame implements ActionListener {
         studList.setDefaultEditor(Object.class, null);
         studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        // Ensure we have the correct number of columns
         for (int i = 0; i < tblColumn.length; i++) {
             studList.getColumnModel().getColumn(i).setPreferredWidth(100);
         }
 
-        
-        studList.getColumnModel().getColumn(0).setPreferredWidth(100); // Student's ID
-        studList.getColumnModel().getColumn(1).setPreferredWidth(200); // Student's Name
-        studList.getColumnModel().getColumn(2).setPreferredWidth(70);  // Semester
-        studList.getColumnModel().getColumn(3).setPreferredWidth(70);  // Term
-        
-
-        
         pane = new JScrollPane(studList);
         pane.setBounds(600, 150, 720, 450);
         pane.getViewport().setBackground(Color.LIGHT_GRAY);
         pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(pane);
-
-        
-        btnMenu.addActionListener(this);
-        btnAttendance.addActionListener(this);
     }
 
-    
-    private JButton createButtonWithIcon(String text, String imagePath, int x, int y, int width, int height) {
-        JButton button = new JButton(text);
-        button.setBounds(x, y, width, height);
-        button.setFocusable(false);
-        button.setForeground(Color.WHITE);
-        button.setBackground(new Color(125, 5, 4));
-        try {
-            ImageIcon icon = new ImageIcon(imagePath);
-            button.setIcon(icon);
-        } catch (Exception e) {
-            System.out.println("Error loading image: " + imagePath);
+    private void sortTable(int columnIndex, boolean ascending) {
+        int rowCount = model.getRowCount();
+        String[][] tableData = new String[rowCount][model.getColumnCount()];
+
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                tableData[i][j] = model.getValueAt(i, j).toString();
+            }
         }
-        return button;
+
+        Arrays.sort(tableData, (a, b) -> ascending
+            ? a[columnIndex].compareToIgnoreCase(b[columnIndex])
+            : b[columnIndex].compareToIgnoreCase(a[columnIndex]));
+
+        model.setRowCount(0);
+        for (String[] row : tableData) {
+            model.addRow(row);
+        }
     }
 
- 
     private ImageIcon getCircularImageIcon(String imagePath, int size) {
         try {
             BufferedImage image = ImageIO.read(new File(imagePath));
@@ -188,7 +196,32 @@ public class Performance_Reports extends JFrame implements ActionListener {
         }
     }
 
-    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnMenu) {
+            new Menu_Frame().setVisible(true);
+            dispose();
+        } else if (e.getSource() == btnSearch) {
+            String studentId = txtId.getText().trim();
+            if (studentId.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a Student ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int resultIndex = binarySearch(studentId);
+
+            if (resultIndex != -1) {
+                JOptionPane.showMessageDialog(this, "Student found at index: " + resultIndex, "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Student ID not found.", "Search Result", JOptionPane.ERROR_MESSAGE);
+            }
+        } else if (e.getSource() == btnSortNames) {
+            sortTable(1, true);
+        } else if (e.getSource() == btnSortCourses) {
+            sortTable(3, true);
+        }
+    }
+
     private int binarySearch(String id) {
         int rowCount = model.getRowCount();
         String[] studentIds = new String[rowCount];
@@ -213,27 +246,5 @@ public class Performance_Reports extends JFrame implements ActionListener {
             }
         }
         return -1;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnMenu) {
-            new Menu_Frame().setVisible(true);
-            dispose();
-        } else if (e.getSource() == btnSearch) {
-            String studentId = txtId.getText().trim();
-            if (studentId.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a Student ID.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            int resultIndex = binarySearch(studentId);
-
-            if (resultIndex != -1) {
-                JOptionPane.showMessageDialog(this, "Student found at index: " + resultIndex, "Search Result", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Student ID not found.", "Search Result", JOptionPane.ERROR_MESSAGE);
-            }
-        }
     }
 }
