@@ -14,7 +14,7 @@ public class Student_Management_System {
 
     public static void main(String[] args) {
 
-        Login_Frame run = new Login_Frame();
+        Attendance_Sheet run = new Attendance_Sheet();
         run.setVisible(true);
 
 
