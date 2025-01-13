@@ -54,6 +54,7 @@ public class Student_Class extends JFrame implements ActionListener {
         //Labels
         lblTitle = new JLabel("Student Management System");
         lblTitle.setBounds(30, 20, 350, 30);
+        lblTitle.setForeground(new Color(125,5,4));
         lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
         add(lblTitle);
 
@@ -140,35 +141,35 @@ public class Student_Class extends JFrame implements ActionListener {
         btnAdd.setBounds(70, 500, 120, 40);
         btnAdd.setFocusable(false);
         btnAdd.setForeground(Color.WHITE);
-        btnAdd.setBackground(Color.BLUE);
+        btnAdd.setBackground(new Color(125,5,4));
         add(btnAdd);
 
         btnUpdate = new JButton("Update");
         btnUpdate.setBounds(210, 500, 120, 40);
         btnUpdate.setFocusable(false);
         btnUpdate.setForeground(Color.WHITE);
-        btnUpdate.setBackground(Color.BLUE);
+        btnUpdate.setBackground(new Color(125,5,4));
         add(btnUpdate);
 
         btnDelete = new JButton("Delete");
         btnDelete.setBounds(350, 500, 120, 40);
         btnDelete.setFocusable(false);
         btnDelete.setForeground(Color.WHITE);
-        btnDelete.setBackground(Color.BLUE);
+        btnDelete.setBackground(new Color(125,5,4));
         add(btnDelete);
 
         btnEditRow = new JButton("Edit Row");
         btnEditRow.setBounds(145, 560, 120, 40);
         btnEditRow.setFocusable(false);
         btnEditRow.setForeground(Color.WHITE);
-        btnEditRow.setBackground(Color.BLUE);
+        btnEditRow.setBackground(new Color(125,5,4));
         add(btnEditRow);
 
         btnClear = new JButton("Clear");
         btnClear.setBounds(285, 560, 120, 40);
         btnClear.setFocusable(false);
         btnClear.setForeground(Color.WHITE);
-        btnClear.setBackground(Color.BLUE);
+        btnClear.setBackground(new Color(125,5,4));
         add(btnClear);
 
         //Table where the information will appear
@@ -205,7 +206,7 @@ public class Student_Class extends JFrame implements ActionListener {
         btnSearch.setFocusable(false);
         btnSearch.setForeground(Color.WHITE);
         btnSearch.setFont(new Font("Arial", Font.PLAIN, 10));
-        btnSearch.setBackground(Color.BLUE);
+        btnSearch.setBackground(new Color(125,5,4));
         add(btnSearch);
 
         btnRefresh = new JButton("Refresh");
@@ -213,7 +214,7 @@ public class Student_Class extends JFrame implements ActionListener {
         btnRefresh.setFocusable(false);
         btnRefresh.setForeground(Color.WHITE);
         btnRefresh.setFont(new Font("Arial", Font.PLAIN, 10));
-        btnRefresh.setBackground(Color.BLUE);
+        btnRefresh.setBackground(new Color(125,5,4));
         add(btnRefresh);
 
         //menu Button
@@ -222,7 +223,7 @@ public class Student_Class extends JFrame implements ActionListener {
         btnMenu.setFocusable(false);
         btnMenu.setForeground(Color.WHITE);
         btnMenu.setFont(new Font("Arial", Font.PLAIN, 10));
-        btnMenu.setBackground(Color.BLUE);
+        btnMenu.setBackground(new Color(125,5,4));
         add(btnMenu);
 
         //action listeners for buttons
