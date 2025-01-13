@@ -25,43 +25,62 @@ public class Menu_Frame extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
         // Title
         lblTitle = new JLabel("STUDENT MANAGEMENT");
         lblTitle.setBounds(93, 50, 500, 40);
         lblTitle.setForeground(new Color(125, 5, 4));
         lblTitle.setFont(new Font("Serif", Font.BOLD, 39));
-        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
         add(lblTitle);
 
         lblSystem = new JLabel("SYSTEM");
-        lblSystem.setBounds(95, 90, 500, 40);
+        lblSystem.setBounds(270, 90, 500, 40);
         lblSystem.setForeground(new Color(125, 5, 4));
         lblSystem.setFont(new Font("Serif", Font.BOLD, 39));
-        lblSystem.setHorizontalAlignment(SwingConstants.CENTER);
         add(lblSystem);
 
         // In this part was thee src or the source codeof the images for it to show as the buttons also 
-        btnStudents = ImagePath("C:\\Users\\USER\\Documents\\NetBeansProjects\\MnuFnal\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\students_icon.jpg", 70, 150, 130, 115);
+        ImageIcon studentIcon = new ImageIcon("students_icon.jpg");
+        Image scale = studentIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        ImageIcon logoicon = new ImageIcon(scale);
+        btnStudents = new JButton (logoicon);
+        btnStudents.setBounds(70, 150, 130, 115);
         btnStudents.addActionListener(this);
-        add(btnStudents);
-
-        btnCourse = ImagePath("C:\\Users\\USER\\Documents\\NetBeansProjects\\MnuFnal\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\course_icon.jpg", 275, 150, 130, 115);
+        add(btnStudents); 
+            
+        ImageIcon courseIcon = new ImageIcon("course_icon.jpg");
+        Image scale2 = courseIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        ImageIcon logoicon2 = new ImageIcon(scale);
+        btnCourse = new JButton (logoicon);
+        btnCourse.setBounds(275, 150, 130, 115);
         btnCourse.addActionListener(this);
-        add(btnCourse);
-
-        btnGrade = ImagePath("C:\\Users\\USER\\Documents\\NetBeansProjects\\MnuFnal\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\grade_icon.jpg", 480, 150, 130, 115);
+        add(btnCourse); 
+        
+        ImageIcon gradeIcon = new ImageIcon("grade_icon.jpg");
+        Image scale3 = gradeIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        ImageIcon logoicon3 = new ImageIcon(scale);
+        btnGrade = new JButton (logoicon);
+        btnGrade.setBounds(480, 150, 130, 115);
         btnGrade.addActionListener(this);
-        add(btnGrade);
-
-        btnAttendance = ImagePath("C:\\Users\\USER\\Documents\\NetBeansProjects\\MnuFnal\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\attendance_icon.jpg", 150, 340, 130, 115);
+        add(btnGrade); 
+        
+        ImageIcon attendanceIcon = new ImageIcon("attendance_icon.jpg");
+        Image scale4 = attendanceIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        ImageIcon logoicon4 = new ImageIcon(scale);
+        btnAttendance = new JButton (logoicon);
+        btnAttendance.setBounds(150, 340, 130, 115);
         btnAttendance.addActionListener(this);
-        add(btnAttendance);
-
-        btnPerformanceReports = ImagePath("C:\\Users\\USER\\Documents\\NetBeansProjects\\MnuFnal\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\performance_icon.jpg", 386, 340, 130, 115);
+        add(btnAttendance); 
+        
+        ImageIcon performancereportsIcon = new ImageIcon("performance_icon.jpg");
+        Image scale5 = performancereportsIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        ImageIcon logoicon5 = new ImageIcon(scale);
+        btnPerformanceReports = new JButton (logoicon);
+        btnPerformanceReports.setBounds(386, 340, 130, 115);
         btnPerformanceReports.addActionListener(this);
-        add(btnPerformanceReports);
+        add(btnPerformanceReports); 
+        
 
-        // Labels
         Students = new JLabel("Students");
         Students.setBounds(80, 270, 100, 20);
         Students.setFont(new Font("Arial", Font.BOLD, 15));
@@ -108,22 +127,7 @@ public class Menu_Frame extends JFrame implements ActionListener {
         add(btnLogout);
     }
 
-    private JButton ImagePath(String imagePath, int x, int y, int width, int height) {
-        ImageIcon icon = new ImageIcon(imagePath);
-        Image resizedImage = icon.getImage().getScaledInstance(width , height , Image.SCALE_SMOOTH);
-        icon = new ImageIcon(resizedImage);
-
-        JButton button = new JButton(icon);
-        button.setBounds(x, y, width, height);
-        button.setBorderPainted(true);// with regards this one this is the lne around the buttons
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setBackground(new Color(173,216,230));
-            
-            
-        
-        return button;      
-        }
+   
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnStudents) {
