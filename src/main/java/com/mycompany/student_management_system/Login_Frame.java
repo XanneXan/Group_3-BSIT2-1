@@ -89,7 +89,7 @@ import javax.swing.*;
         
         
         ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
-         Image scale = imgIconLogo.getImage().getScaledInstance(290, 285, Image.SCALE_SMOOTH);
+         Image scale = imgIconLogo.getImage().getScaledInstance(29, 285, Image.SCALE_SMOOTH);
          ImageIcon imgnew = new ImageIcon(scale);
 
          lbllogo = new JLabel(imgnew); 

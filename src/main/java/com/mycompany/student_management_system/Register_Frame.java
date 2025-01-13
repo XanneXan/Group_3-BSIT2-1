@@ -102,8 +102,8 @@ public class Register_Frame extends JFrame implements ActionListener {
         btnconfirm.setBackground(new Color(125, 5, 4));
         add(btnconfirm);
         
-        ImageIcon imgIconLogo = new ImageIcon("logo.jpg");
-        Image scale = imgIconLogo.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
+        Image scale = imgIconLogo.getImage().getScaledInstance(298, 290, Image.SCALE_SMOOTH);
         ImageIcon imgnew = new ImageIcon(scale);
 
         lbllogo = new JLabel(imgnew); 
@@ -115,9 +115,9 @@ public class Register_Frame extends JFrame implements ActionListener {
      //           super.paintComponent(g);
       //      }
       //  };
-        lbllogo.setBounds(100, 150, 200, 200);
-      //  lbllogo.setOpaque(true);
-      //  lbllogo.setBackground(new Color(220, 220, 220));
+      lbllogo.setBounds(95, 150, 200, 200);
+      lbllogo.setOpaque(true);
+      lbllogo.setBackground(new Color(220, 220, 220));
         add(lbllogo);
         
         btnlogin.addActionListener(this);

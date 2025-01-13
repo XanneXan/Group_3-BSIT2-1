@@ -14,7 +14,7 @@ public class Student_Management_System {
 
     public static void main(String[] args) {
 
-        Login_Frame run = new Login_Frame();
+        Register_Frame run = new Register_Frame();
 
         run.setVisible(true);
 
