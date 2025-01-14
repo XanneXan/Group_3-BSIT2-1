@@ -3,10 +3,6 @@ package com.mycompany.student_management_system;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Arrays;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -32,28 +28,28 @@ public class Performance_Reports extends JFrame implements ActionListener {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Logo Setup
-        JLabel lblLogo = new JLabel();
+        // Logo
+        ImageIcon performanIcon = new ImageIcon("ADD.jpg");
+        Image scale = performanIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        ImageIcon logoicon = new ImageIcon(scale);
+        JLabel lblLogo = new JLabel(logoicon);
         lblLogo.setBounds(30, 20, 50, 50);
-        lblLogo.setIcon(getCircularImageIcon(
-            "C:\\Users\\Jasmine\\Documents\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\ADD.jpg", 50)
-        );
         add(lblLogo);
 
-        // Title Setup
+        // Title
         lblTitle = new JLabel("Student Management System");
         lblTitle.setBounds(90, 30, 350, 30);
         lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
         lblTitle.setForeground(Color.decode("#7d0504"));
         add(lblTitle);
 
-        // Performance Reports Label
+        // Performance Reports
         lblPer = new JLabel("Performance Reports");
         lblPer.setBounds(850, 100, 350, 30);
         lblPer.setFont(new Font("Serif", Font.BOLD, 25));
         add(lblPer);
 
-        // Student ID Label
+        // Student ID
         lblId = new JLabel("Student's ID:");
         lblId.setBounds(50, 150, 150, 40);
         lblId.setFont(new Font("Arial", Font.BOLD, 16));
@@ -157,6 +153,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(pane);
+
     }
 
     private void sortTable(int columnIndex, boolean ascending) {
@@ -194,57 +191,44 @@ public class Performance_Reports extends JFrame implements ActionListener {
             System.out.println("Error loading circular image: " + e.getMessage());
             return null;
         }
-    }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnMenu) {
-            new Menu_Frame().setVisible(true);
-            dispose();
-        } else if (e.getSource() == btnSearch) {
-            String studentId = txtId.getText().trim();
-            if (studentId.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a Student ID.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            int resultIndex = binarySearch(studentId);
-
-            if (resultIndex != -1) {
-                JOptionPane.showMessageDialog(this, "Student found at index: " + resultIndex, "Search Result", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Student ID not found.", "Search Result", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (e.getSource() == btnSortNames) {
-            sortTable(1, true);
-        } else if (e.getSource() == btnSortCourses) {
-            sortTable(3, true);
-        }
-    }
-
-    private int binarySearch(String id) {
-        int rowCount = model.getRowCount();
-        String[] studentIds = new String[rowCount];
 
         for (int i = 0; i < rowCount; i++) {
-            studentIds[i] = model.getValueAt(i, 0).toString();
+            try {
+                studentIds[i] = Integer.parseInt(model.getValueAt(i, 0).toString());
+                originalIndices[i] = i;
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Non-numeric ID detected in the table.", "Error", JOptionPane.ERROR_MESSAGE);
+                return -1;
+            }
         }
 
-        Arrays.sort(studentIds);
+        for (int i = 0; i < rowCount - 1; i++) {
+            for (int j = i + 1; j < rowCount; j++) {
+                if (studentIds[i] > studentIds[j]) {
+                    int tempId = studentIds[i];
+                    studentIds[i] = studentIds[j];
+                    studentIds[j] = tempId;
 
-        int low = 0, high = studentIds.length - 1;
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            int comparison = studentIds[mid].compareTo(id);
+                    int tempIndex = originalIndices[i];
+                    originalIndices[i] = originalIndices[j];
+                    originalIndices[j] = tempIndex;
+                }
+            }
+        }
 
-            if (comparison == 0) {
-                return mid;
-            } else if (comparison < 0) {
-                low = mid + 1;
+        int left = 0, right = studentIds.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (studentIds[mid] == target) {
+                return originalIndices[mid];
+            } else if (studentIds[mid] < target) {
+                left = mid + 1;
             } else {
-                high = mid - 1;
+                right = mid - 1;
             }
         }
         return -1;
     }
-}
+
+    
