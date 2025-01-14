@@ -62,8 +62,6 @@ public class Grade_Class extends JFrame implements ActionListener{
         setExtendedState(MAXIMIZED_BOTH);     
         setLayout(null);
         setResizable(false);
-        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\grade_icon.jpg");
-        setIconImage(icon);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
         
@@ -92,20 +90,19 @@ public class Grade_Class extends JFrame implements ActionListener{
     //TextFields for user input in Student ID and Name
     txtId = new JTextField ();
     txtId.setBounds(170, 155, 250, 25);
-    txtId.setEditable(true);
     add(txtId);
     
     txtName = new JTextField ();
     txtName.setBounds(190, 215, 250, 25);
     txtName.setBackground(Color.LIGHT_GRAY);
-    txtName.setEditable(true);
+    txtName.setEditable(false);
     add (txtName);
     
     //The semester will automatically appear here. It is set to non-editable
     txtSem = new JTextField ();
     txtSem.setBounds(160, 265, 70, 25);
     txtSem.setBackground(Color.LIGHT_GRAY);
-    txtSem.setEditable(true);
+    txtSem.setEditable(false);
     add (txtSem);
     
     lblSearch = new JLabel ("Search Student: ");
@@ -444,9 +441,12 @@ public class Grade_Class extends JFrame implements ActionListener{
     btnEdit.addActionListener(this);
     btnClear.addActionListener(this);
     btnMenu.addActionListener(this);
+    btnSearch.addActionListener(this);
+    btnRefresh.addActionListener(this);
+    btnSearch2.addActionListener(this);
               
     
-    loadDataFromDatabase(); // Calling the loadDataFromDatabase method and to load the datas from DB authomatically
+    DbToTable(); // Calling the loadDataFromDatabase method and to load the datas from DB authomatically
 }
 
     @Override
@@ -466,17 +466,62 @@ public class Grade_Class extends JFrame implements ActionListener{
         
        } else if (e.getSource()==btnEdit){
             loadSelectedRowData();
+            vacantCourse();
   
-      }  else if (e.getSource()==btnMenu){
+      } else if (e.getSource()==btnSearch ) {
+          searchStudent();
+      
+      } else if (e.getSource()==btnRefresh){
+          refreshTable();
+          
+      } else if (e.getSource()==btnSearch2){
+          searchStudentId();
+          vacantCourse();
+          
+      } else if (e.getSource()==btnMenu){
             new Menu_Frame().setVisible(true);
             dispose();
        }
     }
     
-    // Method for Add button
+    // Method to Search student's ID in the database then load their information in the textfields
+    private void searchStudentId() {
+        String searchId = txtId.getText().trim(); 
+
+        if (!searchId.isEmpty()) {
+            try (Connection conn = connectToDatabase();
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM student WHERE ID = ?")) {
+                stmt.setString(1, searchId); 
+                ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // load student information in their respective text fields
+                txtName.setText(rs.getString("Name"));
+                txtSem.setText(rs.getString("Semester"));
+                txtC1.setText(rs.getString("Course1"));
+                txtC2.setText(rs.getString("Course2"));
+                txtC3.setText(rs.getString("Course3"));
+                txtC4.setText(rs.getString("Course4"));
+                txtC5.setText(rs.getString("Course5"));
+                txtC6.setText(rs.getString("Course6"));
+                txtC7.setText(rs.getString("Course7"));
+                txtC8.setText(rs.getString("Course8"));
+                
+            } else {
+                JOptionPane.showMessageDialog(this, "Student not found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error searching for student", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Please enter a student ID to search.", "Input Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
+    // Method to Add student in the JTable and Database
      private void addStudent() {
          
-        // Collecting input values
+        // Collecting input values from textfields
         String studId = txtId.getText().trim();
         String studName = txtName.getText().trim();
         String sem = txtSem.getText().trim();
@@ -505,9 +550,9 @@ public class Grade_Class extends JFrame implements ActionListener{
         String m8 = txtG8.getText().trim();
         String f8 = txtG8f.getText().trim();
 
-        // Ensure all required fields are filled
-        if (studId.isEmpty() || studName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        // Ensure Student's ID is filled
+        if (studId.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter Student's ID", "Input Error", JOptionPane.ERROR_MESSAGE);
             return; 
         }
 
@@ -519,13 +564,14 @@ public class Grade_Class extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(this, "Grades must be numbers between 1.0 and 5.0.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        Object[] tblRow = { studId, studName, sem, c1, m1, f1, c2, m2, f2, c3, m3, f3, 
-            c4, m4, f4, c5, m5, f5, c6, m6, f6, c7, m7, f7, c8, m8, f8 };
-
-        boolean isAddedtoDB =false; 
         
-        // Add the data to the database
+        //Array to represent a row of data for the table
+        Object[] tblRow = { studId, studName, sem, c1, m1, f1, c2, m2, f2, c3, m3, f3, 
+            c4, m4, f4, c5, m5, f5, c6, m6, f6, c7, m7, f7, c8, m8, f8 }; 
+
+        boolean isAddedtoDB =false; // Condition whether the data was successfully added to the database 
+        
+        // Connect and Add data to the database
         try (Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(
                  "INSERT INTO grade (studId, studName, sem, course1, mid1, fin1, course2, mid2, fin2, "
@@ -564,92 +610,102 @@ public class Grade_Class extends JFrame implements ActionListener{
                 stmt.executeUpdate();
                 isAddedtoDB = true;
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error adding data to the database: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error adding data to the database");
             }
             
         if (isAddedtoDB){ //To ensure that data is only added to the JTable if it is successfully added to the database
-       
-        int confirmation = JOptionPane.showConfirmDialog(this,
-            "Are you sure you want to add this?",
-            "Add Confirmation", JOptionPane.YES_NO_OPTION);  // Confirmation message before adding the data
+        
+        // Confirmation message before adding the data
+        int confirmation = JOptionPane.showConfirmDialog(this,"Are you sure you want to add this?","Confirmation Message", JOptionPane.YES_NO_OPTION);  
+            if (confirmation == JOptionPane.YES_OPTION) {
+                dataRows.add(tblRow); // Save row to ArrayList
+                sortRows();
+                termsCalculation(model.getRowCount() - 1); // Perform calculations for the new row
+                clearFields(); // Clear text fields after successful addition
 
-        if (confirmation == JOptionPane.YES_OPTION) {
-            dataRows.add(tblRow); // Save row to ArrayList
-            model.addRow(tblRow); // Display row in the table
-            termsCalculation(model.getRowCount() - 1); // Perform calculations for the new row
-         
-            clearFields(); // Clear input fields after successful addition
-            JOptionPane.showMessageDialog(this, "Grades added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Grades added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     
      }    
 
-     //Methods for removing/deleting rows
+     // Methods for removing/deleting rows in JTable and Database 
     private void removeRow() {
-    // Get the index of the selected row
+   
         int selectedRow = studList.getSelectedRow();
 
         if (selectedRow != -1) {
+            
             // Ask for confirmation before proceeding
             int confirmation = JOptionPane.showConfirmDialog(this,"Are you sure you want to delete the selected row?","Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
             if (confirmation == JOptionPane.YES_OPTION) { 
                 String studId = model.getValueAt(selectedRow, 0).toString();
 
-                // Connect to the database and delete the record
-                try (Connection conn = connectToDatabase();
-                     PreparedStatement stmt = conn.prepareStatement("DELETE FROM grade WHERE studId = ?")) {
+            // Connect to the database and delete the row
+            try (Connection conn = connectToDatabase();
+                 PreparedStatement stmt = conn.prepareStatement("DELETE FROM grade WHERE studId = ?")) {
 
-                    stmt.setString(1, studId); // Use the student ID as the condition
-                    int rowSelected = stmt.executeUpdate();
+                stmt.setString(1, studId); //Use student ID as the condition
+                int rowSelected = stmt.executeUpdate();
 
-                    if (rowSelected > 0) {
-                        // Remove the row from the table model if deletion is successful
-                        model.removeRow(selectedRow);
-                        JOptionPane.showMessageDialog(this, "Row deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Error: Could not find the record in the database.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this, "Error deleting data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                if (rowSelected > 0) {
+                    // Remove the row from the table model if deletion is successful
+                    model.removeRow(selectedRow);
+                    JOptionPane.showMessageDialog(this, "Row deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error: Could not find the record in the database.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error deleting data from the database", "Database Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
         } else {
             // Inform the user if no row is selected
             JOptionPane.showMessageDialog(this, "Please select a row to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-     
-     //For Clearing all fields 
-     private void clearFields() {
-        
-        // Enable ID, Name, and Sem fields editing
-        txtId.setEditable(true);
-        txtName.setEditable(true);
-        txtSem.setEditable(true);
-        
+    // Method for Clearing all fields and reseting fields
+    private void clearFields() {
+       
         txtId.setText("");
+        txtId.setEditable(true);
         txtName.setText("");
         txtSem.setText("");
         txtG1.setText("0.0");
+        txtG1.setEditable(true);
         txtG1f.setText("0.0");
+        txtG1f.setEditable(true);
         txtG2.setText("0.0");
+        txtG2.setEditable(true);
         txtG2f.setText("0.0");
+        txtG2f.setEditable(true);
         txtG3.setText("0.0");
+        txtG3.setEditable(true);
         txtG3f.setText("0.0");
+        txtG3f.setEditable(true);
         txtG4.setText("0.0");
+        txtG4.setEditable(true);
         txtG4f.setText("0.0");
+        txtG4f.setEditable(true);
         txtG5.setText("0.0");
+        txtG5.setEditable(true);
         txtG5f.setText("0.0");
+        txtG5f.setEditable(true);
         txtG6.setText("0.0");
+        txtG6.setEditable(true);
         txtG6f.setText("0.0");
+        txtG6f.setEditable(true);
         txtG7.setText("0.0");
+        txtG7.setEditable(true);
         txtG7f.setText("0.0");
+        txtG7f.setEditable(true);
         txtG8.setText("0.0");
+        txtG8.setEditable(true);
         txtG8f.setText("0.0");
+        txtG8f.setEditable(true);
         txtC1.setText("== Course 1 ==");
         txtC2.setText("== Course 2 ==");
         txtC3.setText("== Course 3 ==");
@@ -658,11 +714,12 @@ public class Grade_Class extends JFrame implements ActionListener{
         txtC6.setText("== Course 6 ==");
         txtC7.setText("== Course 7 ==");
         txtC8.setText("== Course 8 ==");
+    }
 
-     }
-     
-     // For update button
+
+     // MEthod to update student information in the Jtable and database
     private void updateRow() {
+        
         if (editingRowIndex != -1) { // Ensure a row is selected for editing
         
         // Get data from text fields
@@ -694,16 +751,22 @@ public class Grade_Class extends JFrame implements ActionListener{
         String m8 = txtG8.getText().trim();
         String f8 = txtG8f.getText().trim();
    
-        // Validate inputs
-        if (!studId.isEmpty() && !studName.isEmpty()) {
-            int confirmation = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to update the selected row?",
-                "Update Confirmation",
-                JOptionPane.YES_NO_OPTION
-            );
-
+        // Ensure Student's ID is filled
+        if (!studId.isEmpty()) { 
+            
+             if (!isValidGrade(m1) || !isValidGrade(m2) || !isValidGrade(m3) || !isValidGrade(m4) ||
+            !isValidGrade(m5) || !isValidGrade(m6) || !isValidGrade(m7) || !isValidGrade(m8) ||
+            !isValidGrade(f1) || !isValidGrade(f2) || !isValidGrade(f3) || !isValidGrade(f4) ||
+            !isValidGrade(f5) || !isValidGrade(f6) || !isValidGrade(f7) || !isValidGrade(f8)) {
+            JOptionPane.showMessageDialog(this, "Grades must be numbers between 1.0 and 5.0.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+            int confirmation = JOptionPane.showConfirmDialog(this,"Are you sure you want to update the selected row?","Update Confirmation",JOptionPane.YES_NO_OPTION);
+            
+            
         if (confirmation == JOptionPane.YES_OPTION) {
+            
+            //Connect to database
            try (Connection conn = connectToDatabase();
             PreparedStatement stmt = conn.prepareStatement(
                 "UPDATE grade SET studName = ?, sem = ?, course1 = ?, mid1 = ?, fin1 = ?, " +
@@ -748,29 +811,36 @@ public class Grade_Class extends JFrame implements ActionListener{
             model.setValueAt(studName, editingRowIndex, 1);
             model.setValueAt(sem, editingRowIndex, 2);
             model.setValueAt(c1, editingRowIndex, 3);
-            model.setValueAt(m1, editingRowIndex, 4);  // Midterm Grade for Course 1
-            model.setValueAt(f1, editingRowIndex, 5);  // Final Grade for Course 1
+            model.setValueAt(m1, editingRowIndex, 4);  
+            model.setValueAt(f1, editingRowIndex, 5);  
+            
             model.setValueAt(c2, editingRowIndex, 6);
-            model.setValueAt(m2, editingRowIndex, 7);  // Midterm Grade for Course 2
-            model.setValueAt(f2, editingRowIndex, 8);  // Final Grade for Course 2
+            model.setValueAt(m2, editingRowIndex, 7); 
+            model.setValueAt(f2, editingRowIndex, 8);  
+            
             model.setValueAt(c3, editingRowIndex, 9);
-            model.setValueAt(m3, editingRowIndex, 10); // Midterm Grade for Course 3
-            model.setValueAt(f3, editingRowIndex, 11); // Final Grade for Course 3
+            model.setValueAt(m3, editingRowIndex, 10); 
+            model.setValueAt(f3, editingRowIndex, 11); 
+            
             model.setValueAt(c4, editingRowIndex, 12);
-            model.setValueAt(m4, editingRowIndex, 13); // Midterm Grade for Course 4
-            model.setValueAt(f4, editingRowIndex, 14); // Final Grade for Course 4
+            model.setValueAt(m4, editingRowIndex, 13); 
+            model.setValueAt(f4, editingRowIndex, 14); 
+            
             model.setValueAt(c5, editingRowIndex, 15);
-            model.setValueAt(m5, editingRowIndex, 16); // Midterm Grade for Course 5
-            model.setValueAt(f5, editingRowIndex, 17); // Final Grade for Course 5
+            model.setValueAt(m5, editingRowIndex, 16); 
+            model.setValueAt(f5, editingRowIndex, 17);
+            
             model.setValueAt(c6, editingRowIndex, 18);
-            model.setValueAt(m6, editingRowIndex, 19); // Midterm Grade for Course 6
-            model.setValueAt(f6, editingRowIndex, 20); // Final Grade for Course 6
+            model.setValueAt(m6, editingRowIndex, 19); 
+            model.setValueAt(f6, editingRowIndex, 20); 
+            
             model.setValueAt(c7, editingRowIndex, 21);
-            model.setValueAt(m7, editingRowIndex, 22); // Midterm Grade for Course 7
-            model.setValueAt(f7, editingRowIndex, 23); // Final Grade for Course 7
+            model.setValueAt(m7, editingRowIndex, 22); 
+            model.setValueAt(f7, editingRowIndex, 23);
+            
             model.setValueAt(c8, editingRowIndex, 24);
-            model.setValueAt(m8, editingRowIndex, 25); // Midterm Grade for Course 8
-            model.setValueAt(f8, editingRowIndex, 26); // Final Grade for Course 8
+            model.setValueAt(m8, editingRowIndex, 25); 
+            model.setValueAt(f8, editingRowIndex, 26); 
 
 
         JOptionPane.showMessageDialog(this, "Row updated successfully.", "Update Successful", JOptionPane.INFORMATION_MESSAGE);
@@ -781,7 +851,7 @@ public class Grade_Class extends JFrame implements ActionListener{
 
         }
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Database error", "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         }
             } else {
@@ -799,52 +869,43 @@ public class Grade_Class extends JFrame implements ActionListener{
         if (selectedRow != -1) {
             editingRowIndex = selectedRow;
             
-            // Disable ID, Name, and Sem fields to prevent editing
+            // Disable ID textfield to prevent editing
             txtId.setEditable(false);
-            txtName.setEditable(false);
-            txtSem.setEditable(false);
             
             // Populate the text fields with the data from the selected row
             txtId.setText(model.getValueAt(selectedRow, 0).toString());
             txtName.setText(model.getValueAt(selectedRow, 1).toString());
             txtSem.setText(model.getValueAt(selectedRow, 2).toString());
 
-            // Set course 1 details
+            // Set course 1 - 8 details
             txtC1.setText(model.getValueAt(selectedRow, 3).toString());
             txtG1.setText(model.getValueAt(selectedRow, 4).toString()); 
             txtG1f.setText(model.getValueAt(selectedRow, 5).toString()); 
 
-            // Set course 2 details
             txtC2.setText(model.getValueAt(selectedRow, 6).toString());
             txtG2.setText(model.getValueAt(selectedRow, 7).toString());
             txtG2f.setText(model.getValueAt(selectedRow, 8).toString()); 
 
-            // Set course 3 details
             txtC3.setText(model.getValueAt(selectedRow, 9).toString());
             txtG3.setText(model.getValueAt(selectedRow, 10).toString()); 
             txtG3f.setText(model.getValueAt(selectedRow, 11).toString());
 
-            // Set course 4 details
             txtC4.setText(model.getValueAt(selectedRow, 12).toString());
             txtG4.setText(model.getValueAt(selectedRow, 13).toString()); 
             txtG4f.setText(model.getValueAt(selectedRow, 14).toString()); 
 
-            // Set course 5 details
             txtC5.setText(model.getValueAt(selectedRow, 15).toString());
             txtG5.setText(model.getValueAt(selectedRow, 16).toString()); 
             txtG5f.setText(model.getValueAt(selectedRow, 17).toString()); 
 
-            // Set course 6 details
             txtC6.setText(model.getValueAt(selectedRow, 18).toString());
             txtG6.setText(model.getValueAt(selectedRow, 19).toString());
             txtG6f.setText(model.getValueAt(selectedRow, 20).toString()); 
 
-            // Set course 7 details
             txtC7.setText(model.getValueAt(selectedRow, 21).toString());
             txtG7.setText(model.getValueAt(selectedRow, 22).toString()); 
             txtG7f.setText(model.getValueAt(selectedRow, 23).toString()); 
 
-            // Set course 8 details
             txtC8.setText(model.getValueAt(selectedRow, 24).toString());
             txtG8.setText(model.getValueAt(selectedRow, 25).toString()); 
             txtG8f.setText(model.getValueAt(selectedRow, 26).toString()); 
@@ -856,13 +917,14 @@ public class Grade_Class extends JFrame implements ActionListener{
     }
     
     //load data from database to JTable
-    private void loadDataFromDatabase() {
+    private void DbToTable() {
     try (Connection conn = connectToDatabase();
          Statement stmt = conn.createStatement();
          ResultSet rs = stmt.executeQuery("SELECT * FROM grade")) {
         
-        // Clear existing rows in the table model
-        model.setRowCount(0);
+        
+        dataRows.clear(); // Clear dataRows to ensure fresh data is loaded
+
 
         while (rs.next()) {
             Object[] row = { rs.getString("studId"), rs.getString("studName"), rs.getString("sem"),
@@ -876,17 +938,81 @@ public class Grade_Class extends JFrame implements ActionListener{
                 rs.getString("course8"), rs.getString("mid8"), rs.getString("fin8"),
                 rs.getString("midterm"), rs.getString("final"), rs.getString("gwa") };
 
-            // Add the row to the table model
             model.addRow(row);
+            dataRows.add(row);
+        }
+
+        // Sort the data and update the table
+        sortRows();
        
-                }
+                
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     
-    // Methods to calculate the grade in midterm and final grade average 
-    private void termsCalculation(int rowIndex) {
+    // If course is vacant the textfields are set to non editable
+     private void vacantCourse() {
+        String course1 = txtC1.getText();
+        String course2 = txtC2.getText();
+        String course3 = txtC3.getText();
+        String course4 = txtC4.getText();
+        String course5 = txtC5.getText();
+        String course6 = txtC6.getText();
+        String course7 = txtC7.getText();
+        String course8 = txtC8.getText();
+
+        if ("Vacant".equalsIgnoreCase(course1)) {
+            txtG1.setEditable(false);
+            txtG1f.setEditable(false);
+            txtG1.setText("--");
+            txtG1f.setText("--");
+            
+        } if ("Vacant".equalsIgnoreCase(course2)) {
+            txtG2.setEditable(false);
+            txtG2f.setEditable(false);
+            txtG2.setText("--");
+            txtG2f.setText("--");
+            
+        } if ("Vacant".equalsIgnoreCase(course3)) {
+            txtG3.setEditable(false);
+            txtG3f.setEditable(false);
+            txtG3.setText("--");
+            txtG3f.setText("--");
+            
+        } if ("Vacant".equalsIgnoreCase(course4)) {
+            txtG4.setEditable(false);
+            txtG4f.setEditable(false);
+            txtG4.setText("--");
+            txtG4f.setText("--");
+            
+        } if ("Vacant".equalsIgnoreCase(course5)) {
+            txtG5.setEditable(false);
+            txtG5f.setEditable(false);
+            txtG5.setText("--");
+            txtG5f.setText("--");
+            
+        } if ("Vacant".equalsIgnoreCase(course6)) {
+            txtG6.setEditable(false);
+            txtG6f.setEditable(false);
+            txtG6.setText("--");
+            txtG6f.setText("--");
+            
+        }  if ("Vacant".equalsIgnoreCase(course7)) {
+            txtG7.setEditable(false);
+            txtG7f.setEditable(false);
+            txtG7.setText("--");
+            txtG7f.setText("--");
+            
+        } if ("Vacant".equalsIgnoreCase(course8)) {
+            txtG8.setEditable(false);
+            txtG8f.setEditable(false);
+            txtG8.setText("--");
+            txtG8f.setText("--");
+        }
+    }
+    
+   private void termsCalculation(int rowIndex) {
         try {
             // Get grades for midterm (fallback to 0.0 if the field is empty)
             double g1 = parseGrade(model.getValueAt(rowIndex, 4).toString());
@@ -907,57 +1033,126 @@ public class Grade_Class extends JFrame implements ActionListener{
             double g6f = parseGrade(model.getValueAt(rowIndex, 20).toString());
             double g7f = parseGrade(model.getValueAt(rowIndex, 23).toString());
             double g8f = parseGrade(model.getValueAt(rowIndex, 26).toString());
-            
-            // Check for incomplete grades
-            boolean isMidIncomplete = (g1 == 0.0 || g2 == 0.0 || g3 == 0.0 || g4 == 0.0 || g5 == 0.0 || g6 == 0.0 || g7 == 0.0 || g8 == 0.0); 
-            boolean isFinIncomplete = (g1f == 0.0 || g2f == 0.0 || g3f == 0.0 || g4f == 0.0 || g5f == 0.0 || g6f == 0.0 || g7f == 0.0 || g8f == 0.0);
 
-           
-             String midtermResult;
-             String finalResult;
-             String gwaResult;
+        // Count non-vacant courses for midterm and check for completeness
+        int midtermCount = 0;
+        boolean isMidIncomplete = false;
 
-            // Midterm grade calculation
-            if (isMidIncomplete) {
-                midtermResult = "Grade Incomplete";
-            } else {
-                double midtermAverage = (g1 + g2 + g3 + g4 + g5 + g6 + g7 + g8) / 8;
-                midtermResult = String.valueOf(midtermAverage);
+            if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 3).toString())) { // Course 1
+                if (g1 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            } if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 6).toString())) { // Course 2
+                if (g2 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 9).toString())) { // Course 3
+                if (g3 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 12).toString())) { // Course 4
+                if (g4 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 15).toString())) { // Course 5
+                if (g5 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 18).toString())) { // Course 6
+                if (g6 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 21).toString())) { // Course 7
+                if (g7 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 24).toString())) { // Course 8
+                if (g8 == 0.0) isMidIncomplete = true;
+                else midtermCount++;
             }
 
-            // Final grade calculation
-            if (isFinIncomplete) {
-                finalResult = "Grade Incomplete";
-            } else {
-                double finalAverage = (g1f + g2f + g3f + g4f + g5f + g6f + g7f + g8f) / 8;
-                finalResult = String.valueOf(finalAverage);
-            }
-            
-            if (!midtermResult.equals("Grade Incomplete") && !finalResult.equals("Grade Incomplete")) {
-                double gwa = (Double.parseDouble(midtermResult) + Double.parseDouble(finalResult)) / 2;
-                gwaResult = String.valueOf(gwa);
-            } else {
-                gwaResult = "Grade Incomplete";
-            }
-            
-                 // Update JTable
-            model.setValueAt(midtermResult, rowIndex, 27); // Midterm Average
-            model.setValueAt(finalResult, rowIndex, 28);  // Final Average
-            model.setValueAt(gwaResult, rowIndex, 29);    // GWA
+        // Count non-vacant courses for final and check for completeness
+        int finalCount = 0;
+        boolean isFinIncomplete = false;
 
-            // Save to database
-            saveAveragesToDatabase(rowIndex, midtermResult, finalResult, gwaResult);
+            if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 3).toString())) { // Course 1
+                if (g1f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 6).toString())) { // Course 2
+                if (g2f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 9).toString())) { // Course 3
+                if (g3f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 12).toString())) { // Course 4
+                if (g4f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 15).toString())) { // Course 5
+                if (g5f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 18).toString())) { // Course 6
+                if (g6f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 21).toString())) { // Course 7
+                if (g7f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+                
+            }if (!"Vacant".equalsIgnoreCase(model.getValueAt(rowIndex, 24).toString())) { // Course 8
+                if (g8f == 0.0) isFinIncomplete = true;
+                else finalCount++;
+            }
 
-            
+        // Calculate results
+        String midtermResult;
+        String finalResult;
+        String gwaResult;
+
+        if (isMidIncomplete || midtermCount == 0) {
+            midtermResult = "Grade Incomplete";
+        } else {
+            double midtermAverage = (g1 + g2 + g3 + g4 + g5 + g6 + g7 + g8) / midtermCount;
+            midtermResult = String.format("%.2f", midtermAverage); // Format to 2 decimal places
+        }
+
+        if (isFinIncomplete || finalCount == 0) {
+            finalResult = "Grade Incomplete";
+        } else {
+            double finalAverage = (g1f + g2f + g3f + g4f + g5f + g6f + g7f + g8f) / finalCount;
+            finalResult = String.format("%.2f", finalAverage); // Format to 2 decimal places
+        }
+
+        if (!midtermResult.equals("Grade Incomplete") && !finalResult.equals("Grade Incomplete")) {
+            double gwa = (Double.parseDouble(midtermResult) + Double.parseDouble(finalResult)) / 2;
+            gwaResult = String.format("%.2f", gwa); // Format to 2 decimal places
+        } else {
+            gwaResult = "Grade Incomplete";
+        }
+
+
+        // Update JTable
+        model.setValueAt(midtermResult, rowIndex, 27); // Midterm Average
+        model.setValueAt(finalResult, rowIndex, 28);  // Final Average
+        model.setValueAt(gwaResult, rowIndex, 29);    // GWA
+
+        // Save to database
+        saveAveragesToDatabase(rowIndex, midtermResult, finalResult, gwaResult);
+
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid grade input. Please ensure all grades are numbers.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+
     // Helper method to parse grades with fallback
     private double parseGrade(String grade) {
-        if (grade == null || grade.trim().isEmpty()) {
-            return 0.0; // Default to 0.0 for empty or null input
+        if (grade == null || grade.trim().isEmpty() || "--".equals(grade)) {
+            return 0.0; // Default to 0.0 for empty or "Vacant" input
         }
         try {
             return Double.parseDouble(grade); // Parse the grade value
@@ -995,8 +1190,9 @@ public class Grade_Class extends JFrame implements ActionListener{
     
     //Validate the grades 
     private boolean isValidGrade(String grade) {
-        if (grade == null || grade.trim().isEmpty()) {
-            return true; // Accept blank or no data as valid
+        if (grade == null || grade.trim().isEmpty() || "--".equals(grade)) {
+        return true; // Accept blank, no data, or "--" as valid (for vacant courses)
+    
         }
         try {
             double value = Double.parseDouble(grade);
@@ -1005,4 +1201,119 @@ public class Grade_Class extends JFrame implements ActionListener{
             return false; // Invalid if not a number
         }
     }
+    
+
+    // Sorting Algorithm implementation (bubble sort)
+    private void bubbleSort (ArrayList <Object[]> studData){
+        int numStudent = studData.size();
+        
+        for (int i = 0; i< numStudent-1; i++){
+            for (int j = 0; j < numStudent - i - 1; j++) {
+            
+            String name1 = studData.get(j)[1].toString().toLowerCase();
+            String name2 = studData.get(j + 1)[1].toString().toLowerCase();
+            
+             if (name1.compareTo(name2) > 0) {
+                // Swap the current student with the next student
+                Object[] temp = studData.get(j);
+                studData.set(j, studData.get(j + 1));
+                studData.set(j + 1, temp);
+                }
+            }
+        }                
+    }
+
+    // Sort and Update JTable
+    private void sortRows() {
+        bubbleSort(dataRows);
+        updateTableModel();
+    }
+
+    // Method to Update Table Model
+    private void updateTableModel() {
+        model.setRowCount(0); // Clear the JTable
+        for (Object[] row : dataRows) {
+            model.addRow(row); // Add rows from sorted dataRows
+        }
+    }
+    
+    private void searchStudent() {
+        String search = txtSearch.getText().trim();
+
+        if (!search.isEmpty()) {
+        Object[] result = binarySearchStudent(search); // Search by Name or ID using binary search
+        
+            if (result != null) {
+            // Move the found student to the top of the JTable
+            moveStudentToTop(result);
+            txtSearch.setText("");
+            JOptionPane.showMessageDialog(this, "Student found and moved to the top.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+        
+            } else {
+            JOptionPane.showMessageDialog(this, "Student not found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+        }
+    } else {
+            JOptionPane.showMessageDialog(this, "Please enter a name or ID to search.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        
+        }
+    }
+    
+   private Object[] binarySearchStudent(String search) {
+        // Determine if search is by ID (numeric) or name (alphabetic)
+        boolean isSearchingById = search.matches("\\d+"); // Numeric input for ID
+
+        int left = 0;
+        int right = dataRows.size() - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            Object[] midRow = dataRows.get(mid);
+
+            String studName = midRow[1].toString().toLowerCase();  // Name
+            String studId = midRow[0].toString().toLowerCase();    // ID
+
+            // Compare search text with both name and ID
+            if (studName.equalsIgnoreCase(search) || studId.equalsIgnoreCase(search)) {
+                return midRow; // Found the student
+            }
+
+            // Adjust search range based on the comparison of the chosen field
+            if (isSearchingById) {
+                int idComparison = studId.compareToIgnoreCase(search);
+                if (idComparison < 0) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            } else {
+                int nameComparison = studName.compareToIgnoreCase(search);
+                if (nameComparison < 0) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+        }
+        return null; // Student not found
+    }
+
+    
+    private void moveStudentToTop(Object[] studentRow) {
+        
+        dataRows.remove(studentRow);
+        dataRows.add(0, studentRow);
+
+        // Update the table model to reflect the change
+        updateTableModel();
+    }
+    
+    private void refreshTable() {
+        
+        DbToTable(); 
+        updateTableModel();
+    }
+    
+   
+
+
 }

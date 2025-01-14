@@ -37,6 +37,7 @@ public class Register_Frame extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setLocationRelativeTo(null);
+        setResizable(false);
         
         lbltitle = new JLabel("REGISTER");
         lbltitle.setBounds(525, 70, 800, 50);
@@ -103,21 +104,10 @@ public class Register_Frame extends JFrame implements ActionListener {
         add(btnconfirm);
         
         ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
-        Image scale = imgIconLogo.getImage().getScaledInstance(298, 290, Image.SCALE_SMOOTH);
+        Image scale = imgIconLogo.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
         ImageIcon imgnew = new ImageIcon(scale);
-
         lbllogo = new JLabel(imgnew); 
-
-     //       @Override
-      //      protected void paintComponent(Graphics g) {
-     //           Shape circle = new Ellipse2D.Double(0, 0, getWidth(), getHeight());
-     //           g.setClip(circle);
-     //           super.paintComponent(g);
-      //      }
-      //  };
-      lbllogo.setBounds(95, 150, 200, 200);
-      lbllogo.setOpaque(true);
-      lbllogo.setBackground(new Color(220, 220, 220));
+        lbllogo.setBounds(50, 100, 300, 300);
         add(lbllogo);
         
         btnlogin.addActionListener(this);

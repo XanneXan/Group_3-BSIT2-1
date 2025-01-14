@@ -28,13 +28,13 @@ public class Menu_Frame extends JFrame implements ActionListener {
 
         // Title of the frame
         lblTitle = new JLabel("STUDENT MANAGEMENT");
-        lblTitle.setBounds(119, 50, 500, 40);
+        lblTitle.setBounds(119, 30, 500, 40);
         lblTitle.setForeground(new Color(125, 5, 4));
         lblTitle.setFont(new Font("Serif", Font.BOLD, 35));
         add(lblTitle);
 
         lblSystem = new JLabel("SYSTEM");
-        lblSystem.setBounds(268, 90, 500, 40);
+        lblSystem.setBounds(268, 70, 500, 40);
         lblSystem.setForeground(new Color(125, 5, 4));
         lblSystem.setFont(new Font("Serif", Font.BOLD, 35));
         add(lblSystem);
