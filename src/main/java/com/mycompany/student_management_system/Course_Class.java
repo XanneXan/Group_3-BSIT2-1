@@ -5,14 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -27,6 +21,8 @@ public class Course_Class extends JFrame implements ActionListener{
     private DefaultTableModel mdl;
     private int editingRowIndex = -1;
     
+    private ArrayList<Object[]> dataRows = new ArrayList<>(); // Array list to store the data rows for the table
+  
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
     private String pass = "mysqlpasswordg3"; 
@@ -47,12 +43,12 @@ public class Course_Class extends JFrame implements ActionListener{
             setLayout(null);
             setBackground(new Color(125, 5, 4));
             setResizable(false);
-           Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\course_icon.jpg");
-           setIconImage(icon);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            getRootPane().setBorder(BorderFactory.createLineBorder(new Color(125,5,4),5));
-            getContentPane().setBackground(new Color(240,240,240));
-        
+            
+            ImageIcon course_icon = new ImageIcon("course_icon.jpg");
+            Image scale = course_icon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+            setIconImage(scale);
+            
             lblTitle = new JLabel ("Student Management System");
             lblTitle.setBounds(30, 20, 350, 30);setExtendedState(MAXIMIZED_BOTH);     
             lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
@@ -255,6 +251,7 @@ public class Course_Class extends JFrame implements ActionListener{
             String studentNum = txtStudentnum.getText();
             String courseIdPattern = "^[A-Z]{4}\\d{4}$";
             
+            Object[] tblRow = { courseId, courseName, studentNum };
             boolean isAddedtoDB = false; 
             
         if (courseId.isEmpty() && courseName.isEmpty() && studentNum.isEmpty()){
@@ -289,15 +286,22 @@ public class Course_Class extends JFrame implements ActionListener{
     }
 
         if (isAddedtoDB) {
-    JOptionPane.showMessageDialog(this, "Course added to the database successfully!");
-    } 
+            int confirmation = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to add this?",
+            "Add Confirmation", JOptionPane.YES_NO_OPTION);  // Confirmation message before adding the data
+            if (confirmation == JOptionPane.YES_OPTION){
+            dataRows.add(tblRow); // Save row to ArrayList
+            mdl.addRow(tblRow); // Display row in the table
+            clearTextFields();
+      JOptionPane.showMessageDialog(this, "Course added to the database successfully as well!");
+    }
+        }
        else {
     JOptionPane.showMessageDialog(this, "Failed to add the course.");
             }
         }
-  private void updateCourse() {
+private void updateCourse() {
     if (editingRowIndex != -1) {  
-
         String courseId = txtCourseId.getText().trim();
         String courseName = txtCourseName.getText().trim();
         String studentNum = txtStudentnum.getText().trim();
@@ -306,49 +310,66 @@ public class Course_Class extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        
         String courseIdPattern = "^[A-Z]{4}\\d{4}$";
         if (!courseId.matches(courseIdPattern)) {
             JOptionPane.showMessageDialog(this, "Invalid Course ID format. Must be 4 capital letters followed by 4 numbers (e.g., ABCD1234).", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        try (Connection conn = connectToDatabase()) {
-            String checkQuery = "SELECT COUNT(*) FROM course_table WHERE courseID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
-                stmt.setString(1, courseId);
-                ResultSet rs = stmt.executeQuery();
-                rs.next();
-                int count = rs.getInt(1);
 
-                if (count > 0) {
-                    JOptionPane.showMessageDialog(this, "Course ID already exists. Please choose a different ID.", "Duplicate Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error checking course ID: " + ex.getMessage());
+        if (!studentNum.matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "Student number must be a valid number.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        int originalStudentNum;
+        try {
+            originalStudentNum = Integer.parseInt(studentNum);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Student number must be a valid integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int confirmation = JOptionPane.showConfirmDialog(this, 
             "Are you sure you want to update the selected course?", 
             "Update Confirmation", JOptionPane.YES_NO_OPTION);
 
         if (confirmation == JOptionPane.YES_OPTION) {
-            mdl.setValueAt(courseId, editingRowIndex, 0);
-            mdl.setValueAt(courseName, editingRowIndex, 1);
-            mdl.setValueAt(studentNum, editingRowIndex, 2);
-
             try (Connection conn = connectToDatabase()) {
-                String udQue = "UPDATE course_table SET courseName = ?, studentNum = ? WHERE courseID = ?";
+                String originalCourseId = (String) mdl.getValueAt(editingRowIndex, 0);
+                if (!originalCourseId.equals(courseId)) {
+                    String checkQuery = "SELECT COUNT(*) FROM course_table WHERE courseID = ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
+                        stmt.setString(1, courseId);
+                        ResultSet rs = stmt.executeQuery();
+                        rs.next();
+                        int count = rs.getInt(1);
+                        if (count > 0) {
+                            JOptionPane.showMessageDialog(this, "Course ID already exists. Please choose a different ID.", "Duplicate Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+                }
+                // Updating course in database
+                String udQue = "UPDATE course_table SET courseID = ?, courseName = ?, studentNum = ? WHERE courseID = ?";
                 try (PreparedStatement stmt = conn.prepareStatement(udQue)) {
-                    stmt.setString(1, courseName);  
-                    stmt.setString(2, studentNum);   
-                    stmt.setString(3, courseId);     
-                    stmt.executeUpdate();            
+                    stmt.setString(1, courseId);  
+                    stmt.setString(2, courseName);  
+                    stmt.setInt(3, originalStudentNum);   
+                    stmt.setString(4, originalCourseId); 
+                    stmt.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "Course updated successfully!");
+
+                    // Updates table model
+                    mdl.setValueAt(courseId, editingRowIndex, 0);
+                    mdl.setValueAt(courseName, editingRowIndex, 1);
+                    mdl.setValueAt(studentNum, editingRowIndex, 2);
                 }
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error updating course: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error updating course: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             }
-            JOptionPane.showMessageDialog(this, "Course updated successfully!");
+
             clearTextFields();
             editingRowIndex = -1;  
         }
@@ -432,13 +453,14 @@ public class Course_Class extends JFrame implements ActionListener{
         int index = binarySearch(crs); //binary search method
         
      if (index != -1) {
-            tbl.setRowSelectionInterval(index, index); 
+            tbl.setRowSelectionInterval(index, index);
             found = true;
         }
     }
      if (!found) {
         JOptionPane.showMessageDialog(this, "No matching course found.");
     }
+     clearTextFields();
 }
    private void sortingAl(boolean par) {   //sorting algorithm method
     int n = mdl.getRowCount();
@@ -462,21 +484,21 @@ public class Course_Class extends JFrame implements ActionListener{
         mdl.setValueAt(temp, row2, col);
     }
 }
-    private int binarySearch(String crs) { //binary search method
+   private int binarySearch(String crs) { //binary search method
     int left = 0;
     int right = mdl.getRowCount() - 1;
 
     while (left <= right) {
         int mid = (left + right) / 2;
+        String courseId = mdl.getValueAt(mid, 0).toString().toLowerCase();
         String courseName = mdl.getValueAt(mid, 1).toString().toLowerCase(); // course ID is in the first column
 
-        if (courseName.equalsIgnoreCase(crs)) {
-            return mid; // Course found!
-        }
-        if (courseName.compareToIgnoreCase(crs) < 0) {
-            left = mid + 1; // Searching in the right half
+        if (courseId.contains(crs) || courseName.contains(crs)) {
+            return mid;
+        } else if (courseId.compareToIgnoreCase(crs) > 0) {
+            right = mid - 1;
         } else {
-            right = mid - 1; // Searching in the left half
+            left = mid + 1;
         }
     }
     return -1; // Course not found!

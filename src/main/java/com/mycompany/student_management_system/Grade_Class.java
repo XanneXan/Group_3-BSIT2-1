@@ -62,8 +62,9 @@ public class Grade_Class extends JFrame implements ActionListener{
         setExtendedState(MAXIMIZED_BOTH);     
         setLayout(null);
         setResizable(false);
-        Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\grade_icon.jpg");
-        setIconImage(icon);
+        ImageIcon course_icon = new ImageIcon("grade_icon.jpg");
+        Image scale = course_icon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        setIconImage(scale);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
         
