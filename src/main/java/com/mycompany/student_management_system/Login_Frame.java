@@ -12,16 +12,9 @@ package com.mycompany.student_management_system;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Ellipse2D;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
      public class Login_Frame extends JFrame implements ActionListener {
@@ -29,18 +22,21 @@ import javax.swing.*;
          private JPasswordField passField;
          private JLabel lblname,lbl, passJLabel, lbllogo,lblStudent, lblStudent1;
          private JButton btnlogin, btnregister;
-         private ImageIcon imgIconLogo, imgnew;
-         private URL ImgLogo;
+         
          
     Login_Frame (){
-      
+        
+        
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Student Management System - Login");
         setLayout(null);
         setLocationRelativeTo(null);
+        setResizable(false);
+        
         
         lblname = new JLabel("LOG IN");
-        lblname.setBounds(525, 70, 800, 50);
+        lblname.setBounds(560, 70, 800, 50);
         lblname.setFont(new Font("Arial Black",Font.BOLD,20));
         lblname.setForeground(new Color(125, 5, 4));
         add(lblname);
@@ -89,22 +85,12 @@ import javax.swing.*;
         
         
         ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
-         Image scale = imgIconLogo.getImage().getScaledInstance(29, 285, Image.SCALE_SMOOTH);
-         ImageIcon imgnew = new ImageIcon(scale);
-
-         lbllogo = new JLabel(imgnew); 
-         lbllogo = new JLabel(imgnew) {
-             @Override
-             protected void paintComponent(Graphics g) {
-                 Shape circle = new Ellipse2D.Double(0, 0, getWidth(), getHeight());
-                 g.setClip(circle);
-                 super.paintComponent(g);
-            }
-         };
-         lbllogo.setBounds(94, 150, 200, 200);
-         lbllogo.setOpaque(true);
-         lbllogo.setBackground(new Color(220, 220, 220));
-         add(lbllogo);
+        Image scale = imgIconLogo.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+        ImageIcon imgnew = new ImageIcon(scale);
+        lbllogo = new JLabel(imgnew);
+        lbllogo.setBounds(50, 100, 300, 300);
+        add(lbllogo);
+         
 
         
         

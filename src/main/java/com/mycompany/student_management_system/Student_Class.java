@@ -9,6 +9,11 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -17,14 +22,18 @@ import java.awt.event.ActionListener;
 
 public class Student_Class extends JFrame implements ActionListener {
     
-    private JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch;
-    private JTextField txtName, txtId, txtSearch;
-    private JComboBox<String> cmbSem, cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8;
-    private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu;
-    private JTable studList;
+    private final JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch;
+    private final JTextField txtName, txtId, txtSearch;
+    private final JComboBox<String> cmbSem, cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8;
+    private final JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu;
+    private final JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
-    private int editingRowIndex = -1;//
+    private int editingRowIndex = -1;
+    
+    //global varbs for mySql connection
+    private PreparedStatement pst;
+    private Connection con;
     
     // Original format for column in the table
     private int[] originalColumnFormat;
@@ -34,14 +43,13 @@ public class Student_Class extends JFrame implements ActionListener {
     String[] semester = {"1", "2"};
     
     //tentative list of courses, will be inputed as proxy
-    String[] courses = { "N/A or Vacant", "Introduction to Computing", "Computer Programming 1",
+    String[] courses = { "Vacant", "Introduction to Computing", "Computer Programming 1",
                         "Computer Programming 2", "Data Structures and Algorithm",
                         "Structured Programming", "Object-Oriented Programming",
                         "Networking and Data Communications", "Web Development"};
     
-    String[] columnList = {"ID", "Name", "Semester", "Course 1", "Grade", "Course 2", "Grade", 
-                           "Course 3", "Grade", "Course 4", "Grade", "Course 5", "Grade",
-                           "Course 6", "Grade", "Course 7", "Grade", "Course 8", "Grade", "Average"};
+    String[] columnList = {"ID", "Name", "Semester", "Course 1", "Course 2", 
+                           "Course 3", "Course 4", "Course 5", "Course 6", "Course 7", "Course 8",};
     
     Student_Class(){
         
@@ -235,6 +243,9 @@ public class Student_Class extends JFrame implements ActionListener {
         btnSearch.addActionListener(this);
         btnRefresh.addActionListener(this);
         btnMenu.addActionListener(this);
+        
+        //add the method for connecting to mysql
+        connectionMySql();
 
     }
     
@@ -243,25 +254,17 @@ public class Student_Class extends JFrame implements ActionListener {
         TableColumnModel columnModel = studList.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(80); 
         columnModel.getColumn(1).setPreferredWidth(250);
-        columnModel.getColumn(2).setPreferredWidth(150);
-        columnModel.getColumn(3).setPreferredWidth(150);
-        columnModel.getColumn(4).setPreferredWidth(50);
-        columnModel.getColumn(5).setPreferredWidth(150);
-        columnModel.getColumn(6).setPreferredWidth(50);
-        columnModel.getColumn(7).setPreferredWidth(150);
-        columnModel.getColumn(8).setPreferredWidth(50);
-        columnModel.getColumn(9).setPreferredWidth(150);
-        columnModel.getColumn(10).setPreferredWidth(50);
-        columnModel.getColumn(11).setPreferredWidth(150);
-        columnModel.getColumn(12).setPreferredWidth(50);
-        columnModel.getColumn(13).setPreferredWidth(150);
-        columnModel.getColumn(14).setPreferredWidth(50);
-        columnModel.getColumn(15).setPreferredWidth(150);
-        columnModel.getColumn(16).setPreferredWidth(50);
-        columnModel.getColumn(17).setPreferredWidth(150);
-        columnModel.getColumn(18).setPreferredWidth(50);
-        columnModel.getColumn(19).setPreferredWidth(150);
+        columnModel.getColumn(2).setPreferredWidth(250);
+        columnModel.getColumn(3).setPreferredWidth(250);
+        columnModel.getColumn(4).setPreferredWidth(250);
+        columnModel.getColumn(5).setPreferredWidth(250);
+        columnModel.getColumn(6).setPreferredWidth(250);
+        columnModel.getColumn(7).setPreferredWidth(250);
+        columnModel.getColumn(8).setPreferredWidth(250);
+        columnModel.getColumn(9).setPreferredWidth(250);
+        columnModel.getColumn(10).setPreferredWidth(250);
         return columnModel;
+        
     }
     
     //method for easy manipulation of the comboboxes
@@ -274,7 +277,7 @@ public class Student_Class extends JFrame implements ActionListener {
         ArrayList<String> selectedCourses = new ArrayList<>();
         for (JComboBox<String> cmb : getComboBoxes()) {
             String selected = (String) cmb.getSelectedItem();
-            if (selected != null && !selected.isEmpty() && !selected.equals("N/A or Vacant")) {
+            if (selected != null && !selected.isEmpty() && !selected.equals(" ")) {
                 selectedCourses.add(selected);
             }
         }
@@ -320,13 +323,13 @@ public class Student_Class extends JFrame implements ActionListener {
             txtName.setText(model.getValueAt(selectedRow, 1).toString());
             cmbSem.setSelectedItem(model.getValueAt(selectedRow, 2).toString());
             cmbC1.setSelectedItem(model.getValueAt(selectedRow, 3).toString());
-            cmbC2.setSelectedItem(model.getValueAt(selectedRow, 5).toString());
-            cmbC3.setSelectedItem(model.getValueAt(selectedRow, 7).toString());
-            cmbC4.setSelectedItem(model.getValueAt(selectedRow, 9).toString());
-            cmbC5.setSelectedItem(model.getValueAt(selectedRow, 11).toString());
-            cmbC6.setSelectedItem(model.getValueAt(selectedRow, 13).toString());
-            cmbC7.setSelectedItem(model.getValueAt(selectedRow, 15).toString());
-            cmbC8.setSelectedItem(model.getValueAt(selectedRow, 17).toString());
+            cmbC2.setSelectedItem(model.getValueAt(selectedRow, 4).toString());
+            cmbC3.setSelectedItem(model.getValueAt(selectedRow, 5).toString());
+            cmbC4.setSelectedItem(model.getValueAt(selectedRow, 6).toString());
+            cmbC5.setSelectedItem(model.getValueAt(selectedRow, 7).toString());
+            cmbC6.setSelectedItem(model.getValueAt(selectedRow, 8).toString());
+            cmbC7.setSelectedItem(model.getValueAt(selectedRow, 9).toString());
+            cmbC8.setSelectedItem(model.getValueAt(selectedRow, 10).toString());
             
         }else{
              JOptionPane.showMessageDialog(this, "Please select a row to edit.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -335,7 +338,6 @@ public class Student_Class extends JFrame implements ActionListener {
     
     //method to add student in the table
     private void addStudent() {
-        String grade = "N/A";
         String ID = txtId.getText().trim();
         String studName = txtName.getText().trim();
         String sem = (String) cmbSem.getSelectedItem();
@@ -351,31 +353,68 @@ public class Student_Class extends JFrame implements ActionListener {
         ArrayList<String> selectedCourses = getCourse();
         clearFieldsAndCmBoxes();
         
+        // Validqtion, 6 digits)
+        if (!ID.matches("\\d{6}")) {
+            JOptionPane.showMessageDialog(this, "Invalid ID. Please enter a number with up to 6 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+            return; 
+        }
+        
         int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to add student?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-        if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION) {
-
-            Object[] rowData = {ID, studName, sem, 
-                cmb1, grade, cmb2, grade, cmb3, grade, cmb4, grade, 
-                cmb5, grade, cmb6, grade, cmb7, grade, cmb8, grade, grade};
- 
-            storeStudent.add(rowData);//save to arrayList
-            model.addRow(rowData);
-
-            JOptionPane.showMessageDialog(this, "Student Added.", "Succesful.", JOptionPane.INFORMATION_MESSAGE);
+        if (ID.isEmpty() || studName.isEmpty() || selectedCourses.isEmpty()) {
+             JOptionPane.showMessageDialog(this, "Please fill in all required information.", "Error", JOptionPane.ERROR_MESSAGE);
             
-        }else if(confirmation == JOptionPane.NO_OPTION){
-           //it will not show anything
-        }else {
-            JOptionPane.showMessageDialog(this, "Please fill in all required information.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        }else if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION){
+             try {
+               // Check for duplicate ID
+               pst = con.prepareStatement("SELECT COUNT(*) FROM student WHERE ID = ?");
+               pst.setString(1, ID);
+               ResultSet rs = pst.executeQuery();
+               if (rs.next() && rs.getInt(1) > 0) {
+                   JOptionPane.showMessageDialog(this, "ID already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+               }
+                    pst = con.prepareStatement("INSERT INTO student (ID, Name, Semester, Course1, Course2,  Course3,  Course4,"
+                            + " Course5,  Course6,  Course7,  Course8) "
+                            + "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+                    
+                    pst.setString(1, ID);
+                    pst.setString(2, studName);
+                    pst.setString(3, sem);
+                    pst.setString(4, cmb1);
+                    pst.setString(5, cmb2);
+                    pst.setString(6, cmb3);
+                    pst.setString(7, cmb4);
+                    pst.setString(8, cmb5);
+                    pst.setString(9, cmb6);
+                    pst.setString(10, cmb7);
+                    pst.setString(11, cmb8);
+
+                    int k = pst.executeUpdate();
+                    
+                    if (k == 1) {
+                        JOptionPane.showMessageDialog(this, "Student added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                        // Add the data to the table model
+                        Object[] rowData = {ID, studName, sem, cmb1, cmb2, cmb3, cmb4, cmb5, cmb6, cmb7, cmb8,};
+                        
+                        storeStudent.add(rowData); // Save to ArrayList
+                        model.addRow(rowData);
+                    }
+                    
+               } catch(Exception ex){
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+               }
+             
+           }else {
+             JOptionPane.showMessageDialog(this, "Fill Information.", "Notification", JOptionPane.INFORMATION_MESSAGE);
+        } 
     }
     
     //methpd for updating student info
     private void updateStudent() {
         int selectedRow = studList.getSelectedRow();
         if (selectedRow != -1) {
-            String grade = "N/A";
             String ID = txtId.getText().trim();
             String studName = txtName.getText().trim();
             String sem = (String) cmbSem.getSelectedItem();
@@ -399,27 +438,19 @@ public class Student_Class extends JFrame implements ActionListener {
             model.setValueAt(studName, editingRowIndex, 1);
             model.setValueAt(sem, editingRowIndex, 2);
             model.setValueAt(cmb1, editingRowIndex, 3);
-            model.setValueAt(grade, editingRowIndex, 4);
-            model.setValueAt(cmb2, editingRowIndex, 5);
-            model.setValueAt(grade, editingRowIndex, 6);
-            model.setValueAt(cmb3, editingRowIndex, 7);
-            model.setValueAt(grade, editingRowIndex, 8);
-            model.setValueAt(cmb4, editingRowIndex, 9);
-            model.setValueAt(grade, editingRowIndex, 10);
-            model.setValueAt(cmb5, editingRowIndex, 11);
-            model.setValueAt(grade, editingRowIndex, 12);
-            model.setValueAt(cmb6, editingRowIndex, 13);
-            model.setValueAt(grade, editingRowIndex, 14);
-            model.setValueAt(cmb7, editingRowIndex, 15);
-            model.setValueAt(grade, editingRowIndex, 16);
-            model.setValueAt(cmb8, editingRowIndex, 17);
-            model.setValueAt(grade, editingRowIndex, 18);
-            model.setValueAt(grade, editingRowIndex, 19);
+            model.setValueAt(cmb2, editingRowIndex, 4);
+            model.setValueAt(cmb3, editingRowIndex, 5);
+            model.setValueAt(cmb4, editingRowIndex, 6);
+            model.setValueAt(cmb5, editingRowIndex, 7);
+            model.setValueAt(cmb6, editingRowIndex, 8);
+            model.setValueAt(cmb7, editingRowIndex, 9);
+            model.setValueAt(cmb8, editingRowIndex, 10);
 
             JOptionPane.showMessageDialog(this, "Student updated successfully.", "Successful", JOptionPane.INFORMATION_MESSAGE);
                 
             }else if(confirmation == JOptionPane.NO_OPTION){
              //it will not show anything
+             
             }else {
                 JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -491,6 +522,21 @@ public class Student_Class extends JFrame implements ActionListener {
         
         JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
     }
+    
+    //method to connect to mysql
+    public void connectionMySql(){
+        
+        String url = "jdbc:mysql://127.0.0.1:3306/student_management_system";
+        String username = "root";
+        String password = "mysqlpasswordg3";
+        
+        try{
+            con = DriverManager.getConnection(url, username, password);
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
      
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -511,7 +557,7 @@ public class Student_Class extends JFrame implements ActionListener {
                 refreshTable();
             } else if (e.getSource() == btnMenu) {
                 new Menu_Frame().setVisible(true);
-                dispose();//proxy
+                dispose();
             }
                 
         } catch (Exception e1) {
