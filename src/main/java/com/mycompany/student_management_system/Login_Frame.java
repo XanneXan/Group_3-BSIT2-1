@@ -1,9 +1,5 @@
-package com.mycompany.student_management_system;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+package com.mycompany.student_management_system;
 
 /**
  *
@@ -15,17 +11,27 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.*;
 
      public class Login_Frame extends JFrame implements ActionListener {
          private JTextField txtInput;
          private JPasswordField passField;
-         private JLabel lblname,lbl, passJLabel, lbllogo,lblStudent, lblStudent1;
+         private JLabel lblname,lbl, passJLabel, lbllogo,lblStudent, lblStudent1, lblCountdown;
          private JButton btnlogin, btnregister;
          
+        private Connection registerCon; // Connection for the 'register' database
+        private Connection loginCon;    // Connection for the 'login' database
+        private PreparedStatement pst;
+        private int loginAttempt = 0;
+        private int loginCountdown = 60;
+        private Timer timer;
          
     Login_Frame (){
-        
         
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,7 +39,6 @@ import javax.swing.*;
         setLayout(null);
         setLocationRelativeTo(null);
         setResizable(false);
-        
         
         lblname = new JLabel("LOG IN");
         lblname.setBounds(560, 70, 800, 50);
@@ -55,6 +60,13 @@ import javax.swing.*;
         lbl.setBounds(370,180 ,150, 50);
         lbl.setFont(new Font("Arial Black",Font.BOLD,13));
         add(lbl);
+        
+        lblCountdown = new JLabel();
+        lblCountdown.setBounds(80, 470, 350, 30);
+        lblCountdown.setFont(new Font("Arial", Font.ITALIC, 14));
+        lblCountdown.setForeground(Color.RED);
+        add(lblCountdown);
+          
 
         txtInput = new JTextField();
         txtInput.setBounds (470,180,265,50);
@@ -83,7 +95,6 @@ import javax.swing.*;
         btnregister.setBackground(new Color(125, 5, 4));
         add(btnregister);
         
-        
         ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
         Image scale = imgIconLogo.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
         ImageIcon imgnew = new ImageIcon(scale);
@@ -91,38 +102,118 @@ import javax.swing.*;
         lbllogo.setBounds(50, 100, 300, 300);
         add(lbllogo);
          
-
-        
-        
         btnlogin.addActionListener(this);
         btnregister.addActionListener(this);
        
+        //add method for mysql
+        connectionMySql();
         
-        }
+    }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()== btnregister){
-            new Register_Frame ().setVisible (true);
+        
+        if(e.getSource() == btnregister) {     
+            new Register_Frame().setVisible(true);
             dispose();
             
-        }if (e.getSource()== btnlogin){
-            new Menu_Frame().setVisible(true);
-            dispose();
+        } if(e.getSource() == btnlogin) {
+          
+            String txt = txtInput.getText().trim();
+            String field = new String(passField.getPassword()).trim();
             
-            String txt=txtInput.getText().trim();
-            String field=new String(passField.getPassword()).trim();
-            
-            if(txt.isEmpty()&& field.isEmpty()){
-                JOptionPane.showMessageDialog(this, "PLEASE INPUT A PASSWORD AND NAME", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else if(field.isEmpty()){
-                JOptionPane.showMessageDialog(this, "PLEASE INPUT A PASSWORD", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else if(txt.isEmpty()) {
-                 JOptionPane.showMessageDialog(this, "PLEASE INPUT A NAME", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else {
-                JOptionPane.showMessageDialog(this, "INCORRECT NAME OR PASSWORD", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }
+            if(txt.isEmpty()&& field.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Input a Name and Password", "ERROR", JOptionPane.ERROR_MESSAGE);
                 
-           }
+            }else if(field.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Input a Password", "ERROR", JOptionPane.ERROR_MESSAGE);
+                
+            }else if(txt.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Input a Name", "ERROR", JOptionPane.ERROR_MESSAGE);
+                 
+            }else {
+                           
+                try {
+                    pst = registerCon.prepareStatement("SELECT * FROM register WHERE Username = ? AND Password = ?");
+                    pst.setString(1, txt);
+                    pst.setString(2, field);
+
+                    ResultSet result = pst.executeQuery();
+
+                    if (result.next()) {
+                        JOptionPane.showMessageDialog(this, "Login", "Successful", JOptionPane.INFORMATION_MESSAGE);
+                            try {
+                                pst = loginCon.prepareStatement("INSERT INTO login(Username, Password) VALUES(?,?)");
+                                pst.setString(1, txt);
+                                pst.setString(2, field);
+                                pst.executeUpdate();
+
+                            } catch(Exception ex){
+                                ex.printStackTrace();
+                            }
+                              new Menu_Frame().setVisible(true);
+                              dispose();
+                              
+                        } else {
+                            loginAttempt++; 
+                            if (loginAttempt >= 5) {
+                                startCountdown();
+                            } else {
+                                JOptionPane.showMessageDialog(this, "Incorrect name, password or no existing user. Attempt " + loginAttempt + " of 5.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }    
+
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "DATABASE ERROR", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+            }     
         }
     }
+      
+        public void connectionMySql() {
+
+            String urlReg = "jdbc:mysql://127.0.0.1:3306/student_management_system";
+            String usernameReg = "root";
+            String passwordReg = "mysqlpasswordg3";
+
+            try{
+                registerCon = DriverManager.getConnection(urlReg, usernameReg,passwordReg);
+            }
+            catch(SQLException ex){
+                ex.printStackTrace();
+            }
+            
+            String urlLog = "jdbc:mysql://127.0.0.1:3306/student_management_system";
+            String usernameLog = "root";
+            String passwordLog = "mysqlpasswordg3";
+
+            try{
+               loginCon = DriverManager.getConnection(urlLog,usernameLog,passwordLog);
+            } catch(SQLException ex){
+                ex.printStackTrace();
+            }
+    } 
+        
+        private void startCountdown() {
+        btnlogin.setEnabled(false);
+        lblCountdown.setText("Too many failed attempts. Please wait " + loginCountdown + " seconds.");
+        timer = new Timer(1000, new ActionListener() {
+            int timeLeft = loginCountdown;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeLeft--;
+                lblCountdown.setText("Too many failed attempts. Please wait " + timeLeft + " seconds.");
+                if (timeLeft <= 0) {
+                    timer.stop();
+                    btnlogin.setEnabled(true);
+                    lblCountdown.setText("");
+                    loginAttempt = 0; // Reset failed attempts
+                }
+            }
+        });
+        timer.start();
+    }
+ }    

@@ -1,27 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.student_management_system;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Ellipse2D;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.*;
 
 /**
  *
  * @author Admin
  */
+
 public class Register_Frame extends JFrame implements ActionListener {
     private JLabel lblpassword, lblpass, lblrpass, lbltitle, lblname, lblstud, lblsystem, lbllogo;
     private JTextField txtInput;
@@ -30,6 +27,9 @@ public class Register_Frame extends JFrame implements ActionListener {
     private ImageIcon imgIconLogo, imgnew;
     private URL ImgLogo;
     
+    //varbs for mysql
+    private PreparedStatement pst, insertPst;
+    private Connection con;
             
     Register_Frame (){
      
@@ -50,7 +50,7 @@ public class Register_Frame extends JFrame implements ActionListener {
         lblstud.setFont(new Font("Arial Black",Font.BOLD,20));
         add(lblstud);
         
-         lblsystem = new JLabel("SYSTEM");
+        lblsystem = new JLabel("SYSTEM");
         lblsystem.setBounds(150, 400, 800, 50);
         lblsystem.setFont(new Font("Arial Black",Font.BOLD,20));
         add(lblsystem);
@@ -88,7 +88,6 @@ public class Register_Frame extends JFrame implements ActionListener {
         add(rpassField);
         
         //Buttons
-        
         btnlogin = new JButton("LOG IN");
         btnlogin.setBounds(410,400,120,60);
         btnlogin.setFont(new Font("Arial Black",Font.BOLD,13));
@@ -114,35 +113,81 @@ public class Register_Frame extends JFrame implements ActionListener {
         btnconfirm.addActionListener(this);
         
     }
-
-    //Button function
     
+    //Button function
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource()==btnconfirm) { //if the confirm button was clicked
-            String txt=txtInput.getText().trim(); //get the text input from the txtInput field
-            String field=new String(passField.getPassword()).trim(); //get the password entered in the passField
-            String rfield=new String(rpassField.getPassword()).trim(); //get the password entered in the rpassField
+        if (e.getSource() == btnconfirm) { //if the confirm button was clicked
+            String txt = txtInput.getText().trim(); //get the text input from the txtInput field
+            String field = new String(passField.getPassword()).trim(); //get the password entered in the passField
+            String rfield = new String(rpassField.getPassword()).trim(); //get the password entered in the rpassField
             
-            if(txt.isEmpty()&& field.isEmpty()&& rfield.isEmpty()){
-                JOptionPane.showMessageDialog(this, "PLEASE FILL ALL FIELD", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else if(field.isEmpty()){
-                JOptionPane.showMessageDialog(this, "PLEASE INPUT A PASSWORD", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else if(txt.isEmpty()) {
-                 JOptionPane.showMessageDialog(this, "PLEASE INPUT A NAME", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else if(!field.equals(rfield)){
-                JOptionPane.showMessageDialog(this, "PASSWORD DO NOT MATCH", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }else{
-                JOptionPane.showMessageDialog(this, "SUCCESSFULLY REGISTERED");
+            if(txt.isEmpty()&& field.isEmpty()&& rfield.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all the required fields.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                
+            } else if(field.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Input a Password.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                
+            } else if(txt.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please Input a Name.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                 
+            } else if(rfield.isEmpty()) {
+                 JOptionPane.showMessageDialog(this, "Please Repeat the password.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                 
+            } else if(!field.equals(rfield)) {
+                JOptionPane.showMessageDialog(this, "Password Do Not Match.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                
+            } else {
+                try {
+                    pst = con.prepareStatement("SELECT * FROM register WHERE Username = ? AND Password = ?");
+                    pst.setString(1, txt);
+                    pst.setString(2, field);
+
+                    ResultSet result = pst.executeQuery();
+
+                    if (result.next()) {       
+                       JOptionPane.showMessageDialog(this, "User already exist.", "Registration", JOptionPane.INFORMATION_MESSAGE);
+                        
+                    } else {
+                        insertPst = con.prepareStatement("INSERT INTO register (Username, Password) VALUES(?,?)");
+                        insertPst.setString(1, txt);
+                        insertPst.setString(2, rfield);
+
+                        int k = insertPst.executeUpdate();
+
+                        if(k == 1){
+                          JOptionPane.showMessageDialog(this, "Successfully Registered", "Registration", JOptionPane.INFORMATION_MESSAGE);
+                          
+                        }
+                    }    
+
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                }
                 txtInput.setText("");
                 passField.setText("");
                 rpassField.setText("");
-                
-            
+                    
             }
-        }else if(e.getSource()==btnlogin){
-            new Login_Frame();
+            
+        } else if(e.getSource() == btnlogin) {
+            new Login_Frame().setVisible(true);
+            dispose();
+            
         }       
-      }
     }
     
+    public void connectionMySql(){
+        
+        String url = "jdbc:mysql://127.0.0.1:3306/student_management_system";
+        String username = "root";
+        String password = "mysqlpasswordg3";
+        
+        try{
+            con = DriverManager.getConnection(url, username, password);
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+}
