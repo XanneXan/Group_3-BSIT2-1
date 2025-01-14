@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -26,6 +25,12 @@ public class Course_Class extends JFrame implements ActionListener{
     private JScrollPane spane;
     private DefaultTableModel mdl;
     private int editingRowIndex = -1;
+    
+    //store course for dynamic access
+    public static ArrayList<String> storeCourse = new ArrayList<>();
+    
+    //global varbs for mySql connection
+    private Connection con;
     
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
@@ -41,14 +46,15 @@ public class Course_Class extends JFrame implements ActionListener{
     }
      
     Course_Class (){
-        // system layout
+        
+            //system layout
             setTitle("Student Management System");
             setExtendedState(MAXIMIZED_BOTH);     
             setLayout(null);
             setBackground(new Color(125, 5, 4));
             setResizable(false);
-           Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\course_icon.jpg");
-           setIconImage(icon);
+            Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\course_icon.jpg");
+            setIconImage(icon);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             getRootPane().setBorder(BorderFactory.createLineBorder(new Color(125,5,4),5));
             getContentPane().setBackground(new Color(240,240,240));
@@ -69,11 +75,6 @@ public class Course_Class extends JFrame implements ActionListener{
             lblcourseName.setFont(new Font("Arial", 1, 16));
             add (lblcourseName);
 
-            lblStudentNum = new JLabel ("Number of Students: ");
-            lblStudentNum.setBounds(50, 290, 250, 40);
-            lblStudentNum.setFont(new Font("Arial", 1, 16));
-            add (lblStudentNum);
-
             txtCourseId = new JTextField ("");
             txtCourseId.setEditable(true);
             txtCourseId.setBounds(200, 195, 250, 25);
@@ -83,12 +84,6 @@ public class Course_Class extends JFrame implements ActionListener{
             txtCourseName.setEditable(true);
             txtCourseName.setBounds(200, 245, 250, 25);
             add(txtCourseName);
-
-            txtStudentnum = new JTextField ();
-            txtStudentnum.setBackground(Color.WHITE);
-            txtStudentnum.setEditable(true);
-            txtStudentnum.setBounds(215, 295, 100, 25);
-            add(txtStudentnum);
 
             // butttons' layout
             btnAdd = new JButton ("Add");
@@ -169,10 +164,10 @@ public class Course_Class extends JFrame implements ActionListener{
             add (btnMenu);
             
              /* Table where the information will appear
-       Initializing the table model with no rows (null) and column headers (Column)
-       Setting the rows to null so the table starts empty and will be populated based on user inputs */
-    
-            String[] columns = {"Course ID", "Course Name", "Number of Students Enrolled"};
+            Initializing the table model with no rows (null) and column headers (Column)
+            Setting the rows to null so the table starts empty and will be populated based on user inputs */
+
+            String[] columns = {"Course ID", "Course Name"};
             mdl = new DefaultTableModel (null, columns);
             tbl = new JTable (mdl);
             tbl.getTableHeader().setReorderingAllowed(false);
@@ -181,326 +176,364 @@ public class Course_Class extends JFrame implements ActionListener{
             
             // Adjusting column sizes for the JTable to enhance readability and proper alignment
             TableColumn columnId = tbl.getColumnModel().getColumn(0);
-            columnId.setPreferredWidth(250);
+            columnId.setPreferredWidth(360);
             tbl.getColumnModel().getColumn(0).setResizable(false);
             
             TableColumn columnName = tbl.getColumnModel().getColumn(1);
-            columnName.setPreferredWidth(250);
+            columnName.setPreferredWidth(360);
             tbl.getColumnModel().getColumn(1).setResizable(false);
             
-            TableColumn columnStudentNum = tbl.getColumnModel().getColumn(2);
-            columnStudentNum.setPreferredWidth(220);
-            tbl.getColumnModel().getColumn(2).setResizable(false);
-            
             spane = new JScrollPane(tbl);
-            spane.setBounds(550, 150, 720, 450);
+            spane.setBounds(600, 150, 720, 450);
             spane.getViewport().setBackground(Color.LIGHT_GRAY);
             add (spane);
             
+            connectionMySql();
             loadData(); //data loading from database
+
     }
+    
     //functionalities with the buttons
- @Override
+    @Override
     public void actionPerformed(ActionEvent e) { 
         if (e.getSource() == btnAdd ) {
             addCourse();
-        }
-        else if (e.getSource()== btnUpdate) {
+            
+        }else if (e.getSource()== btnUpdate) {
             updateCourse();
-            }
- 
-        else if (e.getSource() == btnDelete) {
+            
+        }else if (e.getSource() == btnDelete) {
             deleteCourse();
-                }
-        else if (e.getSource() == btnClear){
+            
+        }else if (e.getSource() == btnClear){
             clearTextFields();
-        }
-        else if (e.getSource() == btnEdit){
+            
+        }else if (e.getSource() == btnEdit){
             editRow();
-        }
-        else if (e.getSource() == btnSearch){
+            
+        }else if (e.getSource() == btnSearch){
                 searchCourse();
-            }
-        else if (e.getSource()== btnRefresh){
+                
+        }else if (e.getSource()== btnRefresh){
                 refreshTbl();
-            } 
-        else if (e.getSource() == btnMenu){
+                
+        }else if (e.getSource() == btnMenu){
             new Menu_Frame().setVisible(true);
             dispose();
-            }
+            
+        }
     }
-    //functionalities
     
-     private void loadData(){
-         Connection conn = connectToDatabase();
-        if (conn != null) {
+    private void loadData(){
+        if (con != null) {
             try {
-                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM course_table");
+                PreparedStatement stmt = con.prepareStatement("SELECT * FROM course_table");
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    mdl.addRow(new Object[]{rs.getString("courseID"), rs.getString("courseName"), rs.getInt("studentNum")});
+                    mdl.addRow(new Object[]{rs.getString("courseID"), rs.getString("courseName")});
                 }
-                rs.close();
-                stmt.close();
-                conn.close();
+
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
             }
         }
-}
-
+    }
+    
     private void addCourse() {
-            String courseId = txtCourseId.getText();
-            String courseName = txtCourseName.getText();
-            String studentNum = txtStudentnum.getText();
-            String courseIdPattern = "^[A-Z]{4}\\d{4}$";
-            
-            boolean isAddedtoDB = false; 
-            
-        if (courseId.isEmpty() && courseName.isEmpty() && studentNum.isEmpty()){
-                  JOptionPane.showMessageDialog(this, "All fields are required!", "Validation Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-       if (!courseId.matches(courseIdPattern)){
-                   JOptionPane.showMessageDialog(this, "Invalid Course ID format. Must be 4 capital letters followed by 4 numbers (e.g., ABCD1234).");
-        return;
-}
-        try {
-        int numStudents = Integer.parseInt(studentNum);
-        if (numStudents < 0) {
-            JOptionPane.showMessageDialog(this, "Number of Students must be a positive number.");
-            return;
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Number of Students must be a valid integer.");
-        return;
-    }
-         try (Connection conn = connectToDatabase();
-        PreparedStatement stmt = conn.prepareStatement(
-          "INSERT INTO course_table (courseID, courseName, studentNum) VALUES (?, ?, ?)")) {
-            stmt.setString(1, courseId);
-            stmt.setString(2, courseName);
-            stmt.setString(3, studentNum);
-            stmt.executeUpdate();
-             isAddedtoDB = true; 
-        } 
-         catch (SQLException ex) {
-    JOptionPane.showMessageDialog(this, "Error adding data to the database: " + ex.getMessage());
-    }
-
-        if (isAddedtoDB) {
-    JOptionPane.showMessageDialog(this, "Course added to the database successfully!");
-    } 
-       else {
-    JOptionPane.showMessageDialog(this, "Failed to add the course.");
-            }
-        }
-  private void updateCourse() {
-    if (editingRowIndex != -1) {  
-
         String courseId = txtCourseId.getText().trim();
         String courseName = txtCourseName.getText().trim();
-        String studentNum = txtStudentnum.getText().trim();
 
-        if (courseId.isEmpty() || courseName.isEmpty() || studentNum.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        String courseIdPattern = "^[A-Z]{4}\\d{4}$";
+        String courseIdPattern = "^[A-Z]{4}\\d{4}$";  
+
         if (!courseId.matches(courseIdPattern)) {
-            JOptionPane.showMessageDialog(this, "Invalid Course ID format. Must be 4 capital letters followed by 4 numbers (e.g., ABCD1234).", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid Course ID format. Must be 4 capital letters followed by 4 digits (e.g., ABCD1234).", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        try (Connection conn = connectToDatabase()) {
-            String checkQuery = "SELECT COUNT(*) FROM course_table WHERE courseID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
-                stmt.setString(1, courseId);
-                ResultSet rs = stmt.executeQuery();
-                rs.next();
-                int count = rs.getInt(1);
 
-                if (count > 0) {
-                    JOptionPane.showMessageDialog(this, "Course ID already exists. Please choose a different ID.", "Duplicate Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error checking course ID: " + ex.getMessage());
-            return;
-        }
-        int confirmation = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to update the selected course?", 
-            "Update Confirmation", JOptionPane.YES_NO_OPTION);
+        int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to add this course?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
         if (confirmation == JOptionPane.YES_OPTION) {
-            mdl.setValueAt(courseId, editingRowIndex, 0);
-            mdl.setValueAt(courseName, editingRowIndex, 1);
-            mdl.setValueAt(studentNum, editingRowIndex, 2);
-
             try (Connection conn = connectToDatabase()) {
-                String udQue = "UPDATE course_table SET courseName = ?, studentNum = ? WHERE courseID = ?";
-                try (PreparedStatement stmt = conn.prepareStatement(udQue)) {
-                    stmt.setString(1, courseName);  
-                    stmt.setString(2, studentNum);   
-                    stmt.setString(3, courseId);     
-                    stmt.executeUpdate();            
+
+                // Check for duplicate Course ID or Course Name
+                String checkQuery = "SELECT COUNT(*) FROM course_table WHERE courseID = ? OR courseName = ?";
+                try (PreparedStatement checkPst = conn.prepareStatement(checkQuery)) {
+                    checkPst.setString(1, courseId);
+                    checkPst.setString(2, courseName);
+                    try (ResultSet rs = checkPst.executeQuery()) {
+                        rs.next();
+                        int count = rs.getInt(1);
+
+                        if (count > 0) {
+                            JOptionPane.showMessageDialog(this, "Course ID or Course Name already exists. Please use different values.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
                 }
+
+                // Insert data into the database
+                String insertQuery = "INSERT INTO course_table (courseID, courseName) VALUES (?, ?)";
+                try (PreparedStatement insertPst = conn.prepareStatement(insertQuery)) {
+                    insertPst.setString(1, courseId);
+                    insertPst.setString(2, courseName);
+
+                    int rowsInserted = insertPst.executeUpdate();
+
+                    if (rowsInserted > 0) {
+                        clearTextFields();
+                        JOptionPane.showMessageDialog(this, "Course added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        
+                        // Add the new data to the JTable model
+                        Object[] rowData = {courseId, courseName};
+                        mdl.addRow(rowData);
+                    }
+                }
+
             } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error updating course: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Error adding course to the database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid number of students. Please enter a valid integer.", "Validation Error", JOptionPane.ERROR_MESSAGE);
             }
-            JOptionPane.showMessageDialog(this, "Course updated successfully!");
-            clearTextFields();
-            editingRowIndex = -1;  
+        } else {
+            JOptionPane.showMessageDialog(this, "Operation cancelled.", "Notification", JOptionPane.INFORMATION_MESSAGE);
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "No row selected for editing.", "Error", JOptionPane.ERROR_MESSAGE);
     }
-}
-     private void deleteCourse() {
-            if (mdl.getRowCount() == 0) {
-        JOptionPane.showMessageDialog(this, "There are no courses to delete.", "No Data", JOptionPane.WARNING_MESSAGE);
-        return;
-        }
-           int selectedRow = tbl.getSelectedRow(); 
-            if (selectedRow != -1) {
-        String courseId = mdl.getValueAt(selectedRow, 0).toString(); 
-        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this course?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
-        
-        if (confirm == JOptionPane.YES_OPTION) {
-            // Remove the selected course from the database
-            try (Connection conn = connectToDatabase();
-                 PreparedStatement stmt = conn.prepareStatement("DELETE FROM course_table WHERE courseID = ?")) {
-                stmt.setString(1, courseId);
-                int rowsAffected = stmt.executeUpdate(); // Executes the delete operation
+    
+    private void updateCourse() {
+        if (editingRowIndex != -1) {// Check if a row is selected for editing
+            String courseId = txtCourseId.getText().trim();
+            String courseName = txtCourseName.getText().trim();
 
-                if (rowsAffected > 0) {
-                    mdl.removeRow(selectedRow); 
-                    JOptionPane.showMessageDialog(this, "Course deleted successfully!");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to delete the course from the database.");
+            if (courseId.isEmpty() || courseName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill in all required fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to update the selected course?", "Update Confirmation", JOptionPane.YES_NO_OPTION);
+
+            if (confirmation == JOptionPane.YES_OPTION) {
+                try (Connection conn = connectToDatabase()) {
+                    // Validate if the ID or Name exists in the database and belongs to a different record
+                    String checkQuery = "SELECT COUNT(*) FROM course_table WHERE (courseID = ? OR courseName = ?) AND courseID != ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(checkQuery)) {
+                        stmt.setString(1, courseId);       // Check for duplicate courseID
+                        stmt.setString(2, courseName);    // Check for duplicate courseName
+                        ResultSet rs = stmt.executeQuery();
+                        rs.next();
+                        int count = rs.getInt(1);
+
+                        if (count > 0) {
+                            JOptionPane.showMessageDialog(this, "Course ID or Course Name already exists. Please choose different values.", "Duplicate Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+
+                    // Update the record in the database
+                    String updateQuery = "UPDATE course_table SET courseName = ?, studentNum = ? WHERE courseID = ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
+                        stmt.setString(1, courseName);  // New course name
+                        stmt.setString(2, courseId);   // Execute the update
+                        stmt.executeUpdate();          
+                    }
+
+                    // Update the JTable model
+                    if (editingRowIndex >= 0) {
+                        mdl.setValueAt(courseId, editingRowIndex, 0);
+                        mdl.setValueAt(courseName, editingRowIndex, 1);
+
+                    }
+
+                    JOptionPane.showMessageDialog(this, "Course updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    clearTextFields();  // Clear input fields after updating
+                    editingRowIndex = -1; // Reset editing row index
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error updating course: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error deleting course: " + e.getMessage());
             }
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a course to delete!");
+    }
+    
+    //to delete
+    private void deleteCourse() {
+        int selectedRow = tbl.getSelectedRow();
+        clearTextFields();
+
+        if (selectedRow != -1) {
+            String courseId = mdl.getValueAt(selectedRow, 0).toString();
+            int confirmation = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to delete the selected course?", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+            if (confirmation == JOptionPane.YES_OPTION) {
+                try (Connection conn = connectToDatabase()) {
+                    if (conn == null) {
+                        JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    PreparedStatement deletePst = conn.prepareStatement("DELETE FROM course_table WHERE courseID = ?");
+                    deletePst.setString(1, courseId);
+
+                    int rowsDeleted = deletePst.executeUpdate();
+
+                    if (rowsDeleted > 0) {
+                        mdl.removeRow(selectedRow);
+                        JOptionPane.showMessageDialog(this, "Course deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        refreshTbl();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Failed to delete the course from the database.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Debugging
+                    JOptionPane.showMessageDialog(this, "Error deleting course: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a course to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-        }
-   
     private void clearTextFields() {
         txtCourseName.setText("");
         txtCourseId.setText("");
-        txtStudentnum.setText("");
         txtSearch.setText("");
+        
     }
 
     private void editRow() {
-         if (mdl.getRowCount() == 0) {
-        JOptionPane.showMessageDialog(this, "There are no courses to edit.", "No Data", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
+        if (mdl.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "There are no courses to edit.", "No Data", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         int selectedRow = tbl.getSelectedRow();
     
         if (selectedRow != -1) {
-           editingRowIndex = selectedRow;
-            // Populate the text fields with the data from the selected row
+            editingRowIndex = selectedRow;
             txtCourseId.setText(mdl.getValueAt(selectedRow, 0).toString());
             txtCourseName.setText(mdl.getValueAt(selectedRow, 1).toString());
-            txtStudentnum.setText(mdl.getValueAt(selectedRow, 2).toString());
         
-        }else{
+        }else {
              JOptionPane.showMessageDialog(this, "Please select a row to edit.", "Error", JOptionPane.ERROR_MESSAGE);
-          }
-        
+        }  
     }
- private void searchCourse() {
-        sortingAl(false);
-         String crs = txtSearch.getText().toLowerCase(); // Get the searched course id or name from the text field
-         boolean found = false;
-   for (int i = 0; i < mdl.getRowCount(); i++) {
-        String courseId = mdl.getValueAt(i, 0).toString().toLowerCase();
-        String courseName = mdl.getValueAt(i, 1).toString().toLowerCase();
-   if (courseId.contains(crs) || courseName.contains(crs)) {
-            tbl.setRowSelectionInterval(i, i); 
-            found = true;
-            break;
-        }
-    } 
-     if (!found) {
-        int index = binarySearch(crs); //binary search method
-        
-     if (index != -1) {
-            tbl.setRowSelectionInterval(index, index); 
-            found = true;
-        }
-    }
-     if (!found) {
-        JOptionPane.showMessageDialog(this, "No matching course found.");
-    }
-}
-   private void sortingAl(boolean par) {   //sorting algorithm method
-    int n = mdl.getRowCount();
     
+    private void searchCourse() {
+        sortingAl(false);
+        String crs = txtSearch.getText().toLowerCase(); // Get the searched course id or name from the text field
+        boolean found = false;
+        for (int i = 0; i < mdl.getRowCount(); i++) {
+           String courseId = mdl.getValueAt(i, 0).toString().toLowerCase();
+           String courseName = mdl.getValueAt(i, 1).toString().toLowerCase();
+           
+        if (courseId.contains(crs) || courseName.contains(crs)) {
+               tbl.setRowSelectionInterval(i, i); 
+               found = true;
+               break;
+           }
+       } 
+        
+        if(!found) {
+           int index = binarySearch(crs); //binary search method
+
+        if(index != -1) {
+               tbl.setRowSelectionInterval(index, index); 
+               found = true;
+           }
+        
+       }if (!found) {
+           JOptionPane.showMessageDialog(this, "No matching course found.");
+       }
+   }
+    
+    private void sortingAl(boolean par) {   //sorting algorithm method
+        int n = mdl.getRowCount();
+
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
             String courseId1 = mdl.getValueAt(j, 0).toString();
             String courseId2 = mdl.getValueAt(j + 1, 0).toString();
-           if (courseId1.compareToIgnoreCase(courseId2) > 0) {
-                swapRows(j, j + 1);
+                if(courseId1.compareToIgnoreCase(courseId2) > 0) {
+                     swapRows(j, j + 1);
                 }
-               
             }
         }
-}
-   private void swapRows(int row1, int row2) {
-    int columnCount = mdl.getColumnCount();
-    for (int col = 0; col < columnCount; col++) {
-        Object temp = mdl.getValueAt(row1, col);
-        mdl.setValueAt(mdl.getValueAt(row2, col), row1, col);
-        mdl.setValueAt(temp, row2, col);
     }
-}
-    private int binarySearch(String crs) { //binary search method
-    int left = 0;
-    int right = mdl.getRowCount() - 1;
-
-    while (left <= right) {
-        int mid = (left + right) / 2;
-        String courseName = mdl.getValueAt(mid, 1).toString().toLowerCase(); // course ID is in the first column
-
-        if (courseName.equalsIgnoreCase(crs)) {
-            return mid; // Course found!
-        }
-        if (courseName.compareToIgnoreCase(crs) < 0) {
-            left = mid + 1; // Searching in the right half
-        } else {
-            right = mid - 1; // Searching in the left half
+    
+    private void swapRows(int row1, int row2) {
+        int columnCount = mdl.getColumnCount();
+        for (int col = 0; col < columnCount; col++) {
+            Object temp = mdl.getValueAt(row1, col);
+            mdl.setValueAt(mdl.getValueAt(row2, col), row1, col);
+            mdl.setValueAt(temp, row2, col);
         }
     }
-    return -1; // Course not found!
-}
+    
+    //binary search method
+    private int binarySearch(String crs) { 
+        int left = 0;
+        int right = mdl.getRowCount() - 1;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            String courseName = mdl.getValueAt(mid, 1).toString().toLowerCase(); //course ID is in the first column
+
+            if (courseName.equalsIgnoreCase(crs)) {
+                return mid; //Course found!
+            }
+            if (courseName.compareToIgnoreCase(crs) < 0) {
+                left = mid + 1; //Searching in the right half
+            } else {
+                right = mid - 1; //Searching in the left half
+            }
+        }
+        return -1; // Course not found!
+    }
+    
     private void refreshTbl() {
-         try (Connection conn = connectToDatabase()) {
-        String query = "SELECT * FROM course_table";
-        try (PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
-            // Clear the JTable before inserting new data
-            mdl.setRowCount(0); 
-
-            while (rs.next()) {
-                String courseId = rs.getString("courseID");
-                String courseName = rs.getString("courseName");
-                String studentNum = rs.getString("studentNum");
-
-                // Add data to the table model
-                mdl.addRow(new Object[]{courseId, courseName, studentNum});
+        try (Connection conn = connectToDatabase()) {
+            if (conn == null) {
+                JOptionPane.showMessageDialog(this, "Database connection failed.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
+
+            String query = "SELECT * FROM course_table";
+            try (PreparedStatement stmt = conn.prepareStatement(query);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                if (mdl == null) {
+                    JOptionPane.showMessageDialog(this, "Table model is not initialized.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                mdl.setRowCount(0); 
+
+                while (rs.next()) {
+                    String courseId = rs.getString("courseID");
+                    String courseName = rs.getString("courseName");
+
+                    // Add data to the table model
+                    mdl.addRow(new Object[]{courseId, courseName});
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(this, "Error loading data: " + ex.getMessage());
     }
-}
+
+    
+    //method to connect to mysql
+    public void connectionMySql(){
+        
+        String url = "jdbc:mysql://127.0.0.1:3306/student_management_system";
+        String username = "root";
+        String password = "mysqlpasswordg3";
+        
+        try{
+            con = DriverManager.getConnection(url, username, password);
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+ 
 }

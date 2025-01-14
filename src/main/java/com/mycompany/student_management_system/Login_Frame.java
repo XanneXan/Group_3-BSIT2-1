@@ -33,14 +33,12 @@ import javax.swing.*;
          
     Login_Frame (){
         
-        
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Student Management System - Login");
         setLayout(null);
         setLocationRelativeTo(null);
         setResizable(false);
-        
         
         lblname = new JLabel("LOG IN");
         lblname.setBounds(560, 70, 800, 50);
@@ -97,7 +95,6 @@ import javax.swing.*;
         btnregister.setBackground(new Color(125, 5, 4));
         add(btnregister);
         
-        
         ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
         Image scale = imgIconLogo.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
         ImageIcon imgnew = new ImageIcon(scale);
@@ -105,9 +102,6 @@ import javax.swing.*;
         lbllogo.setBounds(50, 100, 300, 300);
         add(lbllogo);
          
-
-        
-        
         btnlogin.addActionListener(this);
         btnregister.addActionListener(this);
        

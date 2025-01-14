@@ -3,21 +3,15 @@ package com.mycompany.student_management_system;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Ellipse2D;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -36,7 +30,6 @@ public class Register_Frame extends JFrame implements ActionListener {
     //varbs for mysql
     private PreparedStatement pst, insertPst;
     private Connection con;
-    
             
     Register_Frame (){
      
