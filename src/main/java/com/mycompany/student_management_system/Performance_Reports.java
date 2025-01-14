@@ -1,7 +1,6 @@
 package com.mycompany.student_management_system;
 
 import java.awt.*;
-import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -11,7 +10,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
 
     private JLabel lblTitle, lblId, lblPer;
     private JTextField txtId;
-    private JButton btnMenu, btnGrades, btnGWA, btnAttendance, btnClear, btnSearch;
+    private JButton btnMenu, btnGrades, btnGWA, btnAttendance, btnClear, btnSearch, btnSortNames, btnSortCourses;
     private JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
@@ -24,7 +23,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
     };
 
     public Performance_Reports() {
-        setExtendedState(MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,6 +67,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         btnSearch.setForeground(Color.WHITE);
         btnSearch.setFont(new Font("Arial", Font.PLAIN, 10));
         btnSearch.setBackground(new Color(125, 5, 4));
+        btnSearch.addActionListener(this);
         add(btnSearch);
 
         // Grades Button
@@ -104,6 +104,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         btnMenu.setForeground(Color.WHITE);
         btnMenu.setFont(new Font("Arial", Font.PLAIN, 10));
         btnMenu.setBackground(new Color(125, 5, 4));
+        btnMenu.addActionListener(this);
         add(btnMenu);
 
         // Clear Button
@@ -114,6 +115,26 @@ public class Performance_Reports extends JFrame implements ActionListener {
         btnClear.setFont(new Font("Arial", Font.PLAIN, 10));
         btnClear.setBackground(new Color(125, 5, 4));
         add(btnClear);
+
+        // Sort by Names Button
+        btnSortNames = new JButton("Sort by Names");
+        btnSortNames.setBounds(145, 440, 120, 40);
+        btnSortNames.setFocusable(false);
+        btnSortNames.setForeground(Color.WHITE);
+        btnSortNames.setFont(new Font("Arial", Font.PLAIN, 10));
+        btnSortNames.setBackground(new Color(125, 5, 4));
+        btnSortNames.addActionListener(this);
+        add(btnSortNames);
+
+        // Sort by Courses Button
+        btnSortCourses = new JButton("Sort by Courses");
+        btnSortCourses.setBounds(285, 440, 120, 40);
+        btnSortCourses.setFocusable(false);
+        btnSortCourses.setForeground(Color.WHITE);
+        btnSortCourses.setFont(new Font("Arial", Font.PLAIN, 10));
+        btnSortCourses.setBackground(new Color(125, 5, 4));
+        btnSortCourses.addActionListener(this);
+        add(btnSortCourses);
 
         // Table Model Setup
         model = new DefaultTableModel(null, tblColumn);
@@ -133,27 +154,44 @@ public class Performance_Reports extends JFrame implements ActionListener {
         pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(pane);
 
-        btnMenu.addActionListener(this);
-        btnSearch.addActionListener(this);
     }
 
-    private int binarySearch(String id) {
-        int target;
-        try {
-            target = Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid ID format. Please enter a numerical ID.", "Error", JOptionPane.ERROR_MESSAGE);
-            return -1;
-        }
-
+    private void sortTable(int columnIndex, boolean ascending) {
         int rowCount = model.getRowCount();
-        if (rowCount == 0) {
-            JOptionPane.showMessageDialog(this, "The table is empty. There are no students to search.", "Error", JOptionPane.ERROR_MESSAGE);
-            return -1;
+        String[][] tableData = new String[rowCount][model.getColumnCount()];
+
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                tableData[i][j] = model.getValueAt(i, j).toString();
+            }
         }
 
-        int[] studentIds = new int[rowCount];
-        int[] originalIndices = new int[rowCount];
+        Arrays.sort(tableData, (a, b) -> ascending
+            ? a[columnIndex].compareToIgnoreCase(b[columnIndex])
+            : b[columnIndex].compareToIgnoreCase(a[columnIndex]));
+
+        model.setRowCount(0);
+        for (String[] row : tableData) {
+            model.addRow(row);
+        }
+    }
+
+    private ImageIcon getCircularImageIcon(String imagePath, int size) {
+        try {
+            BufferedImage image = ImageIO.read(new File(imagePath));
+            BufferedImage circularImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g2 = circularImage.createGraphics();
+            g2.setClip(new java.awt.geom.Ellipse2D.Float(0, 0, size, size));
+            g2.drawImage(image, 0, 0, size, size, null);
+            g2.dispose();
+
+            return new ImageIcon(circularImage);
+        } catch (Exception e) {
+            System.out.println("Error loading circular image: " + e.getMessage());
+            return null;
+        }
+
 
         for (int i = 0; i < rowCount; i++) {
             try {
@@ -192,29 +230,5 @@ public class Performance_Reports extends JFrame implements ActionListener {
         }
         return -1;
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnMenu) {
-            new Menu_Frame().setVisible(true);
-            dispose();
-        } else if (e.getSource() == btnSearch) {
-            String studentId = txtId.getText().trim();
-            if (studentId.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a Student ID.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            int resultIndex = binarySearch(studentId);
-
-            if (resultIndex != -1) {
-                JOptionPane.showMessageDialog(this, "Student found at table row: " + (resultIndex + 1), "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                studList.setRowSelectionInterval(resultIndex, resultIndex);
-            } else {
-                JOptionPane.showMessageDialog(this, "Student ID not found.", "Search Result", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-}
 
     
