@@ -16,48 +16,65 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import javax.swing.*;
 
      public class Login_Frame extends JFrame implements ActionListener {
-         private JTextField txtInput;
-         private JPasswordField passField;
-         private JLabel lblname,lbl, passJLabel, lbllogo,lblStudent, lblStudent1, lblCountdown;
-         private JButton btnlogin, btnregister;
          
-        private Connection registerCon; // Connection for the 'register' database
-        private Connection loginCon;    // Connection for the 'login' database
-        private PreparedStatement pst;
-        private int loginAttempt = 0;
-        private int loginCountdown = 60;
+        private JTextField txtInput;
+        private JPasswordField passField;
+        private JLabel lblname,lbl, passJLabel, lbllogo,lblStudent, lblStudent1, lblCountdown;
+        private JButton btnlogin, btnregister;
+
+        private int loginAttempt = 0; //track number of login attempts
+        private int loginCountdown = 60; // Countdown timer for locking out login after failed attempts
         private Timer timer;
+        
+        
+        //Establish connection to MySQL database
+        private String url = "jdbc:mysql://localhost:3306/student_management_system";
+        private String user = "root"; 
+        private String pass = "mysqlpasswordg3";
+        private Connection loginCon;  
+        
+        private Connection sqlConnection() {
+         try {
+             return DriverManager.getConnection(url, user, pass);
+         } catch (SQLException e) {
+             JOptionPane.showMessageDialog(this, "Database connection failed: ");
+             return null;
+         }
+     }
          
     Login_Frame (){
         
-        setSize(800, 600);
+        //Main frmae
+        setSize(800, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Student Management System - Login");
         setLayout(null);
         setLocationRelativeTo(null);
         setResizable(false);
         
+        // GUI components
         lblname = new JLabel("LOG IN");
-        lblname.setBounds(560, 70, 800, 50);
+        lblname.setBounds(560, 80, 800, 50);
         lblname.setFont(new Font("Arial Black",Font.BOLD,20));
         lblname.setForeground(new Color(125, 5, 4));
         add(lblname);
         
         lblStudent = new JLabel("STUDENT MANAGEMENT");
-        lblStudent.setBounds(65, 370, 800, 50);
+        lblStudent.setBounds(45, 310, 800, 50);
         lblStudent.setFont(new Font("Arial Black",Font.BOLD,20));
         add(lblStudent);
         
         lblStudent1= new JLabel("SYSTEM");
-        lblStudent1.setBounds(150, 400, 800, 50);
+        lblStudent1.setBounds(130, 340, 800, 50);
         lblStudent1.setFont(new Font("Arial Black",Font.BOLD,20));
         add(lblStudent1);
         
         lbl = new JLabel("Name:");
-        lbl.setBounds(370,180 ,150, 50);
+        lbl.setBounds(370,150 ,150, 50);
         lbl.setFont(new Font("Arial Black",Font.BOLD,13));
         add(lbl);
         
@@ -69,44 +86,43 @@ import javax.swing.*;
           
 
         txtInput = new JTextField();
-        txtInput.setBounds (470,180,265,50);
+        txtInput.setBounds (470,150,265,50);
         add(txtInput);
         
         passJLabel = new JLabel("Password:");
-        passJLabel.setBounds(370, 250, 210, 50);
+        passJLabel.setBounds(370, 220, 210, 50);
         passJLabel.setFont(new Font("Arial Black",Font.BOLD,13));
         add(passJLabel);
        
         passField = new JPasswordField();
-        passField.setBounds(470,250,265,50);
+        passField.setBounds(470,220,265,50);
         add(passField);
         
         btnlogin = new JButton("LOG IN");
-        btnlogin.setBounds(410,400,120,60);
+        btnlogin.setBounds(410,320,120,60);
         btnlogin.setFont(new Font("Arial Black",Font.BOLD,13));
         btnlogin.setForeground(Color.WHITE);
         btnlogin.setBackground(new Color(125, 5, 4));
         add(btnlogin);
         
         btnregister = new JButton("REGISTER");
-        btnregister.setBounds(580,400,120,60);
+        btnregister.setBounds(580,320,120,60);
         btnregister.setFont(new Font("Arial Black",Font.BOLD,13));
         btnregister.setForeground(Color.WHITE);
         btnregister.setBackground(new Color(125, 5, 4));
         add(btnregister);
         
-        ImageIcon imgIconLogo = new ImageIcon("logo_icon.png");
-        Image scale = imgIconLogo.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+        //Insert image in the Jlabel
+        ImageIcon imgIconLogo = new ImageIcon("logo_icon.png"); // load image file
+        Image scale = imgIconLogo.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH); // size of the image
         ImageIcon imgnew = new ImageIcon(scale);
         lbllogo = new JLabel(imgnew);
-        lbllogo.setBounds(50, 100, 300, 300);
+        lbllogo.setBounds(30, 40, 300, 300);
         add(lbllogo);
          
         btnlogin.addActionListener(this);
         btnregister.addActionListener(this);
        
-        //add method for mysql
-        connectionMySql();
         
     }
 
@@ -114,40 +130,58 @@ import javax.swing.*;
     @Override
     public void actionPerformed(ActionEvent e) {
         
+        //Buttons Functions 
         if(e.getSource() == btnregister) {     
             new Register_Frame().setVisible(true);
             dispose();
             
         } if(e.getSource() == btnlogin) {
-          
-            String txt = txtInput.getText().trim();
-            String field = new String(passField.getPassword()).trim();
+            String txt = txtInput.getText().trim(); //get username from textfield
+            String field = new String(passField.getPassword()).trim(); //get password from passwordfield
             
+            // Check if both fields are empty
             if(txt.isEmpty()&& field.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please Input a Name and Password", "ERROR", JOptionPane.ERROR_MESSAGE);
-                
+            
+            // Check if password field is empty
             }else if(field.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please Input a Password", "ERROR", JOptionPane.ERROR_MESSAGE);
-                
+            
+            // Check if username field is empty
             }else if(txt.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please Input a Name", "ERROR", JOptionPane.ERROR_MESSAGE);
                  
             }else {
-                           
+                
+                // Proceed with database operations
+                Connection con = null;
+                PreparedStatement pst = null;
+                PreparedStatement stmt = null;
+                ResultSet rs = null;
+
                 try {
-                    pst = registerCon.prepareStatement("SELECT * FROM register WHERE Username = ? AND Password = ?");
+                    con = sqlConnection(); // Establish database connection
+                    if (con == null) {
+                        throw new SQLException("Failed to connect to the database.");
+                    }
+
+                     // Check if the user exists in the database
+                    pst = con.prepareStatement("SELECT * FROM register WHERE Username = ?");
                     pst.setString(1, txt);
-                    pst.setString(2, field);
+                    rs = pst.executeQuery();
 
-                    ResultSet result = pst.executeQuery();
-
-                    if (result.next()) {
-                        JOptionPane.showMessageDialog(this, "Login", "Successful", JOptionPane.INFORMATION_MESSAGE);
+                    if (rs.next()) { // If the username exists
+                        
+                        JOptionPane.showMessageDialog(this, "WELCOME TO STUDENT MANAGEMENT SYSTEM OF GROUP 3!!!", "Successful", JOptionPane.INFORMATION_MESSAGE);
                             try {
-                                pst = loginCon.prepareStatement("INSERT INTO login(Username, Password) VALUES(?,?)");
-                                pst.setString(1, txt);
-                                pst.setString(2, field);
-                                pst.executeUpdate();
+                                
+                                // Insert the login record into the login table
+                                stmt = loginCon.prepareStatement("INSERT INTO login(Username, Password, Time) VALUES(?,?,?)");
+                                stmt.setString(1, txt);
+                                stmt.setString(2, field);
+                                stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis())); // Log the current time
+
+                                stmt.executeUpdate();
 
                             } catch(Exception ex){
                                 ex.printStackTrace();
@@ -155,10 +189,10 @@ import javax.swing.*;
                               new Menu_Frame().setVisible(true);
                               dispose();
                               
-                        } else {
+                        } else { // If the username does not exist
                             loginAttempt++; 
-                            if (loginAttempt >= 5) {
-                                startCountdown();
+                            if (loginAttempt >= 5) { // If too many failed attempt
+                                startCountdown(); //start cooldown timer
                             } else {
                                 JOptionPane.showMessageDialog(this, "Incorrect name, password or no existing user. Attempt " + loginAttempt + " of 5.", "ERROR", JOptionPane.ERROR_MESSAGE);
                             }
@@ -171,31 +205,8 @@ import javax.swing.*;
             }     
         }
     }
-      
-        public void connectionMySql() {
-
-            String urlReg = "jdbc:mysql://127.0.0.1:3306/student_management_system";
-            String usernameReg = "root";
-            String passwordReg = "mysqlpasswordg3";
-
-            try{
-                registerCon = DriverManager.getConnection(urlReg, usernameReg,passwordReg);
-            }
-            catch(SQLException ex){
-                ex.printStackTrace();
-            }
-            
-            String urlLog = "jdbc:mysql://127.0.0.1:3306/student_management_system";
-            String usernameLog = "root";
-            String passwordLog = "mysqlpasswordg3";
-
-            try{
-               loginCon = DriverManager.getConnection(urlLog,usernameLog,passwordLog);
-            } catch(SQLException ex){
-                ex.printStackTrace();
-            }
-    } 
-        
+    
+        // Method to start the cooldown timer after too many failed login attempts
         private void startCountdown() {
         btnlogin.setEnabled(false);
         lblCountdown.setText("Too many failed attempts. Please wait " + loginCountdown + " seconds.");
@@ -216,4 +227,5 @@ import javax.swing.*;
         });
         timer.start();
     }
+       
  }    

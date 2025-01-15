@@ -4,10 +4,6 @@
  */
 package com.mycompany.student_management_system;
 
-/**
- *
- * @author Jasmine
- */
 import java.awt.Color;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
@@ -16,163 +12,288 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class Attendance_Sheet extends JFrame implements ActionListener {
-
-    private JTextField searchField;
     private JTable attendanceTable;
-    private JButton backButton, searchButton, clearButton;
-    private DefaultTableModel tableModel;
-    private ImageIcon logoIcon;
-    private JLabel titleLabel, logoLabel, searchLabel, attendanceLabel;
-    private Image scaledLogo;
-    JScrollPane scrollPane;
-
-    private String[] columns = {"ID", "Name", "Course", "Present", "Absent"};
+    private JButton presentButton, absentButton, saveButton, editButton, menuButton, searchButton, refreshButton;
+    private JLabel lblTitle, lblLogo, courseLabel, dateLabel, searchLabel, attendanceLabel, lblDate;
+    private JTextField searchField;
+    private DefaultTableModel model;
+    private JScrollPane scrollPane;
+    
+    
+    private  String[] columnNames = {"ID", "Name", "Date", "Status"};  // Array of column headers for the table
+    
+    private ArrayList<Object[]> dataRows = new ArrayList<>(); // Array list to store the data rows for the table
+  
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
     private String pass = "mysqlpasswordg3"; 
-
+    
     private Connection connectToDatabase() {
         try {
             return DriverManager.getConnection(url, user, pass);
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database connection failed: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Database connection failed: ");
             return null;
         }
     }
-
+        
     public Attendance_Sheet() {
-        setTitle("Student Management System");
-        setExtendedState(MAXIMIZED_BOTH); 
-        setLayout(null); // Absolute positioning for components
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Student Management System - ATTENDANCE SHEET");
+        setExtendedState(MAXIMIZED_BOTH);
+        setLayout(null);
         setResizable(false);
-        
-        ImageIcon performanIcon = new ImageIcon("ADD.jpg");
-        Image scale = performanIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        lblTitle = new JLabel ("Student Management System");
+        lblTitle.setBounds(90, 20, 600, 30);
+        lblTitle.setFont(new Font("Arial Black", Font.BOLD, 25));
+        lblTitle.setForeground(Color.decode("#7d0504"));
+        add (lblTitle);
+
+        ImageIcon attendanceIcn = new ImageIcon("attendancel.jpg");
+        Image scale = attendanceIcn.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         ImageIcon logoicon = new ImageIcon(scale);
-        
-        // Logo Setup
-        JLabel lblLogo = new JLabel(logoicon);
-        lblLogo.setBounds(30, 20, 50, 50);
+        lblLogo = new JLabel(logoicon);
+        lblLogo.setBounds(20, 10, 60, 60);
         add(lblLogo);
-
-        // Title label
-        titleLabel = new JLabel("STUDENT MANAGEMENT SYSTEM");
-        titleLabel.setBounds(150, 30, 600, 40);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setForeground(Color.decode("#7d0504"));
-        add(titleLabel);
-
-        attendanceLabel = new JLabel("Attendance Sheet");
-        attendanceLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        attendanceLabel.setBounds(50, 100, 200, 30);
+        
+        attendanceLabel = new JLabel("ATTENDANCE");
+        attendanceLabel.setBounds(580, 90, 600, 30);
+        attendanceLabel.setFont(new Font("Arial Black", Font.BOLD, 28));
+        attendanceLabel.setForeground(Color.decode("#7d0504"));
         add(attendanceLabel);
 
+        // JLabel to display the date
         
-        // Search label
-        searchLabel = new JLabel("Search Student:");
-        searchLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        searchLabel.setBounds(750, 100, 150, 30);
-        add(searchLabel);
-
-        // Search field
-        searchField = new JTextField();
-        searchField.setBounds(870, 100, 230, 25);
-        searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(searchField);
-
-        searchButton = new JButton("Search");
-        searchButton.setBounds(1110, 100, 70, 25);
-        searchButton.setForeground(Color.WHITE);
-        searchButton.setBackground(Color.decode("#7d0504"));
-        searchButton.setFont(new Font("Arial", Font.PLAIN, 11));
-        add(searchButton);
-
-        clearButton = new JButton("Clear");
-        clearButton.setBounds(1200, 100, 70, 25);
-        clearButton.setForeground(Color.WHITE);
-        clearButton.setBackground(Color.decode("#7d0504"));
-        clearButton.setFont(new Font("Arial", Font.PLAIN, 11));
-        add(clearButton);
-
-        backButton = new JButton("Back");
-        backButton.setBounds(1220, 660, 100, 30); 
-        backButton.setForeground(Color.WHITE);
-        backButton.setBackground(Color.decode("#7d0504"));
-        backButton.setFont(new Font("Arial", Font.PLAIN, 12));
-        add(backButton);
-
-        // Attendance table
-        tableModel = new DefaultTableModel(null, columns);
-        attendanceTable = new JTable(tableModel);
+        lblDate = new JLabel("DATE: ");
+        lblDate.setBounds(1130, 150, 200, 35);
+        lblDate.setFont(new Font("Arial", Font.BOLD, 16));
+        add(lblDate);
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = dateFormat.format(new Date());
+        dateLabel = new JLabel( formattedDate);
+        dateLabel.setBounds(1190, 150, 200, 35);
+        dateLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        add(dateLabel);
+        
+        model = new DefaultTableModel(null, columnNames);
+        attendanceTable = new JTable(model);
         attendanceTable.setFont(new Font("Arial", Font.PLAIN, 14));
         attendanceTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
 
-        // Customize table appearance
         scrollPane = new JScrollPane(attendanceTable);
-        scrollPane.setBounds(50, 140, 1250, 500);
+        scrollPane.setBounds(50, 190, 1270, 400);
         scrollPane.getViewport().setBackground(Color.decode("#fdecec"));
         add(scrollPane);
 
+        // Set column widths
+        attendanceTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+        attendanceTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        attendanceTable.getColumnModel().getColumn(2).setPreferredWidth(200);
+        attendanceTable.getColumnModel().getColumn(3).setPreferredWidth(200);
+
+        // Customize table header color
         DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) attendanceTable.getTableHeader().getDefaultRenderer();
         headerRenderer.setBackground(Color.PINK);
         attendanceTable.getTableHeader().setDefaultRenderer(headerRenderer);
-
+        attendanceTable.setDefaultEditor(Object.class, null); // Disable editing for all cells
+       
+        presentButton = new JButton ("Present");
+        presentButton.setBounds( 100, 620, 150, 50);
+        presentButton.setForeground(Color.WHITE);
+        presentButton.setBackground(Color.decode("#7d0504"));
+        add(presentButton);
         
-        searchButton.addActionListener(this);
-        clearButton.addActionListener(this);
-        backButton.addActionListener(this);
+        absentButton = new JButton("Absent");
+        absentButton.setBounds( 450, 620, 150, 50);
+        absentButton.setForeground(Color.WHITE);
+        absentButton.setBackground(Color.decode("#7d0504"));
+        add(absentButton);
+        
+        saveButton = new JButton("Save");
+        saveButton.setBounds( 750, 620, 150, 50);
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setBackground(Color.decode("#7d0504"));
+        add(saveButton);
+        
+        menuButton = new JButton("Menu");
+        menuButton.setBounds( 1100, 620, 150, 50);
+        menuButton.setForeground(Color.WHITE);
+        menuButton.setBackground(Color.decode("#7d0504"));
+        add(menuButton);
+      
+       
+        // Add action listeners to buttons
+       presentButton.addActionListener(this);
+       absentButton.addActionListener(this);
+       saveButton.addActionListener(this);
+       menuButton.addActionListener(this);
+        
+        
 
-        loadStudentsFromDB();
+        infoFromDB();
+        
     }
-
-   
-
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == searchButton) {
-            String searchText = searchField.getText().trim();
+     if  (e.getSource() == presentButton) {
+            int selectedRow = attendanceTable.getSelectedRow();
+            if (selectedRow != -1) {
             
-        } else if (e.getSource() == clearButton) {
-            searchField.setText("");
-        } else if (e.getSource() == backButton) {
-            new Performance_Reports().setVisible(true);
+            String Date = dateLabel.getText(); // get current date
+                    
+            model.setValueAt(Date, selectedRow, 2); // Set the date
+            model.setValueAt("Present", selectedRow, 3); // Set "Present" status
+            
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a row to mark attendance.");
+        }
+            
+        } else if (e.getSource() == absentButton) {
+            int selectedRow = attendanceTable.getSelectedRow();
+            int seC  = attendanceTable.getSelectedColumn();
+            if (selectedRow != -1) { 
+            
+            String Date = dateLabel.getText(); // get current date
+                    
+            model.setValueAt(Date, selectedRow, 2); // Set the date
+            model.setValueAt("Absent", selectedRow, 3); // Set "Absent" status
+            
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a row to mark attendance.");
+        }
+    
+        } else if (e.getSource()== saveButton) {
+            saveAttendance();
+       
+        } else if (e.getSource() == menuButton) {
+            new Menu_Frame().setVisible(true);
             dispose();
         }
     }
+    
+    private void infoFromDB() {
+    
+    try (Connection conn = connectToDatabase();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT * FROM student")) {
+        
+        // Clear existing rows in the table model
+         dataRows.clear(); // Clear dataRows to ensure fresh data is loaded
 
-    private void loadStudentsFromDB() {
-        try (Connection conn = connectToDatabase();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM attendance_sheet")) {
-
+        while (rs.next()) {
+            Object[] row = { rs.getString("ID"), rs.getString("Name")};
             
-            tableModel.setRowCount(0);
+            dataRows.add(row); // Add to arraylist
+            model.addRow(row); // Add the row to the table
+       
+        }
+        
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        } 
+        sortRows();  // Ensure the data is sorted after loading
+    }
+    
+    private void saveAttendance() {
+        boolean allRowsComplete = true;
+        
+        try (Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(
+                 "INSERT INTO attendance (ID, Name, Date, Status) VALUES (?, ?, ?, ?)")) {
 
-            while (rs.next()) {
-                Object[] row = {rs.getString("studId"), rs.getString("name"), rs.getString("course"),
-                                rs.getString("presents"), rs.getString("absents")};
+            // Iterate through the rows in the JTable
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String studId = model.getValueAt(i, 0).toString();
+                String studName = model.getValueAt(i, 1).toString();
+                Object dateObj = model.getValueAt(i, 2);
+                Object statusObj = model.getValueAt(i, 3);
 
-               
-                tableModel.addRow(row);
+                // Check if "Status" is empty
+            if (statusObj == null || statusObj.toString().isEmpty()) {
+                allRowsComplete = false;
+                break;
             }
+
+            // Prepare data for insertion
+            String date = (dateObj != null) ? dateObj.toString() : ""; // Use empty string if date is null
+            String status = statusObj.toString();
+
+            // Set the parameters for the PreparedStatement
+            stmt.setString(1, studId);
+            stmt.setString(2, studName);
+            stmt.setString(3, date);
+            stmt.setString(4, status);
+
+            // Add to batch for bulk insertion
+            stmt.addBatch();
+        }
+
+            if (allRowsComplete) {
+                // Execute batch insert
+                stmt.executeBatch();
+                JOptionPane.showMessageDialog(this, "Attendance records saved successfully.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error: Not all rows have a 'Status'. Please complete all rows before saving.", "Incomplete Data", JOptionPane.ERROR_MESSAGE);
+            }
+
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error saving attendance", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    
+    
+    
+    // sorting algorithm to arrange student alphabetically
+    private void bubbleSort(ArrayList <Object[]> studData) {
+       int numStudent = studData.size();
+        
+        for (int i = 0; i< numStudent-1; i++){
+            for (int j = 0; j < numStudent - i - 1; j++) {
+            
+            String name1 = studData.get(j)[1].toString().toLowerCase();
+            String name2 = studData.get(j + 1)[1].toString().toLowerCase();
+            
+             if (name1.compareTo(name2) > 0) {
+                // Swap the current student with the next student
+                Object[] temp = studData.get(j);
+                studData.set(j, studData.get(j + 1));
+                studData.set(j + 1, temp);
+                
+                }
+            }
+        }
+
+        updateTableModel();  // Update the table after sorting
+    }
+    
+    private void sortRows() {
+        bubbleSort(dataRows);
+        updateTableModel();
+    }
+
+    // Refresh the table model based on dataRows
+    private void updateTableModel() {
+        model.setRowCount(0); // Clear the model
+        for (Object[] row : dataRows) {
+            model.addRow(row); // Re-add sorted data to the model
         }
     }
 }

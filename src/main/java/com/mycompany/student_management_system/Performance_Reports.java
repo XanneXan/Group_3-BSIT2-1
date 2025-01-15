@@ -1,3 +1,4 @@
+
 package com.mycompany.student_management_system;
 
 import java.awt.BorderLayout;
@@ -30,7 +31,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
     private JLabel lblTitle, lblStuInfo, lblName, lblSep, lblId, lblSem, lblGwa, lblSearch;
     private JTextField txtSearch;
     private JButton btnMenu, btnSearch;
-    private JLabel picHolder, semlabelField, namelabelField, idlabelField, semGwaField;
+    private JLabel picHolder, semlabelField, namelabelField, idlabelField, semGwaField, lblLogo;
     private JTable studList;
     private JPanel container, boxPanel;
     private JScrollPane pane;
@@ -55,26 +56,24 @@ public class Performance_Reports extends JFrame implements ActionListener{
     public Performance_Reports() {
         
         //Main Frame
-        setTitle("Performance Report");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setTitle("Student Management System - Performance Report");
+        setSize(1920, 1080);
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
           
-        //Add Image
-        ImageIcon studentIcon = new ImageIcon("performance_icon.jpg");
-        Image scaledImage = studentIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-        ImageIcon newImageIcon = new ImageIcon(scaledImage);
-        picHolder = new JLabel (newImageIcon);
-        picHolder.setBounds(50, 30, 150, 150); 
-        add(picHolder);
-
-        //Title
-        lblTitle = new JLabel("PERFORMANCE REPORT");
-        lblTitle.setBounds(280, 20, 550, 80);
-        lblTitle.setFont(new Font("Serif", Font.BOLD, 40));
+        lblTitle = new JLabel ("Student Management System");
+        lblTitle.setBounds(90, 20, 600, 30);
+        lblTitle.setFont(new Font("Arial Black", Font.BOLD, 25));
         lblTitle.setForeground(Color.decode("#7d0504"));
-        add(lblTitle);
+        add (lblTitle);
+
+        ImageIcon attendanceIcn = new ImageIcon("performancel.jpg");
+        Image scale = attendanceIcn.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        ImageIcon logoicon = new ImageIcon(scale);
+        lblLogo = new JLabel(logoicon);
+        lblLogo.setBounds(20, 10, 60, 60);
+        add(lblLogo);
 
         //Student Information
         lblStuInfo = new JLabel("Student Information");

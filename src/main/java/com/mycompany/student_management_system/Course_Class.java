@@ -18,7 +18,7 @@ import javax.swing.table.TableColumn;
 
 public class Course_Class extends JFrame implements ActionListener{
 
-    private JLabel lblTitle, lblcourseName, lblCourseId , lblStudentNum, lblSearch;
+    private JLabel lblTitle, lblcourseName, lblCourseId , lblStudentNum, lblSearch, lblLogo;
     private JTextField txtCourseName, txtCourseId, txtStudentnum, txtSearch;
     private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnSearch, btnRefresh, btnMenu,btnEdit;
     private JTable tbl;
@@ -47,158 +47,161 @@ public class Course_Class extends JFrame implements ActionListener{
      
     Course_Class (){
         
-            //system layout
-            setTitle("Student Management System");
-            setExtendedState(MAXIMIZED_BOTH);     
-            setLayout(null);
-            setBackground(new Color(125, 5, 4));
-            setResizable(false);
-            Image icon = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Brit\\Documents\\Group_3-BSIT2-1\\Group_3-BSIT2-1\\src\\main\\java\\com\\mycompany\\student_management_system\\course_icon.jpg");
-            setIconImage(icon);
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            getRootPane().setBorder(BorderFactory.createLineBorder(new Color(125,5,4),5));
-            getContentPane().setBackground(new Color(240,240,240));
-        
-            lblTitle = new JLabel ("Student Management System");
-            lblTitle.setBounds(30, 20, 350, 30);setExtendedState(MAXIMIZED_BOTH);     
-            lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
-            lblTitle.setForeground(new Color(125,5,4));
-            add (lblTitle);
+        //Main Frame
+        setTitle("Student Management System");
+        setExtendedState(MAXIMIZED_BOTH);     
+        setLayout(null);
+        setBackground(new Color(125, 5, 4));
+        setResizable(false);
 
-            lblCourseId = new JLabel ("Course ID: ");
-            lblCourseId.setBounds(50, 190, 150, 40);
-            lblCourseId.setFont(new Font("Arial", 1, 16));
-            add (lblCourseId);
+        lblTitle = new JLabel ("Student Management System");
+        lblTitle.setBounds(90, 20, 600, 30);
+        lblTitle.setFont(new Font("Arial Black", Font.BOLD, 25));
+        lblTitle.setForeground(Color.decode("#7d0504"));
+        add (lblTitle);
 
-            lblcourseName = new JLabel ("Course Name: ");
-            lblcourseName.setBounds(50, 240, 150, 40);
-            lblcourseName.setFont(new Font("Arial", 1, 16));
-            add (lblcourseName);
+        //Insert Image to label
+        ImageIcon gradeIcn = new ImageIcon("coursel.jpg");
+        Image scale = gradeIcn.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        ImageIcon logoicon = new ImageIcon(scale);
+        lblLogo = new JLabel(logoicon);
+        lblLogo.setBounds(20, 10, 60, 60);
+        add(lblLogo);
 
-            txtCourseId = new JTextField ("");
-            txtCourseId.setEditable(true);
-            txtCourseId.setBounds(200, 195, 250, 25);
-            add (txtCourseId);
+        lblCourseId = new JLabel ("Course ID: ");
+        lblCourseId.setBounds(50, 190, 150, 40);
+        lblCourseId.setFont(new Font("Arial", 1, 16));
+        add (lblCourseId);
 
-            txtCourseName = new JTextField ("");
-            txtCourseName.setEditable(true);
-            txtCourseName.setBounds(200, 245, 250, 25);
-            add(txtCourseName);
+        lblcourseName = new JLabel ("Course Name: ");
+        lblcourseName.setBounds(50, 240, 150, 40);
+        lblcourseName.setFont(new Font("Arial", 1, 16));
+        add (lblcourseName);
 
-            // butttons' layout
-            btnAdd = new JButton ("Add");
-            btnAdd.setBounds(50, 400, 120, 40);
-            btnAdd.setFocusable(false);
-            btnAdd.setForeground(Color.WHITE);
-            btnAdd.setBackground(new Color(125,5,4));
-            btnAdd.addActionListener(this);
-            add (btnAdd);
+        txtCourseId = new JTextField ("");
+        txtCourseId.setEditable(true);
+        txtCourseId.setBounds(200, 195, 250, 25);
+        add (txtCourseId);
 
-            btnUpdate = new JButton ("Update");
-            btnUpdate.setBounds(190, 400, 120, 40);
-            btnUpdate.setFocusable(false);
-            btnUpdate.setForeground(Color.WHITE);
-            btnUpdate.setBackground(new Color(125,5,4));
-            btnUpdate.addActionListener(this);
-            add (btnUpdate);
+        txtCourseName = new JTextField ("");
+        txtCourseName.setEditable(true);
+        txtCourseName.setBounds(200, 245, 250, 25);
+        add(txtCourseName);
 
-            btnDelete = new JButton ("Delete");
-            btnDelete.setBounds(330, 400, 120, 40);
-            btnDelete.setFocusable(false);
-            btnDelete.setForeground(Color.WHITE);
-            btnDelete.setBackground(new Color(125,5,4));
-            btnDelete.addActionListener(this);
-            add(btnDelete);
+        // butttons' layout
+        btnAdd = new JButton ("Add");
+        btnAdd.setBounds(50, 400, 120, 40);
+        btnAdd.setFocusable(false);
+        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setBackground(new Color(125,5,4));
+        btnAdd.addActionListener(this);
+        add (btnAdd);
 
-            btnClear = new JButton ("Clear");
-            btnClear.setBounds(115, 460, 120, 40);
-            btnClear.setFocusable(false);
-            btnClear.setForeground(Color.WHITE);
-            btnClear.setBackground(new Color(125,5,4));
-            btnClear.addActionListener(this);
-            add (btnClear);
+        btnUpdate = new JButton ("Update");
+        btnUpdate.setBounds(190, 400, 120, 40);
+        btnUpdate.setFocusable(false);
+        btnUpdate.setForeground(Color.WHITE);
+        btnUpdate.setBackground(new Color(125,5,4));
+        btnUpdate.addActionListener(this);
+        add (btnUpdate);
 
-            btnEdit = new JButton("Edit Row");
-            btnEdit.setBounds(265, 460, 120, 40);
-            btnEdit.setFocusable(false);
-            btnEdit.setForeground(Color.WHITE);
-            btnEdit.setBackground(new Color(125,5,4));
-            btnEdit.addActionListener(this);
-            add (btnEdit);
+        btnDelete = new JButton ("Delete");
+        btnDelete.setBounds(330, 400, 120, 40);
+        btnDelete.setFocusable(false);
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setBackground(new Color(125,5,4));
+        btnDelete.addActionListener(this);
+        add(btnDelete);
 
-            // other buttons' layout
-            lblSearch = new JLabel ("Search Course: ");
-            lblSearch.setBounds(600, 110, 150, 40);
-            lblSearch.setFont(new Font("Arial", 1, 14));
-            add (lblSearch);
+        btnClear = new JButton ("Clear");
+        btnClear.setBounds(115, 460, 120, 40);
+        btnClear.setFocusable(false);
+        btnClear.setForeground(Color.WHITE);
+        btnClear.setBackground(new Color(125,5,4));
+        btnClear.addActionListener(this);
+        add (btnClear);
 
-            txtSearch = new JTextField ();
-            txtSearch.setBounds(730, 115, 400, 25);
-            add (txtSearch);
+        btnEdit = new JButton("Edit Row");
+        btnEdit.setBounds(265, 460, 120, 40);
+        btnEdit.setFocusable(false);
+        btnEdit.setForeground(Color.WHITE);
+        btnEdit.setBackground(new Color(125,5,4));
+        btnEdit.addActionListener(this);
+        add (btnEdit);
 
-            btnSearch = new JButton ("Search");
-            btnSearch.setBounds(1170, 115, 70, 25);
-            btnSearch.setFocusable(false);
-            btnSearch.setFont(new Font("Arial", 0, 10));
-            btnSearch.setForeground(Color.WHITE);
-            btnSearch.setBackground(new Color(125,5,4));
-            btnSearch.addActionListener(this);
-            add (btnSearch);
+        // other buttons' layout
+        lblSearch = new JLabel ("Search Course: ");
+        lblSearch.setBounds(600, 110, 150, 40);
+        lblSearch.setFont(new Font("Arial", 1, 14));
+        add (lblSearch);
 
-            btnRefresh = new JButton ("Refresh");
-            btnRefresh.setBounds(1250, 115, 70, 25);
-            btnRefresh.setFocusable(false);
-            btnRefresh.setFont(new Font("Arial", 0, 10));
-            btnRefresh.setForeground(Color.WHITE);
-            btnRefresh.setBackground(new Color(125,5,4));
-            btnRefresh.addActionListener(this);
-            add (btnRefresh);
+        txtSearch = new JTextField ();
+        txtSearch.setBounds(730, 115, 400, 25);
+        add (txtSearch);
 
-            btnMenu = new JButton ("Menu");
-            btnMenu.setBounds(1250, 650, 70, 25);
-            btnMenu.setFocusable(false);
-            btnMenu.setFont(new Font("Arial", 0, 10));
-            btnMenu.setForeground(Color.WHITE);
-            btnMenu.setBackground(new Color(125,5,4));
-            btnMenu.addActionListener(this);
-            add (btnMenu);
-            
-             /* Table where the information will appear
-            Initializing the table model with no rows (null) and column headers (Column)
-            Setting the rows to null so the table starts empty and will be populated based on user inputs */
+        btnSearch = new JButton ("Search");
+        btnSearch.setBounds(1170, 115, 70, 25);
+        btnSearch.setFocusable(false);
+        btnSearch.setFont(new Font("Arial", 0, 10));
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setBackground(new Color(125,5,4));
+        btnSearch.addActionListener(this);
+        add (btnSearch);
 
-            String[] columns = {"Course ID", "Course Name"};
-            mdl = new DefaultTableModel (null, columns);
-            tbl = new JTable (mdl);
-            tbl.getTableHeader().setReorderingAllowed(false);
-            tbl.setDefaultEditor(Object.class, null);
-            tbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            
-            // Adjusting column sizes for the JTable to enhance readability and proper alignment
-            TableColumn columnId = tbl.getColumnModel().getColumn(0);
-            columnId.setPreferredWidth(360);
-            tbl.getColumnModel().getColumn(0).setResizable(false);
-            
-            TableColumn columnName = tbl.getColumnModel().getColumn(1);
-            columnName.setPreferredWidth(360);
-            tbl.getColumnModel().getColumn(1).setResizable(false);
-            
-            spane = new JScrollPane(tbl);
-            spane.setBounds(600, 150, 720, 450);
-            spane.getViewport().setBackground(Color.LIGHT_GRAY);
-            add (spane);
-            
-            connectionMySql();
-            loadData(); //data loading from database
+        btnRefresh = new JButton ("Refresh");
+        btnRefresh.setBounds(1250, 115, 70, 25);
+        btnRefresh.setFocusable(false);
+        btnRefresh.setFont(new Font("Arial", 0, 10));
+        btnRefresh.setForeground(Color.WHITE);
+        btnRefresh.setBackground(new Color(125,5,4));
+        btnRefresh.addActionListener(this);
+        add (btnRefresh);
 
-    }
-    
+        btnMenu = new JButton ("Menu");
+        btnMenu.setBounds(1250, 650, 70, 25);
+        btnMenu.setFocusable(false);
+        btnMenu.setFont(new Font("Arial", 0, 10));
+        btnMenu.setForeground(Color.WHITE);
+        btnMenu.setBackground(new Color(125,5,4));
+        btnMenu.addActionListener(this);
+        add (btnMenu);
+
+         /* Table where the information will appear
+        Initializing the table model with no rows (null) and column headers (Column)
+        Setting the rows to null so the table starts empty and will be populated based on user inputs */
+
+        String[] columns = {"Course ID", "Course Name"};
+        mdl = new DefaultTableModel (null, columns);
+        tbl = new JTable (mdl);
+        tbl.getTableHeader().setReorderingAllowed(false);
+        tbl.setDefaultEditor(Object.class, null);
+        tbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        // Adjusting column sizes for the JTable to enhance readability and proper alignment
+        TableColumn columnId = tbl.getColumnModel().getColumn(0);
+        columnId.setPreferredWidth(360);
+        tbl.getColumnModel().getColumn(0).setResizable(false);
+
+        TableColumn columnName = tbl.getColumnModel().getColumn(1);
+        columnName.setPreferredWidth(360);
+        tbl.getColumnModel().getColumn(1).setResizable(false);
+
+        spane = new JScrollPane(tbl);
+        spane.setBounds(600, 150, 720, 450);
+        spane.getViewport().setBackground(Color.LIGHT_GRAY);
+        add (spane);
+
+        connectionMySql();
+        loadData(); //data loading from database
+
+}
+
     //functionalities with the buttons
     @Override
     public void actionPerformed(ActionEvent e) { 
         if (e.getSource() == btnAdd ) {
-            addCourse();
-            
+                addCourse();
+
         }else if (e.getSource()== btnUpdate) {
             updateCourse();
             
