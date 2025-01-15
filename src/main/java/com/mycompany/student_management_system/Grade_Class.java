@@ -1,3 +1,4 @@
+
  /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -21,6 +22,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
 
 public class Grade_Class extends JFrame implements ActionListener{
     private JLabel lblTitle, lblName, lblId , lblSem, lblTerm, lblC1 , lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, 
