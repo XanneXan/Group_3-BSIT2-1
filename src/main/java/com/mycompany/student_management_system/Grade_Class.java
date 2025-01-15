@@ -476,6 +476,8 @@ public class Grade_Class extends JFrame implements ActionListener{
       
       } else if (e.getSource()==btnRefresh){
           refreshTable();
+          JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
+         
           
       } else if (e.getSource()==btnSearch2){
           searchStudentId();
@@ -1304,6 +1306,8 @@ public class Grade_Class extends JFrame implements ActionListener{
         
         DbToTable(); // Reload data from the database into dataRows
         updateTableModel(); // Update the JTable with the reloaded data
+        JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
+            
     }
    
 }

@@ -1,10 +1,6 @@
 
 package com.mycompany.student_management_system;
 
-/**
- *
- * @author Sebastian Rafael
- */
 
 public class Student_Management_System {
 
@@ -12,6 +8,9 @@ public class Student_Management_System {
 
         Login_Frame run = new Login_Frame(); 
         run.setVisible(true);
+        
+        // username: admin
+        // password: 123
 
 
     }

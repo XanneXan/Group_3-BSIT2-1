@@ -642,7 +642,7 @@ public class Student_Class extends JFrame implements ActionListener {
     //mehthod to clear info from textfields and cmboxess
     private void clearFieldsAndCmBoxes() {
         txtId.setEditable(true);
-        txtId.setEditable(true);
+        txtName.setEditable(true);
         txtId.setText("");
         txtName.setText("");
         cmbSem.setSelectedIndex(0);

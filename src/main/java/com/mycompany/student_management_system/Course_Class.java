@@ -221,6 +221,8 @@ public class Course_Class extends JFrame implements ActionListener{
                 
         }else if (e.getSource()== btnRefresh){
                 refreshTable();
+                JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
+         
                 
         }else if (e.getSource() == btnMenu){
             new Menu_Frame().setVisible(true);
@@ -542,6 +544,7 @@ public class Course_Class extends JFrame implements ActionListener{
         
         loadData(); // Reload data from the database into dataRows
         updateTableModel(); // Update the JTable with the reloaded data
+           
     }
    
 

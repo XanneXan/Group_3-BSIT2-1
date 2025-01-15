@@ -78,71 +78,71 @@ public class Performance_Reports extends JFrame implements ActionListener{
 
         //Student Information
         lblStuInfo = new JLabel("Student Information");
-        lblStuInfo.setBounds(180, 200, 350, 80);
+        lblStuInfo.setBounds(180, 150, 350, 80);
         lblStuInfo.setForeground(Color.decode("#7d0504"));
         lblStuInfo.setFont(new Font("Arial", Font.BOLD, 28));
         add(lblStuInfo);
         
         //Add labels and other components
         lblName = new JLabel("Name");
-        lblName.setBounds(250, 250, 350, 80);
+        lblName.setBounds(250, 200, 350, 80);
         lblName.setForeground(Color.BLACK);
         lblName.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblName);
         
         lblSep = new JLabel(" :");
-        lblSep.setBounds(400, 250, 350, 80);
+        lblSep.setBounds(400, 200, 350, 80);
         lblSep.setForeground(Color.BLACK);
         lblSep.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblSep);
         
         namelabelField = new JLabel(" ");
-        namelabelField.setBounds(450, 250, 300, 80);
+        namelabelField.setBounds(450, 200, 300, 80);
         namelabelField.setFont(new Font("Arial", Font.BOLD, 20));
         add(namelabelField);
         
         lblId = new JLabel("ID");
-        lblId.setBounds(250, 300, 350, 80);
+        lblId.setBounds(250, 250, 350, 80);
         lblId.setForeground(Color.BLACK);
         lblId.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblId);
 
         lblSep = new JLabel(" :");
-        lblSep.setBounds(400, 300, 350, 80);
+        lblSep.setBounds(400, 250, 350, 80);
         lblSep.setForeground(Color.BLACK);
         lblSep.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblSep);
 
         idlabelField = new JLabel(" ");
-        idlabelField.setBounds(450, 300, 300, 80);
+        idlabelField.setBounds(450, 250, 300, 80);
         idlabelField.setFont(new Font("Arial", Font.BOLD, 20));
         add(idlabelField);
 
         lblSem = new JLabel("Semester");
-        lblSem.setBounds(250, 350, 350, 80);
+        lblSem.setBounds(250, 300, 350, 80);
         lblSem.setForeground(Color.BLACK);
         lblSem.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblSem);
         
         lblSep = new JLabel(" :");
-        lblSep.setBounds(400, 350, 350, 80);
+        lblSep.setBounds(400, 300, 350, 80);
         lblSep.setForeground(Color.BLACK);
         lblSep.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblSep);
         
         semlabelField = new JLabel(" ");
-        semlabelField.setBounds(450, 350, 300, 80);
+        semlabelField.setBounds(450, 300, 300, 80);
         semlabelField.setFont(new Font("Arial", Font.BOLD, 20));
         add(semlabelField);
         
         lblGwa = new JLabel("GWA");
-        lblGwa.setBounds(890, 280, 350, 80);
+        lblGwa.setBounds(890, 230, 350, 80);
         lblGwa.setForeground(Color.BLACK);
         lblGwa.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblGwa);
         
         lblSep = new JLabel(" :");
-        lblSep.setBounds(1010, 280, 350, 80);
+        lblSep.setBounds(1010, 230, 350, 80);
         lblSep.setForeground(Color.BLACK);
         lblSep.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblSep);
@@ -159,25 +159,25 @@ public class Performance_Reports extends JFrame implements ActionListener{
         boxPanel.add(semGwaField, BorderLayout.CENTER); 
 
         container = new JPanel();
-        container.setBounds(1050, 290, 80, 50);
+        container.setBounds(1050, 240, 80, 50);
         container.setLayout(null); 
         container.add(boxPanel);
         add(container);
 
         lblSearch = new JLabel("Search Student");
-        lblSearch.setBounds(650, 120, 350, 80);
+        lblSearch.setBounds(650, 70, 350, 80);
         lblSearch.setForeground(Color.BLACK);
         lblSearch.setFont(new Font("Arial", Font.BOLD, 20));
         add(lblSearch);
         
         //add textfield
         txtSearch = new JTextField();
-        txtSearch.setBounds(820, 145, 300, 30);
+        txtSearch.setBounds(820, 95, 300, 30);
         add(txtSearch);
         
         //add Buttons and action listene to each
         btnSearch = new JButton("Search");
-        btnSearch.setBounds(1140, 145, 150, 30);
+        btnSearch.setBounds(1140, 95, 150, 30);
         btnSearch.setFocusable(false);
         btnSearch.setForeground(Color.WHITE);
         btnSearch.setBackground(new Color(125,5,4));
@@ -185,7 +185,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
         add(btnSearch);
         
         btnMenu = new JButton("Menu");
-        btnMenu.setBounds(1260, 700, 100, 30);
+        btnMenu.setBounds(1220, 650, 100, 30);
         btnMenu.setFocusable(false);
         btnMenu.setForeground(Color.WHITE);
         btnMenu.setBackground(new Color(125,5,4));
@@ -203,7 +203,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
         studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         
         pane = new JScrollPane(studList);
-        pane.setBounds(160, 430, 1010, 300);
+        pane.setBounds(160, 380, 1010, 270);
         pane.getViewport().setBackground(Color.decode("#fdecec"));
         add(pane);
 
