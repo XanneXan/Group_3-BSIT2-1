@@ -35,11 +35,11 @@ public class Student_Class extends JFrame implements ActionListener {
     private DefaultTableModel model;
     private int editingRowIndex = -1;
     
-    //global varbs for mySql connection
+    //Declaring Global variable for mySql connection
     private PreparedStatement pst;
     private Connection con;
     
-    // Original format for column in the table
+    //Original format for column in the table
     private int[] originalColumnFormat;
     
     //store student for dynamic access
@@ -83,13 +83,15 @@ public class Student_Class extends JFrame implements ActionListener {
         lblTitle.setForeground(Color.decode("#7d0504"));
         add (lblTitle);
         
+        //For Image
         ImageIcon studentIcn = new ImageIcon("studentl.jpg");
         Image scale = studentIcn.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         ImageIcon logoicon = new ImageIcon(scale);
         lblLogo = new JLabel(logoicon);
         lblLogo.setBounds(20, 10, 60, 60);
         add(lblLogo);
-
+        
+        //Labels
         lblId = new JLabel("Student's ID: ");
         lblId.setBounds(50, 150, 150, 40);
         lblId.setFont(new Font("Arial", Font.BOLD, 16));
@@ -104,7 +106,8 @@ public class Student_Class extends JFrame implements ActionListener {
         lblSem.setBounds(50, 250, 150, 40);
         lblSem.setFont(new Font("Arial", Font.BOLD, 16));
         add(lblSem );
-
+        
+        //textfields
         txtName = new JTextField();
         txtName.setBounds(200, 205, 250, 25);
         add(txtName);
@@ -220,7 +223,7 @@ public class Student_Class extends JFrame implements ActionListener {
         studList.setDefaultEditor(Object.class, null); 
         pane = new JScrollPane(studList);
         pane.setBounds(600, 150, 720, 450);
-        pane.getViewport().setBackground(Color.lightGray);
+        pane.getViewport().setBackground(Color.decode("#fdecec"));
         add(pane);
 
         //When table refreshed it will revert the table or column section format to original
@@ -238,7 +241,8 @@ public class Student_Class extends JFrame implements ActionListener {
         txtSearch = new JTextField();
         txtSearch.setBounds(730, 115, 400, 25);
         add(txtSearch);
-
+        
+        //btn for searching and refresh
         btnSearch = new JButton("Search");
         btnSearch.setBounds(1170, 115, 70, 25);
         btnSearch.setFocusable(false);
@@ -274,7 +278,7 @@ public class Student_Class extends JFrame implements ActionListener {
         btnRefresh.addActionListener(this);
         btnMenu.addActionListener(this);
         
-        //add the method for connecting to mysql
+        //add and load the method for connecting to mysql
         connectionMySql();
         loadStudentFromDatabase();
 
@@ -334,7 +338,6 @@ public class Student_Class extends JFrame implements ActionListener {
             });
         }
 
-        // Populate combo boxes with initial data
         populateComboBoxes();
     }
     
@@ -484,7 +487,7 @@ public class Student_Class extends JFrame implements ActionListener {
         }
     }
     
-    //methpd for updating student info
+    //method for updating student info
     private void updateStudent() {
         int selectedRow = studList.getSelectedRow();
         if (selectedRow != -1) {
@@ -510,13 +513,13 @@ public class Student_Class extends JFrame implements ActionListener {
             
             }else if (!ID.isEmpty() && !studName.isEmpty() && sem != null && !selectedCourses.isEmpty() && confirmation == JOptionPane.YES_OPTION){
                  try {
-                   // Check for duplicate ID
+                   //Check for duplicate ID
                    pst = con.prepareStatement("SELECT COUNT(*) FROM student WHERE ID = ?");
                    pst.setString(1, ID);
                    ResultSet rs = pst.executeQuery();
 
                 if (rs.next() && rs.getInt(1) > 0) {
-                    // If ID exists, update the record
+                    //If ID exists, update the record
                     PreparedStatement updatePst = con.prepareStatement(
                         "UPDATE student SET Name = ?, Semester = ?, Course1 = ?, Course2 = ?, Course3 = ?, Course4 = ?, Course5 = ?, Course6 = ?, Course7 = ?, Course8 = ? WHERE ID = ?"
                     );
@@ -538,7 +541,6 @@ public class Student_Class extends JFrame implements ActionListener {
                     if (rowsUpdated > 0) {
                         JOptionPane.showMessageDialog(this, "Student updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-                        // Update the JTable
                         model.setValueAt(ID, selectedRow, 0);
                         model.setValueAt(studName, selectedRow, 1);
                         model.setValueAt(sem, selectedRow, 2);
@@ -615,9 +617,9 @@ public class Student_Class extends JFrame implements ActionListener {
                     int rowsDeleted = deletePst.executeUpdate();
 
                     if (rowsDeleted > 0) {
-                        model.removeRow(selectedRow); // Remove row from JTable model
+                        model.removeRow(selectedRow); //Remove row from JTable model
                         JOptionPane.showMessageDialog(this, "Student deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        loadStudentFromDatabase(); // Reload data from database
+                        loadStudentFromDatabase(); //Reload data from database
                         
                         //add bubble sort
                         bubbleSort(1, true);
@@ -648,9 +650,9 @@ public class Student_Class extends JFrame implements ActionListener {
     }
     
     private void updateTableModel() {
-        model.setRowCount(0); // Clear the JTable
+        model.setRowCount(0); //Clear the JTable
         for (Object[] row : storeStudent) {
-            model.addRow(row); // Add rows from sorted dataRows
+            model.addRow(row); //Add rows from sorted dataRows
         }
     }
     
@@ -659,10 +661,10 @@ public class Student_Class extends JFrame implements ActionListener {
          String search = txtSearch.getText().trim();
 
         if (!search.isEmpty()) {
-        Object[] result = binarySearchStudent(search); // Search student name by using binary
+        Object[] result = binarySearchStudent(search); //Search student name by using binary
         
             if (result != null) {
-            // Move the found student to the top of the JTable
+            //Move the found student to the top of the JTable
             moveStudentToTop (result);
             txtSearch.setText("");
             JOptionPane.showMessageDialog(this, "Student found and moved to the top.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
@@ -813,8 +815,10 @@ public class Student_Class extends JFrame implements ActionListener {
                 }
          // Sort the data and update the table
         bubbleSort(1, true);
+        
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                
             }
              
     }

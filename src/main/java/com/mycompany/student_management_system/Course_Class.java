@@ -188,7 +188,7 @@ public class Course_Class extends JFrame implements ActionListener{
 
         spane = new JScrollPane(tbl);
         spane.setBounds(600, 150, 720, 450);
-        spane.getViewport().setBackground(Color.LIGHT_GRAY);
+        spane.getViewport().setBackground(Color.decode("#fdecec"));
         add (spane);
 
         connectionMySql();
@@ -227,6 +227,7 @@ public class Course_Class extends JFrame implements ActionListener{
         }
     }
     
+    //load data frm sql
     private void loadData(){
         if (con != null) {
             try {
@@ -242,6 +243,7 @@ public class Course_Class extends JFrame implements ActionListener{
         }
     }
     
+    //to add course
     private void addCourse() {
         String courseId = txtCourseId.getText().trim();
         String courseName = txtCourseName.getText().trim();
@@ -395,14 +397,16 @@ public class Course_Class extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(this, "Please select a course to delete.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    //clear textfield
     private void clearTextFields() {
         txtCourseName.setText("");
         txtCourseId.setText("");
         txtSearch.setText("");
         
     }
-
+    
+    //to edit a selected row in table
     private void editRow() {
         if (mdl.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "There are no courses to edit.", "No Data", JOptionPane.WARNING_MESSAGE);
@@ -420,6 +424,7 @@ public class Course_Class extends JFrame implements ActionListener{
         }  
     }
     
+    //for searching
     private void searchCourse() {
         sortingAl(false);
         String crs = txtSearch.getText().toLowerCase(); // Get the searched course id or name from the text field
@@ -448,6 +453,7 @@ public class Course_Class extends JFrame implements ActionListener{
        }
    }
     
+    //sorting algo
     private void sortingAl(boolean par) {   //sorting algorithm method
         int n = mdl.getRowCount();
 
@@ -461,6 +467,7 @@ public class Course_Class extends JFrame implements ActionListener{
             }
         }
     }
+    
     
     private void swapRows(int row1, int row2) {
         int columnCount = mdl.getColumnCount();
@@ -492,6 +499,7 @@ public class Course_Class extends JFrame implements ActionListener{
         return -1; // Course not found!
     }
     
+    //refreshing table
     private void refreshTbl() {
         try (Connection conn = connectToDatabase()) {
             if (conn == null) {

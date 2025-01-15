@@ -34,7 +34,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
     private DefaultTableModel model;
     private JScrollPane scrollPane;
     
-    
+    //Column
     private  String[] columnNames = {"ID", "Name", "Date", "Status"};  // Array of column headers for the table
     
     private ArrayList<Object[]> dataRows = new ArrayList<>(); // Array list to store the data rows for the table
@@ -53,6 +53,8 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
     }
         
     public Attendance_Sheet() {
+        
+        //Main Frame
         setTitle("Student Management System - ATTENDANCE SHEET");
         setExtendedState(MAXIMIZED_BOTH);
         setLayout(null);
@@ -78,8 +80,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         attendanceLabel.setForeground(Color.decode("#7d0504"));
         add(attendanceLabel);
 
-        // JLabel to display the date
-        
+        // JLabel to display the date     
         lblDate = new JLabel("DATE: ");
         lblDate.setBounds(1130, 150, 200, 35);
         lblDate.setFont(new Font("Arial", Font.BOLD, 16));
@@ -137,80 +138,83 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         menuButton.setForeground(Color.WHITE);
         menuButton.setBackground(Color.decode("#7d0504"));
         add(menuButton);
-      
        
         // Add action listeners to buttons
-       presentButton.addActionListener(this);
-       absentButton.addActionListener(this);
-       saveButton.addActionListener(this);
-       menuButton.addActionListener(this);
-        
-        
+        presentButton.addActionListener(this);
+        absentButton.addActionListener(this);
+        saveButton.addActionListener(this);
+        menuButton.addActionListener(this);
 
+        //load database
         infoFromDB();
         
     }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
      if  (e.getSource() == presentButton) {
             int selectedRow = attendanceTable.getSelectedRow();
             if (selectedRow != -1) {
             
-            String Date = dateLabel.getText(); // get current date
+            String Date = dateLabel.getText(); //get current date
                     
-            model.setValueAt(Date, selectedRow, 2); // Set the date
-            model.setValueAt("Present", selectedRow, 3); // Set "Present" status
+            model.setValueAt(Date, selectedRow, 2); // et the date
+            model.setValueAt("Present", selectedRow, 3); //Set "Present" status
             
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select a row to mark attendance.");
-        }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select a row to mark attendance.");
+
+            }
             
         } else if (e.getSource() == absentButton) {
             int selectedRow = attendanceTable.getSelectedRow();
             int seC  = attendanceTable.getSelectedColumn();
             if (selectedRow != -1) { 
             
-            String Date = dateLabel.getText(); // get current date
+            String Date = dateLabel.getText(); //get current date
                     
-            model.setValueAt(Date, selectedRow, 2); // Set the date
-            model.setValueAt("Absent", selectedRow, 3); // Set "Absent" status
+            model.setValueAt(Date, selectedRow, 2); //Set the date
+            model.setValueAt("Absent", selectedRow, 3); //Set "Absent" status
             
         } else {
             JOptionPane.showMessageDialog(this, "Please select a row to mark attendance.");
+            
         }
     
         } else if (e.getSource()== saveButton) {
             saveAttendance();
-       
+            
         } else if (e.getSource() == menuButton) {
             new Menu_Frame().setVisible(true);
             dispose();
+            
         }
     }
     
+    //loading data for student info from database
     private void infoFromDB() {
     
     try (Connection conn = connectToDatabase();
          Statement stmt = conn.createStatement();
          ResultSet rs = stmt.executeQuery("SELECT * FROM student")) {
         
-        // Clear existing rows in the table model
-         dataRows.clear(); // Clear dataRows to ensure fresh data is loaded
+         dataRows.clear(); 
 
         while (rs.next()) {
             Object[] row = { rs.getString("ID"), rs.getString("Name")};
             
-            dataRows.add(row); // Add to arraylist
-            model.addRow(row); // Add the row to the table
+            dataRows.add(row); 
+            model.addRow(row); 
        
         }
         
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         } 
-        sortRows();  // Ensure the data is sorted after loading
+        sortRows(); 
     }
     
+    //Method for saving attendance to database
     private void saveAttendance() {
         boolean allRowsComplete = true;
         
@@ -218,30 +222,28 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
              PreparedStatement stmt = conn.prepareStatement(
                  "INSERT INTO attendance (ID, Name, Date, Status) VALUES (?, ?, ?, ?)")) {
 
-            // Iterate through the rows in the JTable
+            //Iterate through the rows in the JTable
             for (int i = 0; i < model.getRowCount(); i++) {
                 String studId = model.getValueAt(i, 0).toString();
                 String studName = model.getValueAt(i, 1).toString();
                 Object dateObj = model.getValueAt(i, 2);
                 Object statusObj = model.getValueAt(i, 3);
 
-                // Check if "Status" is empty
+                //Check if "Status" is empty
             if (statusObj == null || statusObj.toString().isEmpty()) {
                 allRowsComplete = false;
                 break;
             }
 
-            // Prepare data for insertion
+            //Prepare data for insertion
             String date = (dateObj != null) ? dateObj.toString() : ""; // Use empty string if date is null
             String status = statusObj.toString();
 
-            // Set the parameters for the PreparedStatement
             stmt.setString(1, studId);
             stmt.setString(2, studName);
             stmt.setString(3, date);
             stmt.setString(4, status);
 
-            // Add to batch for bulk insertion
             stmt.addBatch();
         }
 
@@ -249,19 +251,22 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
                 // Execute batch insert
                 stmt.executeBatch();
                 JOptionPane.showMessageDialog(this, "Attendance records saved successfully.");
+                
             } else {
                 JOptionPane.showMessageDialog(this, "Error: Not all rows have a 'Status'. Please complete all rows before saving.", "Incomplete Data", JOptionPane.ERROR_MESSAGE);
+                
             }
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error saving attendance", "Database Error", JOptionPane.ERROR_MESSAGE);
+            
         }
     }
     
     
     
     
-    // sorting algorithm to arrange student alphabetically
+    //sorting algorithm to arrange student alphabetically
     private void bubbleSort(ArrayList <Object[]> studData) {
        int numStudent = studData.size();
         
@@ -272,7 +277,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
             String name2 = studData.get(j + 1)[1].toString().toLowerCase();
             
              if (name1.compareTo(name2) > 0) {
-                // Swap the current student with the next student
+                //Swap the current student with the next student
                 Object[] temp = studData.get(j);
                 studData.set(j, studData.get(j + 1));
                 studData.set(j + 1, temp);
@@ -281,7 +286,7 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
             }
         }
 
-        updateTableModel();  // Update the table after sorting
+        updateTableModel(); 
     }
     
     private void sortRows() {
@@ -289,11 +294,13 @@ public class Attendance_Sheet extends JFrame implements ActionListener {
         updateTableModel();
     }
 
-    // Refresh the table model based on dataRows
+    //Refresh the table model based on dataRows
     private void updateTableModel() {
-        model.setRowCount(0); // Clear the model
+        model.setRowCount(0); 
+        
         for (Object[] row : dataRows) {
-            model.addRow(row); // Re-add sorted data to the model
+            model.addRow(row); 
+            
         }
     }
 }
