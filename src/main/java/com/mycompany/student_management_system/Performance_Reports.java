@@ -57,7 +57,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
     public Performance_Reports() {
         
         //Main Frame
-        setTitle("Student Management System - Performance Report");
+        setTitle("Student Management System - PERFORMANCE REPORT");
         setSize(1920, 1080);
         setLayout(null);
         setResizable(false);

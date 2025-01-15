@@ -44,7 +44,7 @@ public class Register_Frame extends JFrame implements ActionListener {
      
         setSize(800, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Student Management System - LOGIN");
+        setTitle("Student Management System - REGISTER");
         setLayout(null);
         setLocationRelativeTo(null);
         setResizable(false);

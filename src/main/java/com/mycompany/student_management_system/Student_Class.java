@@ -70,7 +70,7 @@ public class Student_Class extends JFrame implements ActionListener {
     Student_Class(){
         
         //Main Frame
-        setTitle("Student Management System - Student");
+        setTitle("Student Management System - STUDENT");
         setExtendedState(MAXIMIZED_BOTH);     
         setLayout(null);
         setResizable(false);
@@ -382,6 +382,10 @@ public class Student_Class extends JFrame implements ActionListener {
         int selectedRow = studList.getSelectedRow();
         if (selectedRow != -1) {
             editingRowIndex = selectedRow;
+            
+            // Making name and id non editable
+            txtId.setEditable(false);
+            txtName.setEditable(false);
     
             txtId.setText(model.getValueAt(selectedRow, 0).toString());
             txtName.setText(model.getValueAt(selectedRow, 1).toString());
@@ -470,7 +474,7 @@ public class Student_Class extends JFrame implements ActionListener {
                         storeStudent.add(rowData);
                         
                         //add bubblesort
-                        bubbleSort(1, true);
+                        sortRows();
                         
                     }
                     
@@ -584,7 +588,7 @@ public class Student_Class extends JFrame implements ActionListener {
                         storeStudent.add(rowData);
                         
                         //add bubbble sort
-                        bubbleSort(1, true);
+                        sortRows();
 
                     }
                     
@@ -618,18 +622,16 @@ public class Student_Class extends JFrame implements ActionListener {
 
                     if (rowsDeleted > 0) {
                         model.removeRow(selectedRow); //Remove row from JTable model
+                        storeStudent.remove(selectedRow); 
                         JOptionPane.showMessageDialog(this, "Student deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                         loadStudentFromDatabase(); //Reload data from database
-                        
-                        //add bubble sort
-                        bubbleSort(1, true);
                         
                         
                     } else {
                         JOptionPane.showMessageDialog(this, "Failed to delete student from database.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Error Database ", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
@@ -639,6 +641,8 @@ public class Student_Class extends JFrame implements ActionListener {
     
     //mehthod to clear info from textfields and cmboxess
     private void clearFieldsAndCmBoxes() {
+        txtId.setEditable(true);
+        txtId.setEditable(true);
         txtId.setText("");
         txtName.setText("");
         cmbSem.setSelectedIndex(0);
@@ -683,19 +687,20 @@ public class Student_Class extends JFrame implements ActionListener {
         int left = 0; // left pointer
         int right = storeStudent.size() - 1; // right pointer
         
+       
+        search = search.toLowerCase();  // Convert the search input to lowercase and trim spaces
+        
         // Continue searching while the left pointer is less than or equal to the right pointer
         while (left <= right) {
             int mid = left + (right - left) / 2;  // Calculate the middle index
             Object[] midRow = storeStudent.get(mid); // Retrieve the row at the middle index
 
             String studName = midRow[1].toString().toLowerCase(); // Get student name
-            String studID = midRow[0].toString().toLowerCase(); // Get student id 
-
+            
             // Compare the search input with the student's name and id
             int nameComparison = studName.compareToIgnoreCase(search); // get name in table
-            int IdComparison = studID.compareToIgnoreCase(search); // get id in table
-
-            if (nameComparison == 0 || IdComparison == 0) {
+           
+            if (nameComparison == 0 ) {
                 return midRow; // Student found
             } else if (nameComparison < 0) {
                 left = mid + 1; // Search in the right half
@@ -720,7 +725,7 @@ public class Student_Class extends JFrame implements ActionListener {
         ArrayList<String> courses = new ArrayList<>();
         try (Connection conn = connectToDatabase();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT courseID, courseName FROM course_table")) {
+             ResultSet rs = stmt.executeQuery("SELECT courseID, courseName FROM course")) {
 
             while (rs.next()) {
                 String courseID = rs.getString("courseID");
@@ -736,32 +741,33 @@ public class Student_Class extends JFrame implements ActionListener {
         return courses;
     }
     
-    //sorting algorithm to arrange the student names in ascending or descending
-    private void bubbleSort(int columnIndex, boolean ascending) {
-        int rowCount = model.getRowCount();
-        boolean bs;
-
-        do {
-            bs = false;
-            for (int i = 0; i < rowCount - 1; i++) {
-                String value1 = model.getValueAt(i, columnIndex).toString();
-                String value2 = model.getValueAt(i + 1, columnIndex).toString();
-
-                boolean condition = ascending
-                    ? value1.compareTo(value2) > 0
-                    : value1.compareTo(value2) < 0;
-
-                if (condition) {
-                    for (int j = 0; j < model.getColumnCount(); j++) {
-                        Object temp = model.getValueAt(i, j);
-                        model.setValueAt(model.getValueAt(i + 1, j), i, j);
-                        model.setValueAt(temp, i + 1, j);
-                    }
-                    bs = true;
+    // sorting algorithm to arrange student alphabetically
+    private void bubbleSort (ArrayList <Object[]> cData){
+        int numCourse = cData.size();
+        
+        for (int i = 0; i< numCourse -1; i++){
+            for (int j = 0; j < numCourse - i - 1; j++) {
+            
+            String c1 = cData.get(j)[1].toString().toLowerCase();
+            String c2 = cData.get(j + 1)[1].toString().toLowerCase();
+            
+             if (c1.compareTo(c2) > 0) {
+                // Swap the current student with the next student
+                Object[] temp = cData.get(j);
+                cData.set(j, cData.get(j + 1));
+                cData.set(j + 1, temp);
                 }
             }
-        } while (bs);
+        }                
     }
+
+    // Sort and Update JTable
+    private void sortRows() {
+        bubbleSort(storeStudent); // sort
+        updateTableModel(); // refresh table
+    }
+
+   
 
     //method to use to refresh the table on it's original state
     private void refreshTable() {
@@ -779,7 +785,7 @@ public class Student_Class extends JFrame implements ActionListener {
             studList.clearSelection();
 
             //add bubble sort
-            bubbleSort(1, true);
+            sortRows();
 
             JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
             
@@ -814,7 +820,7 @@ public class Student_Class extends JFrame implements ActionListener {
        
                 }
          // Sort the data and update the table
-        bubbleSort(1, true);
+          sortRows();
         
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
