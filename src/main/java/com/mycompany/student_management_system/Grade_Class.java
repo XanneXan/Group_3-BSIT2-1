@@ -611,6 +611,7 @@ public class Grade_Class extends JFrame implements ActionListener{
                 isAddedtoDB = true;
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error adding data to the database");
+                ex.printStackTrace();
             }
             
         if (isAddedtoDB){ //To ensure that data is only added to the JTable if it is successfully added to the database
@@ -1313,7 +1314,4 @@ public class Grade_Class extends JFrame implements ActionListener{
         updateTableModel();
     }
     
-   
-
-
 }

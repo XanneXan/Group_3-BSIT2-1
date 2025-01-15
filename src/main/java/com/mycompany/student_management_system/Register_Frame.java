@@ -112,6 +112,8 @@ public class Register_Frame extends JFrame implements ActionListener {
         btnlogin.addActionListener(this);
         btnconfirm.addActionListener(this);
         
+        connectionMySql();
+        
     }
     
     //Button function
