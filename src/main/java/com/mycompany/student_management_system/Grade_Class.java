@@ -41,7 +41,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     private int editingRowIndex = -1;  // Stores the index of the row being edited
     
     // Array of column headers for the table
-    private String [] tblColumn = {"Student's ID", "Student's Name", "Semester", "Course 1", "Mid", "Fin", "Course 2", "Mid", "Fin", 
+    private String [] tblColumn = {"ID", "Name", "Semester", "Course 1", "Mid", "Fin", "Course 2", "Mid", "Fin", 
                                     "Course 3", "Mid", "Fin", "Course 4", "Mid", "Fin", "Course 5", "Mid", "Fin", "Course 6", "Mid", "Fin", "Course 7",
                                     "Mid", "Fin", "Course 8","Mid", "Fin", "Midterm Average ", "Final Average", "GWA"};
    
@@ -476,6 +476,8 @@ public class Grade_Class extends JFrame implements ActionListener{
       
       } else if (e.getSource()==btnRefresh){
           refreshTable();
+          JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
+         
           
       } else if (e.getSource()==btnSearch2){
           searchStudentId();
@@ -1228,8 +1230,8 @@ public class Grade_Class extends JFrame implements ActionListener{
 
     // Sort and Update JTable
     private void sortRows() {
-        bubbleSort(dataRows);
-        updateTableModel();
+        bubbleSort(dataRows); // sort
+        updateTableModel(); // refresh table
     }
 
     // Method to Update Table Model
@@ -1240,6 +1242,7 @@ public class Grade_Class extends JFrame implements ActionListener{
         }
     }
     
+    // Search method to find a student by name using binary search    
     private void searchStudent() {
         String search = txtSearch.getText().trim();
 
@@ -1260,7 +1263,8 @@ public class Grade_Class extends JFrame implements ActionListener{
         
         }
     }
-    
+  
+    // Binary search method to find a student by name
    private Object[] binarySearchStudent(String search) {
         int left = 0; // left pointer
         int right = dataRows.size() - 1; // right pointer
@@ -1271,13 +1275,12 @@ public class Grade_Class extends JFrame implements ActionListener{
             Object[] midRow = dataRows.get(mid); // Retrieve the row at the middle index
 
             String studName = midRow[1].toString().toLowerCase(); // Get student name
-            String studID = midRow[0].toString().toLowerCase(); // Get student name
+           
 
             // Compare the search input with the student's name and id
             int nameComparison = studName.compareToIgnoreCase(search); // get name in table
-            int IdComparison = studID.compareToIgnoreCase(search); // get id in table
-
-            if (nameComparison == 0 || IdComparison == 0) {
+          
+            if (nameComparison == 0 ) {
                 return midRow; // Student found
             } else if (nameComparison < 0) {
                 left = mid + 1; // Search in the right half
@@ -1292,8 +1295,8 @@ public class Grade_Class extends JFrame implements ActionListener{
     
     private void moveStudentToTop(Object[] studentRow) {
         
-        dataRows.remove(studentRow);
-        dataRows.add(0, studentRow);
+        dataRows.remove(studentRow);  // Remove the student from their current position
+        dataRows.add(0, studentRow); // Add the student to the top of the list
 
         // Update the table model to reflect the change
         updateTableModel();
@@ -1301,8 +1304,10 @@ public class Grade_Class extends JFrame implements ActionListener{
     
     private void refreshTable() {
         
-        DbToTable(); 
-        updateTableModel();
+        DbToTable(); // Reload data from the database into dataRows
+        updateTableModel(); // Update the JTable with the reloaded data
+        JOptionPane.showMessageDialog(this, "Table refreshed and format restored.", "Refresh", JOptionPane.INFORMATION_MESSAGE);
+            
     }
    
 }

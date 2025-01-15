@@ -50,7 +50,7 @@ import javax.swing.*;
         //Main frmae
         setSize(800, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Student Management System - Login");
+        setTitle("Student Management System - LOGIN");
         setLayout(null);
         setLocationRelativeTo(null);
         setResizable(false);
