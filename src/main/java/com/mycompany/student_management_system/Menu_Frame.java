@@ -18,13 +18,13 @@ public class Menu_Frame extends JFrame implements ActionListener {
     private JButton btnStudents, btnCourse, btnGrade, btnLogout, btnAttendance, btnPerformanceReports;
 
     public Menu_Frame() {
+        
         setTitle("Student Management System");
         setSize(700, 600);
         setLayout(null);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 
         // Title of the frame
         lblTitle = new JLabel("STUDENT MANAGEMENT");
@@ -127,26 +127,31 @@ public class Menu_Frame extends JFrame implements ActionListener {
         add(btnLogout);
     }
 
-   
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnStudents) {
             new Student_Class().setVisible(true);
             dispose();
+            
         } else if (e.getSource() == btnCourse) {
             new Course_Class().setVisible(true);
             dispose();
+            
         } else if (e.getSource() == btnGrade) {
             new Grade_Class().setVisible(true);
             dispose();
+            
         } else if (e.getSource() == btnAttendance) {
             new Attendance_Frame().setVisible(true);
             dispose();
+            
         } else if (e.getSource() == btnPerformanceReports) {
             new Performance_Reports().setVisible(true);
             dispose();
+            
         } else if (e.getSource() == btnLogout) {
             dispose();
+            
         }
     }
 

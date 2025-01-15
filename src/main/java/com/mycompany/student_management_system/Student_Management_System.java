@@ -10,8 +10,7 @@ public class Student_Management_System {
 
     public static void main(String[] args) {
 
-        Performance_Reports run = new Performance_Reports();
-
+        Login_Frame run = new Login_Frame();
         run.setVisible(true);
 
 
