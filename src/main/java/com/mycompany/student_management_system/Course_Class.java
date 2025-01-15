@@ -550,12 +550,8 @@ public class Course_Class extends JFrame implements ActionListener{
     //method to connect to mysql
     public void connectionMySql(){
         
-        String url = "jdbc:mysql://127.0.0.1:3306/student_management_system";
-        String username = "root";
-        String password = "mysqlpasswordg3";
-        
         try{
-            con = DriverManager.getConnection(url, username, password);
+            con = DriverManager.getConnection(url, user, pass);
         }
         catch(SQLException ex){
             ex.printStackTrace();
