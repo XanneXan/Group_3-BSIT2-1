@@ -37,6 +37,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
     private JScrollPane pane;
     private DefaultTableModel model;
     
+    //column for the table
     private String[] tblColumn = {"Course Name", "Grade", "Remarks"};
     
     //for database
@@ -82,7 +83,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
         lblStuInfo.setFont(new Font("Arial", Font.BOLD, 28));
         add(lblStuInfo);
         
-        //Add labels
+        //Add labels and other components
         lblName = new JLabel("Name");
         lblName.setBounds(250, 250, 350, 80);
         lblName.setForeground(Color.BLACK);
@@ -191,7 +192,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
         btnMenu.addActionListener(this);
         add(btnMenu);
         
-        // Table Model Setup
+        //Table Model Setup
         model = new DefaultTableModel(tblColumn, 0);
         studList = new JTable(model);
         studList.setRowHeight(20);
@@ -203,7 +204,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
         
         pane = new JScrollPane(studList);
         pane.setBounds(160, 430, 1010, 300);
-        pane.getViewport().setBackground(Color.lightGray);
+        pane.getViewport().setBackground(Color.decode("#fdecec"));
         add(pane);
 
         //add action listeners
@@ -234,7 +235,7 @@ public class Performance_Reports extends JFrame implements ActionListener{
         
     }
     
-    // Search students ID or Name in the database then load their information 
+    //Search students ID or Name in the database then load their information 
     private void studentSearch() {
         String searchInput = txtSearch.getText().trim();
 
@@ -263,10 +264,22 @@ public class Performance_Reports extends JFrame implements ActionListener{
                 ResultSet gradeRs = gradeStmt.executeQuery();
 
                 if (gradeRs.next()) {
-                    String gwa = gradeRs.getString("final");
-                    semGwaField.setText(gwa);  // Set the GWA value in the field
+                    String finalGrade = gradeRs.getString("final"); //Fetch the final grade from database
+
+                    //Check if the grade is incomplete
+                    String gradeDisplay;
+                    if ("Grade Incomplete".equalsIgnoreCase(finalGrade)) {
+                        gradeDisplay = "INC"; //Assign "INC" if grade is incomplete
+                        
+                    } else {
+                        gradeDisplay = finalGrade; 
+                    }
+
+                    semGwaField.setText(gradeDisplay); 
+                    
                 } else {
-                    semGwaField.setText("No Grade");
+                    semGwaField.setText("N/A"); 
+                    
                 }
 
                 //get courses and grades
@@ -296,24 +309,39 @@ public class Performance_Reports extends JFrame implements ActionListener{
                         double fin = finValue.equals("--") ? 0 : Double.parseDouble(finValue);
 
                         double grade = (mid + fin) / 2;
+                        
+                        String remarks;
+                        
+                        //conditions
+                        if (grade == 0.0) {
+                            remarks = "Incomplete";
+                            
+                        } else if (grade <= 3.00) {
+                            remarks = "Passed";
+                            
+                        } else {
+                            remarks = "Failed";
+                            
+                        }
 
                         if (courseName != null && !courseName.isEmpty()) {
-                            String remarks = grade <= 3.00 ? "Passed" : "Failed";
-                            
                             Object[] row = {courseName, grade, remarks};
                             
                             model.addRow(row);
                             
                         }
                     }
+                    
                 } else {
                     JOptionPane.showMessageDialog(this, "No grades found for the student.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
                     
                 }
+                
             } else {
                 JOptionPane.showMessageDialog(this, "Student not found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
                 
             }
+            
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error retrieving data: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             

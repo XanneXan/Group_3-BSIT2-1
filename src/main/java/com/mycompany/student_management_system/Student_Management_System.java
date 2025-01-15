@@ -10,7 +10,7 @@ public class Student_Management_System {
 
     public static void main(String[] args) {
 
-        Grade_Class run = new Grade_Class(); 
+        Login_Frame run = new Login_Frame(); 
         run.setVisible(true);
 
 

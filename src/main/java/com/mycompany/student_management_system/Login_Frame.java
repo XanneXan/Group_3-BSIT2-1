@@ -30,12 +30,11 @@ import javax.swing.*;
         private int loginCountdown = 60; // Countdown timer for locking out login after failed attempts
         private Timer timer;
         
-        
+    
         //Establish connection to MySQL database
         private String url = "jdbc:mysql://localhost:3306/student_management_system";
         private String user = "root"; 
         private String pass = "mysqlpasswordg3";
-        private Connection loginCon;  
         
         private Connection sqlConnection() {
          try {
@@ -79,12 +78,11 @@ import javax.swing.*;
         add(lbl);
         
         lblCountdown = new JLabel();
-        lblCountdown.setBounds(80, 470, 350, 30);
+        lblCountdown.setBounds(250, 400, 350, 30);
         lblCountdown.setFont(new Font("Arial", Font.ITALIC, 14));
         lblCountdown.setForeground(Color.RED);
         add(lblCountdown);
           
-
         txtInput = new JTextField();
         txtInput.setBounds (470,150,265,50);
         add(txtInput);
@@ -122,10 +120,10 @@ import javax.swing.*;
          
         btnlogin.addActionListener(this);
         btnregister.addActionListener(this);
-       
+        
+        sqlConnection();
         
     }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -154,10 +152,10 @@ import javax.swing.*;
             }else {
                 
                 // Proceed with database operations
-                Connection con = null;
-                PreparedStatement pst = null;
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
+                Connection con;
+                PreparedStatement pst;
+                PreparedStatement stmt;
+                ResultSet rs;
 
                 try {
                     con = sqlConnection(); // Establish database connection
@@ -166,8 +164,9 @@ import javax.swing.*;
                     }
 
                      // Check if the user exists in the database
-                    pst = con.prepareStatement("SELECT * FROM register WHERE Username = ?");
+                    pst = con.prepareStatement("SELECT * FROM register WHERE Username = ? AND Password = ?");
                     pst.setString(1, txt);
+                    pst.setString(2, field);
                     rs = pst.executeQuery();
 
                     if (rs.next()) { // If the username exists
@@ -176,7 +175,7 @@ import javax.swing.*;
                             try {
                                 
                                 // Insert the login record into the login table
-                                stmt = loginCon.prepareStatement("INSERT INTO login(Username, Password, Time) VALUES(?,?,?)");
+                                stmt = con.prepareStatement("INSERT INTO login(Username, Password, Time) VALUES(?,?,?)");
                                 stmt.setString(1, txt);
                                 stmt.setString(2, field);
                                 stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis())); // Log the current time
