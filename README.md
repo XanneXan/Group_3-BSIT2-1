@@ -1,6 +1,5 @@
 School Management System
 
-Description
 The School Management System is a comprehensive application designed to manage student information, courses, and grades for educational institutions. This system provides an efficient way to handle various administrative tasks, ensuring that educational institutions can focus on delivering quality education.
 
 Key Features
