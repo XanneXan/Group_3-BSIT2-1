@@ -17,8 +17,8 @@ public class Menu_Frame extends JFrame implements ActionListener {
     private JLabel lblTitle, lblSystem, Students, Course, Grades, Attendance, Performance, Reports;
     private JButton btnStudents, btnCourse, btnGrade, btnLogout, btnAttendance, btnPerformanceReports;
 
-    public Menu_Frame() {
-        setTitle("Student Management System");
+    Menu_Frame() {
+        setTitle("Student Management System - MENU");
         setSize(700, 600);
         setLayout(null);
         setResizable(false);
@@ -26,22 +26,21 @@ public class Menu_Frame extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
-        // Title of the frame
         lblTitle = new JLabel("STUDENT MANAGEMENT");
         lblTitle.setBounds(119, 30, 500, 40);
         lblTitle.setForeground(new Color(125, 5, 4));
-        lblTitle.setFont(new Font("Serif", Font.BOLD, 35));
+        lblTitle.setFont(new Font("Arial Black", Font.BOLD, 30));
         add(lblTitle);
 
         lblSystem = new JLabel("SYSTEM");
         lblSystem.setBounds(268, 70, 500, 40);
         lblSystem.setForeground(new Color(125, 5, 4));
-        lblSystem.setFont(new Font("Serif", Font.BOLD, 35));
+        lblSystem.setFont(new Font("Arial Black", Font.BOLD, 30));
         add(lblSystem);
 
-        // In this part was thee src or the source code of the images for it to show as the buttons also 
-        ImageIcon studentIcon = new ImageIcon("students_icon.jpg");
-        Image scale = studentIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH);
+        //Insert image on buttons
+        ImageIcon studentIcon = new ImageIcon("students_icon.jpg"); // load image file
+        Image scale = studentIcon.getImage().getScaledInstance(130, 115, Image.SCALE_SMOOTH); // size of the image
         ImageIcon logoicon = new ImageIcon(scale);
         btnStudents = new JButton (logoicon);
         btnStudents.setBounds(70, 150, 130, 115);
@@ -130,22 +129,28 @@ public class Menu_Frame extends JFrame implements ActionListener {
    
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnStudents) {
+        // Buttons Function
+        if (e.getSource() == btnStudents) { //If click go to student class
             new Student_Class().setVisible(true);
             dispose();
-        } else if (e.getSource() == btnCourse) {
+            
+        } else if (e.getSource() == btnCourse) { // If clicked go to course class
             new Course_Class().setVisible(true);
             dispose();
-        } else if (e.getSource() == btnGrade) {
+            
+        } else if (e.getSource() == btnGrade) { // If clicked go to grade class
             new Grade_Class().setVisible(true);
             dispose();
-        } else if (e.getSource() == btnAttendance) {
-            new Attendance_Frame().setVisible(true);
+            
+        } else if (e.getSource() == btnAttendance) { // If clicked go to attendance frame
+            new Attendance_Sheet().setVisible(true);
             dispose();
-        } else if (e.getSource() == btnPerformanceReports) {
+            
+        } else if (e.getSource() == btnPerformanceReports) { // If clicked go to performance report frame
             new Performance_Reports().setVisible(true);
             dispose();
-        } else if (e.getSource() == btnLogout) {
+            
+        } else if (e.getSource() == btnLogout) { // If clicked exit frame
             dispose();
         }
     }

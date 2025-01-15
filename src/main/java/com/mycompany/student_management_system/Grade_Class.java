@@ -1,4 +1,4 @@
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -20,13 +19,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public class Grade_Class extends JFrame implements ActionListener{
     private JLabel lblTitle, lblName, lblId , lblSem, lblTerm, lblC1 , lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, 
-            lblSearch, lblfin1, lblmid1, lblmid2, lblfin2;
+            lblSearch, lblfin1, lblmid1, lblmid2, lblfin2, lblLogo;
     private JTextField txtName, txtId, midGrade, finGrade, txtSearch, txtTerm, txtSem, txtC1, txtC2, txtC5, 
             txtC3, txtC4, txtC6, txtC7, txtC8, txtG1, txtG2, txtG3, txtG4, txtG5, txtG6, txtG7, txtG8 , txtG1f, txtG2f, txtG3f, txtG4f,
             txtG5f, txtG6f, txtG7f, txtG8f ;
@@ -43,7 +41,8 @@ public class Grade_Class extends JFrame implements ActionListener{
                                     "Mid", "Fin", "Course 8","Mid", "Fin", "Midterm Average ", "Final Average", "GWA"};
    
     private ArrayList<Object[]> dataRows = new ArrayList<>(); // Array list to store the data rows for the table
-  
+    
+    //Establish connection to MySQL database
     private String url = "jdbc:mysql://localhost:3306/student_management_system";
     private String user = "root"; 
     private String pass = "mysqlpasswordg3"; 
@@ -58,396 +57,395 @@ public class Grade_Class extends JFrame implements ActionListener{
     }
 
     Grade_Class (){
-        
+        //Main Frame
+        setTitle("Student Management System - GRADE");
         setExtendedState(MAXIMIZED_BOTH);     
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
+        // GUI Components
+        lblTitle = new JLabel ("Student Management System");
+        lblTitle.setBounds(90, 20, 600, 30);
+        lblTitle.setFont(new Font("Arial Black", Font.BOLD, 25));
+        lblTitle.setForeground(Color.decode("#7d0504"));
+        add (lblTitle);
         
-    lblTitle = new JLabel ("Student Management System");
-    lblTitle.setBounds(30, 20, 350, 30);
-    lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
-    lblTitle.setForeground(Color.decode("#7d0504"));
-    add (lblTitle);
-    
-    lblId = new JLabel ("Student's ID: ");
-    lblId.setBounds(50, 150, 150, 40);
-    lblId.setFont(new Font("Arial", 1, 16));
-    add (lblId);
-    
-    lblName = new JLabel ("Student's Name: ");
-    lblName.setBounds(50, 210, 150, 40);
-    lblName.setFont(new Font("Arial", 1, 16));
-    add (lblName);
-       
-    lblSem = new JLabel ("Semester: ");
-    lblSem.setBounds(50, 260, 150, 40);
-    lblSem.setFont(new Font("Arial", 1, 16));
-    add (lblSem );
-    
-    
-    //TextFields for user input in Student ID and Name
-    txtId = new JTextField ();
-    txtId.setBounds(170, 155, 250, 25);
-    add(txtId);
-    
-    txtName = new JTextField ();
-    txtName.setBounds(190, 215, 250, 25);
-    txtName.setBackground(Color.LIGHT_GRAY);
-    txtName.setEditable(false);
-    add (txtName);
-    
-    //The semester will automatically appear here. It is set to non-editable
-    txtSem = new JTextField ();
-    txtSem.setBounds(160, 265, 70, 25);
-    txtSem.setBackground(Color.LIGHT_GRAY);
-    txtSem.setEditable(false);
-    add (txtSem);
-    
-    lblSearch = new JLabel ("Search Student: ");
-    lblSearch.setBounds(600, 110, 150, 40);
-    lblSearch.setFont(new Font("Arial", 1, 14));
-    add (lblSearch);
-    
-    txtSearch = new JTextField ();
-    txtSearch.setBounds(730, 115, 400, 25);
-    add (txtSearch);
-    
-    
-    
-    
-    // User inputs for grades. The course names will automatically appear in non-editable text fields
-    
-    lblmid1 = new JLabel ("MID");
-    lblmid1.setBounds(220, 300, 150, 40);
-    lblmid1.setFont(new Font("Arial", 1, 11));
-    lblmid1.setForeground(Color.decode("#7d0504"));
-    add (lblmid1);
-    
-    lblmid2 = new JLabel ("MID");
-    lblmid2.setBounds(490, 300, 150, 40);
-    lblmid2.setFont(new Font("Arial", 1, 11));
-    lblmid2.setForeground(Color.decode("#7d0504"));
-    add (lblmid2);
-    
-    lblfin1 = new JLabel ("FIN");
-    lblfin1.setBounds(265, 300, 150, 40);
-    lblfin1.setFont(new Font("Arial", 1, 11));
-    lblfin1.setForeground(Color.decode("#7d0504"));
-    add (lblfin1);
-    
-    lblfin2 = new JLabel ("FIN");
-    lblfin2.setBounds(535, 300, 150, 40);
-    lblfin2.setFont(new Font("Arial", 1, 11));
-    lblfin2.setForeground(Color.decode("#7d0504"));
-    add (lblfin2);
-    
-    //Course 1 Components
-    txtC1 = new JTextField ();
-    txtC1.setBounds(50, 340, 145, 20);
-    txtC1.setBackground(Color.LIGHT_GRAY);
-    txtC1.setText("== Course 1 ==");
-    txtC1.setEditable(false);
-    add (txtC1);
-    
-    txtG1 = new JTextField ();
-    txtG1.setBounds(215, 340, 35, 20);
-    txtG1.setBackground(Color.decode("#ffefef"));
-    txtG1.setText("0.0");
-    add (txtG1);
-    
-    txtG1f = new JTextField ();
-    txtG1f.setBounds(260, 340, 35, 20);
-    txtG1f.setBackground(Color.decode("#ffefef"));
-    txtG1f.setText("0.0");
-    add (txtG1f);
-    
-    //Course 2 Components
-   
-    txtC2 = new JTextField ();
-    txtC2.setBounds(50, 380, 145, 20);
-    txtC2.setBackground(Color.LIGHT_GRAY);
-    txtC2.setText("== Course 2 ==");
-    txtC2.setEditable(false);
-    add (txtC2);
-    
-    txtG2 = new JTextField ();
-    txtG2.setBounds(215, 380, 35, 20);
-    txtG2.setBackground(Color.decode("#ffefef"));
-    txtG2.setText("0.0");
-    add (txtG2);
-    
-    txtG2f = new JTextField ();
-    txtG2f.setBounds(260, 380, 35, 20);
-    txtG2f.setBackground(Color.decode("#ffefef"));
-    txtG2f.setText("0.0");
-    add (txtG2f);
-    
-    //Course 3 Components
-    
-    txtC3 = new JTextField ();
-    txtC3.setBounds(50, 420, 145, 20);
-    txtC3.setBackground(Color.LIGHT_GRAY);
-    txtC3.setText("== Course 3 ==");
-    txtC3.setEditable(false);
-    add (txtC3);
-    
-    txtG3 = new JTextField ();
-    txtG3.setBounds(215, 420, 35, 20);
-    txtG3.setBackground(Color.decode("#ffefef"));
-    txtG3.setText("0.0");
-    add (txtG3);
-    
-    txtG3f = new JTextField ();
-    txtG3f.setBounds(260, 420, 35, 20);
-    txtG3f.setBackground(Color.decode("#ffefef"));
-    txtG3f.setText("0.0");
-    add (txtG3f);
-    
-    //Course 4 Components
-    
-    txtC4 = new JTextField ();
-    txtC4.setBounds(50, 460, 145, 20);
-    txtC4.setBackground(Color.LIGHT_GRAY);
-    txtC4.setText("== Course 4 ==");
-    txtC4.setEditable(false);
-    add (txtC4);
-    
-    txtG4 = new JTextField ();
-    txtG4.setBounds(215, 460, 35, 20);
-    txtG4.setBackground(Color.decode("#ffefef"));
-    txtG4.setText("0.0");
-    add (txtG4);
-    
-    txtG4f = new JTextField ();
-    txtG4f.setBounds(260, 460, 35, 20);
-    txtG4f.setBackground(Color.decode("#ffefef"));
-    txtG4f.setText("0.0");
-    add (txtG4f);
-    
-    
-    //Course 5 Components
-    
-    txtC5 = new JTextField ();
-    txtC5.setBounds(320, 340, 145, 20);
-    txtC5.setBackground(Color.LIGHT_GRAY);
-    txtC5.setText("== Course 5 ==");
-    txtC5.setEditable(false);
-    add (txtC5);
-    
-    txtG5 = new JTextField ();
-    txtG5.setBounds(485, 340, 35, 20);
-    txtG5.setBackground(Color.decode("#ffefef"));
-    txtG5.setText("0.0");
-    add (txtG5);
-    
-    txtG5f = new JTextField ();
-    txtG5f.setBounds(530, 340, 35, 20);
-    txtG5f.setBackground(Color.decode("#ffefef"));
-    txtG5f.setText("0.0");
-    add (txtG5f);
-    
-    //Course 6 Components
-    
-    txtC6 = new JTextField ();
-    txtC6.setBounds(320, 380, 145, 20);
-    txtC6.setBackground(Color.LIGHT_GRAY);
-    txtC6.setText("== Course 6 ==");
-    txtC6.setEditable(false);
-    add (txtC6);
-    
-    txtG6 = new JTextField ();
-    txtG6.setBounds(485, 380, 35, 20);
-    txtG6.setBackground(Color.decode("#ffefef"));
-    txtG6.setText("0.0");
-    add (txtG6);
-    
-    txtG6f = new JTextField ();
-    txtG6f.setBounds(530, 380, 35, 20);
-    txtG6f.setBackground(Color.decode("#ffefef"));
-    txtG6f.setText("0.0");
-    add (txtG6f);
-    
-    //Course 7 Components
-    
-    txtC7 = new JTextField ();
-    txtC7.setBounds(320, 420, 145, 20);
-    txtC7.setBackground(Color.LIGHT_GRAY);
-    txtC7.setText("== Course 7 ==");
-    txtC7.setEditable(false);
-    add (txtC7);
-    
-    txtG7 = new JTextField ();
-    txtG7.setBounds(485, 420, 35, 20);
-    txtG7.setBackground(Color.decode("#ffefef"));
-    txtG7.setText("0.0");
-    add (txtG7);
-    
-    txtG7f = new JTextField ();
-    txtG7f.setBounds(530, 420, 35, 20);
-    txtG7f.setBackground(Color.decode("#ffefef"));
-    txtG7f.setText("0.0");
-    add (txtG7f);
-    
-    //Course 8 Components
-   
-    txtC8 = new JTextField ();
-    txtC8.setBounds(320, 460, 145, 20);
-    txtC8.setBackground(Color.LIGHT_GRAY);
-    txtC8.setText("== Course 8 ==");
-    txtC8.setEditable(false);
-    add (txtC8);
-    
-    txtG8 = new JTextField ();
-    txtG8.setBounds(485, 460, 35, 20);
-    txtG8.setBackground(Color.decode("#ffefef"));
-    txtG8.setText("0.0");
-    add (txtG8);
-    
-    txtG8f = new JTextField ();
-    txtG8f.setBounds(530, 460, 35, 20);
-    txtG8f.setBackground(Color.decode("#ffefef"));
-    txtG8f.setText("0.0");
-    add (txtG8f);
-   
-   
-    
-    /* Table where the information will appear
-       Initializing the table model with no rows (null) and predefined column headers (tblColumn)
-       Setting the rows to null so the table starts empty and will be populated based on user inputs */
-    model = new DefaultTableModel(null,tblColumn );
-    studList = new JTable (model);
-    studList.getTableHeader().setReorderingAllowed(false);
-    studList.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-    studList.setDefaultEditor(Object.class, null);
-    studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    
-     // Adjusting column sizes for the JTable to enhance readability and proper alignment
-    int preferredWidth = 200;
-    for (int i = 0; i < studList.getColumnCount(); i++) {
-        studList.getColumnModel().getColumn(i).setPreferredWidth(preferredWidth);
-        studList.getColumnModel().getColumn(i).setResizable(false);
-    }
+        //Insert Image to Label
+        ImageIcon gradeIcn = new ImageIcon("gradel.jpg");
+        Image scale = gradeIcn.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        ImageIcon logoicon = new ImageIcon(scale);
+        lblLogo = new JLabel(logoicon);
+        lblLogo.setBounds(20, 10, 60, 60);
+        add(lblLogo);
 
-    studList.getColumnModel().getColumn(0).setPreferredWidth(100); // Student's ID
-    studList.getColumnModel().getColumn(2).setPreferredWidth(70);  // Semester
+        lblId = new JLabel ("Student's ID: ");
+        lblId.setBounds(50, 150, 150, 40);
+        lblId.setFont(new Font("Arial", 1, 16));
+        add (lblId);
 
-    for (int i = 4; i < studList.getColumnCount(); i++) {
-        String columnName = studList.getColumnName(i);
-        if (columnName.equalsIgnoreCase("Mid") || columnName.equalsIgnoreCase("Fin")) {
-            studList.getColumnModel().getColumn(i).setPreferredWidth(50);
+        lblName = new JLabel ("Student's Name: ");
+        lblName.setBounds(50, 210, 150, 40);
+        lblName.setFont(new Font("Arial", 1, 16));
+        add (lblName);
+
+        lblSem = new JLabel ("Semester: ");
+        lblSem.setBounds(50, 260, 150, 40);
+        lblSem.setFont(new Font("Arial", 1, 16));
+        add (lblSem );
+
+
+        //TextFields for user input in Student ID and Name
+        txtId = new JTextField ();
+        txtId.setBounds(170, 155, 250, 25);
+        add(txtId);
+
+        txtName = new JTextField ();
+        txtName.setBounds(190, 215, 250, 25);
+        txtName.setBackground(Color.LIGHT_GRAY);
+        txtName.setEditable(false);
+        add (txtName);
+
+        //The semester will automatically appear here. It is set to non-editable
+        txtSem = new JTextField ();
+        txtSem.setBounds(160, 265, 70, 25);
+        txtSem.setBackground(Color.LIGHT_GRAY);
+        txtSem.setEditable(false);
+        add (txtSem);
+
+        lblSearch = new JLabel ("Search Student: ");
+        lblSearch.setBounds(600, 110, 150, 40);
+        lblSearch.setFont(new Font("Arial", 1, 14));
+        add (lblSearch);
+
+        txtSearch = new JTextField ();
+        txtSearch.setBounds(730, 115, 400, 25);
+        add (txtSearch);
+        
+        // User inputs for grades. The course names will automatically appear in non-editable text fields
+        lblmid1 = new JLabel ("MID");
+        lblmid1.setBounds(220, 300, 150, 40);
+        lblmid1.setFont(new Font("Arial", 1, 11));
+        lblmid1.setForeground(Color.decode("#7d0504"));
+        add (lblmid1);
+
+        lblmid2 = new JLabel ("MID");
+        lblmid2.setBounds(490, 300, 150, 40);
+        lblmid2.setFont(new Font("Arial", 1, 11));
+        lblmid2.setForeground(Color.decode("#7d0504"));
+        add (lblmid2);
+
+        lblfin1 = new JLabel ("FIN");
+        lblfin1.setBounds(265, 300, 150, 40);
+        lblfin1.setFont(new Font("Arial", 1, 11));
+        lblfin1.setForeground(Color.decode("#7d0504"));
+        add (lblfin1);
+
+        lblfin2 = new JLabel ("FIN");
+        lblfin2.setBounds(535, 300, 150, 40);
+        lblfin2.setFont(new Font("Arial", 1, 11));
+        lblfin2.setForeground(Color.decode("#7d0504"));
+        add (lblfin2);
+
+        //Course 1 Components
+        txtC1 = new JTextField ();
+        txtC1.setBounds(50, 340, 145, 20);
+        txtC1.setBackground(Color.LIGHT_GRAY);
+        txtC1.setText("== Course 1 ==");
+        txtC1.setEditable(false);
+        add (txtC1);
+
+        txtG1 = new JTextField ();
+        txtG1.setBounds(215, 340, 35, 20);
+        txtG1.setBackground(Color.decode("#ffefef"));
+        txtG1.setText("0.0");
+        add (txtG1);
+
+        txtG1f = new JTextField ();
+        txtG1f.setBounds(260, 340, 35, 20);
+        txtG1f.setBackground(Color.decode("#ffefef"));
+        txtG1f.setText("0.0");
+        add (txtG1f);
+
+        //Course 2 Components
+        txtC2 = new JTextField ();
+        txtC2.setBounds(50, 380, 145, 20);
+        txtC2.setBackground(Color.LIGHT_GRAY);
+        txtC2.setText("== Course 2 ==");
+        txtC2.setEditable(false);
+        add (txtC2);
+
+        txtG2 = new JTextField ();
+        txtG2.setBounds(215, 380, 35, 20);
+        txtG2.setBackground(Color.decode("#ffefef"));
+        txtG2.setText("0.0");
+        add (txtG2);
+
+        txtG2f = new JTextField ();
+        txtG2f.setBounds(260, 380, 35, 20);
+        txtG2f.setBackground(Color.decode("#ffefef"));
+        txtG2f.setText("0.0");
+        add (txtG2f);
+
+        //Course 3 Components
+        txtC3 = new JTextField ();
+        txtC3.setBounds(50, 420, 145, 20);
+        txtC3.setBackground(Color.LIGHT_GRAY);
+        txtC3.setText("== Course 3 ==");
+        txtC3.setEditable(false);
+        add (txtC3);
+
+        txtG3 = new JTextField ();
+        txtG3.setBounds(215, 420, 35, 20);
+        txtG3.setBackground(Color.decode("#ffefef"));
+        txtG3.setText("0.0");
+        add (txtG3);
+
+        txtG3f = new JTextField ();
+        txtG3f.setBounds(260, 420, 35, 20);
+        txtG3f.setBackground(Color.decode("#ffefef"));
+        txtG3f.setText("0.0");
+        add (txtG3f);
+
+        //Course 4 Components
+        txtC4 = new JTextField ();
+        txtC4.setBounds(50, 460, 145, 20);
+        txtC4.setBackground(Color.LIGHT_GRAY);
+        txtC4.setText("== Course 4 ==");
+        txtC4.setEditable(false);
+        add (txtC4);
+
+        txtG4 = new JTextField ();
+        txtG4.setBounds(215, 460, 35, 20);
+        txtG4.setBackground(Color.decode("#ffefef"));
+        txtG4.setText("0.0");
+        add (txtG4);
+
+        txtG4f = new JTextField ();
+        txtG4f.setBounds(260, 460, 35, 20);
+        txtG4f.setBackground(Color.decode("#ffefef"));
+        txtG4f.setText("0.0");
+        add (txtG4f);
+
+
+        //Course 5 Components
+        txtC5 = new JTextField ();
+        txtC5.setBounds(320, 340, 145, 20);
+        txtC5.setBackground(Color.LIGHT_GRAY);
+        txtC5.setText("== Course 5 ==");
+        txtC5.setEditable(false);
+        add (txtC5);
+
+        txtG5 = new JTextField ();
+        txtG5.setBounds(485, 340, 35, 20);
+        txtG5.setBackground(Color.decode("#ffefef"));
+        txtG5.setText("0.0");
+        add (txtG5);
+
+        txtG5f = new JTextField ();
+        txtG5f.setBounds(530, 340, 35, 20);
+        txtG5f.setBackground(Color.decode("#ffefef"));
+        txtG5f.setText("0.0");
+        add (txtG5f);
+
+        //Course 6 Components
+        txtC6 = new JTextField ();
+        txtC6.setBounds(320, 380, 145, 20);
+        txtC6.setBackground(Color.LIGHT_GRAY);
+        txtC6.setText("== Course 6 ==");
+        txtC6.setEditable(false);
+        add (txtC6);
+
+        txtG6 = new JTextField ();
+        txtG6.setBounds(485, 380, 35, 20);
+        txtG6.setBackground(Color.decode("#ffefef"));
+        txtG6.setText("0.0");
+        add (txtG6);
+
+        txtG6f = new JTextField ();
+        txtG6f.setBounds(530, 380, 35, 20);
+        txtG6f.setBackground(Color.decode("#ffefef"));
+        txtG6f.setText("0.0");
+        add (txtG6f);
+
+        //Course 7 Components
+        txtC7 = new JTextField ();
+        txtC7.setBounds(320, 420, 145, 20);
+        txtC7.setBackground(Color.LIGHT_GRAY);
+        txtC7.setText("== Course 7 ==");
+        txtC7.setEditable(false);
+        add (txtC7);
+
+        txtG7 = new JTextField ();
+        txtG7.setBounds(485, 420, 35, 20);
+        txtG7.setBackground(Color.decode("#ffefef"));
+        txtG7.setText("0.0");
+        add (txtG7);
+
+        txtG7f = new JTextField ();
+        txtG7f.setBounds(530, 420, 35, 20);
+        txtG7f.setBackground(Color.decode("#ffefef"));
+        txtG7f.setText("0.0");
+        add (txtG7f);
+
+        //Course 8 Components
+        txtC8 = new JTextField ();
+        txtC8.setBounds(320, 460, 145, 20);
+        txtC8.setBackground(Color.LIGHT_GRAY);
+        txtC8.setText("== Course 8 ==");
+        txtC8.setEditable(false);
+        add (txtC8);
+
+        txtG8 = new JTextField ();
+        txtG8.setBounds(485, 460, 35, 20);
+        txtG8.setBackground(Color.decode("#ffefef"));
+        txtG8.setText("0.0");
+        add (txtG8);
+
+        txtG8f = new JTextField ();
+        txtG8f.setBounds(530, 460, 35, 20);
+        txtG8f.setBackground(Color.decode("#ffefef"));
+        txtG8f.setText("0.0");
+        add (txtG8f);
+
+
+        /* Table where the information will appear
+           Initializing the table model with no rows (null) and predefined column headers (tblColumn)
+           Setting the rows to null so the table starts empty and will be populated based on user inputs */
+        model = new DefaultTableModel(null,tblColumn );
+        studList = new JTable (model);
+        studList.getTableHeader().setReorderingAllowed(false);
+        studList.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        studList.setDefaultEditor(Object.class, null);
+        studList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+         // Adjusting column sizes for the JTable to enhance readability and proper alignment
+        int preferredWidth = 200;
+        for (int i = 0; i < studList.getColumnCount(); i++) {
+            studList.getColumnModel().getColumn(i).setPreferredWidth(preferredWidth);
+            studList.getColumnModel().getColumn(i).setResizable(false);
         }
-    }
-    
-    for (int i = 0; i < studList.getColumnCount(); i++) {
-        String columnName = studList.getColumnName(i).trim();
-        if (columnName.equalsIgnoreCase("Midterm Average") ||
-            columnName.equalsIgnoreCase("Final Average") ||
-            columnName.equalsIgnoreCase("GWA")) {
-            studList.getColumnModel().getColumn(i).setPreferredWidth(130);
+
+        studList.getColumnModel().getColumn(0).setPreferredWidth(100); // Student's ID
+        studList.getColumnModel().getColumn(2).setPreferredWidth(70);  // Semester
+
+        for (int i = 4; i < studList.getColumnCount(); i++) {
+            String columnName = studList.getColumnName(i);
+            if (columnName.equalsIgnoreCase("Mid") || columnName.equalsIgnoreCase("Fin")) {
+                studList.getColumnModel().getColumn(i).setPreferredWidth(50);
+            }
         }
-    }
-   
-    pane = new JScrollPane(studList);
-    pane.setBounds(600, 150, 720, 450);
-    pane.getViewport().setBackground(Color.decode("#fdecec"));
-    pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    add(pane);
-    
-    DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) studList.getTableHeader().getDefaultRenderer();
-    headerRenderer.setBackground(Color.PINK);
-    studList.getTableHeader().setDefaultRenderer(headerRenderer);
 
-    
-     
-    //All Buttons
-    btnAdd = new JButton ("Add");
-    btnAdd.setBounds(70, 530, 120, 40);
-    btnAdd.setFocusable(false);
-    btnAdd.setForeground(Color.WHITE);
-    btnAdd.setBackground(Color.decode("#7d0504"));
-    add (btnAdd);
-    
-    btnUpdate = new JButton ("Update");
-    btnUpdate.setBounds(210, 530, 120, 40);
-    btnUpdate.setFocusable(false);
-    btnUpdate.setForeground(Color.WHITE);
-    btnUpdate.setBackground(Color.decode("#7d0504"));
-    add (btnUpdate);
-    
-    btnDelete = new JButton ("Delete");
-    btnDelete.setBounds(350, 530, 120, 40);
-    btnDelete.setFocusable(false);
-    btnDelete.setForeground(Color.WHITE);
-    btnDelete.setBackground(Color.decode("#7d0504"));
-    add(btnDelete);
-    
-    btnEdit = new JButton ("Edit Row");
-    btnEdit.setBounds(145, 590, 120, 40);
-    btnEdit.setFocusable(false);
-    btnEdit.setForeground(Color.WHITE);
-    btnEdit.setBackground(Color.decode("#7d0504"));
-    add (btnEdit);
-    
-    btnClear = new JButton ("Clear");
-    btnClear.setBounds(285, 590, 120, 40);
-    btnClear.setFocusable(false);
-    btnClear.setForeground(Color.WHITE);
-    btnClear.setBackground(Color.decode("#7d0504"));
-    add (btnClear);
-    
-    // "Search" button to trigger the search operation
-    btnSearch = new JButton ("Search");
-    btnSearch.setBounds(1170, 115, 70, 25);
-    btnSearch.setFocusable(false);
-    btnSearch.setForeground(Color.WHITE);
-    btnSearch.setFont(new Font("Arial", 0, 10));
-    btnSearch.setBackground(Color.decode("#7d0504"));
-    add (btnSearch);
-    
-    // "Refresh" button to reload or reset the data in the table
-    btnRefresh = new JButton ("Refresh");
-    btnRefresh.setBounds(1250, 115, 70, 25);
-    btnRefresh.setFocusable(false);
-    btnRefresh.setForeground(Color.WHITE);
-    btnRefresh.setFont(new Font("Arial", 0, 10));
-    btnRefresh.setBackground(Color.decode("#7d0504"));
-    add (btnRefresh);
-    
+        for (int i = 0; i < studList.getColumnCount(); i++) {
+            String columnName = studList.getColumnName(i).trim();
+            if (columnName.equalsIgnoreCase("Midterm Average") ||
+                columnName.equalsIgnoreCase("Final Average") ||
+                columnName.equalsIgnoreCase("GWA")) {
+                studList.getColumnModel().getColumn(i).setPreferredWidth(130);
+            }
+        }
 
-    // "Menu_Frame" button to navigate back to the main menu
-    btnMenu = new JButton ("Menu");
-    btnMenu.setBounds(1250, 650, 70, 25);
-    btnMenu.setFocusable(false);
-    btnMenu.setForeground(Color.WHITE);
-    btnMenu.setFont(new Font("Arial", 0, 10));
-    btnMenu.setBackground(Color.decode("#7d0504"));
-    add (btnMenu);
-    
-    // Additional Search Button for Student ID 
-    btnSearch2 = new JButton ("Search");
-    btnSearch2.setBounds(450, 155, 70, 25);
-    btnSearch2.setFocusable(false);
-    btnSearch2.setForeground(Color.WHITE);
-    btnSearch2.setFont(new Font("Arial", 0, 10));
-    btnSearch2.setBackground(Color.decode("#7d0504"));
-    add (btnSearch2);
-    
-    btnAdd.addActionListener(this);
-    btnDelete.addActionListener(this);
-    btnUpdate.addActionListener(this);
-    btnEdit.addActionListener(this);
-    btnClear.addActionListener(this);
-    btnMenu.addActionListener(this);
-    btnSearch.addActionListener(this);
-    btnRefresh.addActionListener(this);
-    btnSearch2.addActionListener(this);
+        pane = new JScrollPane(studList);
+        pane.setBounds(600, 150, 720, 450);
+        pane.getViewport().setBackground(Color.decode("#fdecec"));
+        pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        add(pane);
+        
+        
+        // Customize Table header
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) studList.getTableHeader().getDefaultRenderer();
+        headerRenderer.setBackground(Color.PINK);
+        studList.getTableHeader().setDefaultRenderer(headerRenderer);
+
+
+
+        //All Buttons
+        btnAdd = new JButton ("Add");
+        btnAdd.setBounds(70, 530, 120, 40);
+        btnAdd.setFocusable(false);
+        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setBackground(Color.decode("#7d0504"));
+        add (btnAdd);
+
+        btnUpdate = new JButton ("Update");
+        btnUpdate.setBounds(210, 530, 120, 40);
+        btnUpdate.setFocusable(false);
+        btnUpdate.setForeground(Color.WHITE);
+        btnUpdate.setBackground(Color.decode("#7d0504"));
+        add (btnUpdate);
+
+        btnDelete = new JButton ("Delete");
+        btnDelete.setBounds(350, 530, 120, 40);
+        btnDelete.setFocusable(false);
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setBackground(Color.decode("#7d0504"));
+        add(btnDelete);
+
+        btnEdit = new JButton ("Edit Row");
+        btnEdit.setBounds(145, 590, 120, 40);
+        btnEdit.setFocusable(false);
+        btnEdit.setForeground(Color.WHITE);
+        btnEdit.setBackground(Color.decode("#7d0504"));
+        add (btnEdit);
+
+        btnClear = new JButton ("Clear");
+        btnClear.setBounds(285, 590, 120, 40);
+        btnClear.setFocusable(false);
+        btnClear.setForeground(Color.WHITE);
+        btnClear.setBackground(Color.decode("#7d0504"));
+        add (btnClear);
+
+        // "Search" button to trigger the search operation
+        btnSearch = new JButton ("Search");
+        btnSearch.setBounds(1170, 115, 70, 25);
+        btnSearch.setFocusable(false);
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setFont(new Font("Arial", 0, 10));
+        btnSearch.setBackground(Color.decode("#7d0504"));
+        add (btnSearch);
+
+        // "Refresh" button to reload or reset the data in the table
+        btnRefresh = new JButton ("Refresh");
+        btnRefresh.setBounds(1250, 115, 70, 25);
+        btnRefresh.setFocusable(false);
+        btnRefresh.setForeground(Color.WHITE);
+        btnRefresh.setFont(new Font("Arial", 0, 10));
+        btnRefresh.setBackground(Color.decode("#7d0504"));
+        add (btnRefresh);
+
+
+        // "Menu_Frame" button to navigate back to the main menu
+        btnMenu = new JButton ("Menu");
+        btnMenu.setBounds(1250, 650, 70, 25);
+        btnMenu.setFocusable(false);
+        btnMenu.setForeground(Color.WHITE);
+        btnMenu.setFont(new Font("Arial", 0, 10));
+        btnMenu.setBackground(Color.decode("#7d0504"));
+        add (btnMenu);
+
+        // Additional Search Button for Student ID 
+        btnSearch2 = new JButton ("Search");
+        btnSearch2.setBounds(450, 155, 70, 25);
+        btnSearch2.setFocusable(false);
+        btnSearch2.setForeground(Color.WHITE);
+        btnSearch2.setFont(new Font("Arial", 0, 10));
+        btnSearch2.setBackground(Color.decode("#7d0504"));
+        add (btnSearch2);
+
+        btnAdd.addActionListener(this);
+        btnDelete.addActionListener(this);
+        btnUpdate.addActionListener(this);
+        btnEdit.addActionListener(this);
+        btnClear.addActionListener(this);
+        btnMenu.addActionListener(this);
+        btnSearch.addActionListener(this);
+        btnRefresh.addActionListener(this);
+        btnSearch2.addActionListener(this);
               
     
-    DbToTable(); // Calling the loadDataFromDatabase method and to load the datas from DB authomatically
-}
+        DbToTable(); // Calling the loadDataFromDatabase method and to load the datas from DB authomatically
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -1203,7 +1201,7 @@ public class Grade_Class extends JFrame implements ActionListener{
     }
     
 
-    // Sorting Algorithm implementation (bubble sort)
+    // sorting algorithm to arrange student alphabetically
     private void bubbleSort (ArrayList <Object[]> studData){
         int numStudent = studData.size();
         
@@ -1241,7 +1239,7 @@ public class Grade_Class extends JFrame implements ActionListener{
         String search = txtSearch.getText().trim();
 
         if (!search.isEmpty()) {
-        Object[] result = binarySearchStudent(search); // Search by Name or ID using binary search
+        Object[] result = binarySearchStudent(search); // Search student name by using binary
         
             if (result != null) {
             // Move the found student to the top of the JTable
@@ -1259,43 +1257,32 @@ public class Grade_Class extends JFrame implements ActionListener{
     }
     
    private Object[] binarySearchStudent(String search) {
-        // Determine if search is by ID (numeric) or name (alphabetic)
-        boolean isSearchingById = search.matches("\\d+"); // Numeric input for ID
-
-        int left = 0;
-        int right = dataRows.size() - 1;
-
+        int left = 0; // left pointer
+        int right = dataRows.size() - 1; // right pointer
+        
+        // Continue searching while the left pointer is less than or equal to the right pointer
         while (left <= right) {
-            int mid = left + (right - left) / 2;
-            Object[] midRow = dataRows.get(mid);
+            int mid = left + (right - left) / 2;  // Calculate the middle index
+            Object[] midRow = dataRows.get(mid); // Retrieve the row at the middle index
 
-            String studName = midRow[1].toString().toLowerCase();  // Name
-            String studId = midRow[0].toString().toLowerCase();    // ID
+            String studName = midRow[1].toString().toLowerCase(); // Get student name
+            String studID = midRow[0].toString().toLowerCase(); // Get student name
 
-            // Compare search text with both name and ID
-            if (studName.equalsIgnoreCase(search) || studId.equalsIgnoreCase(search)) {
-                return midRow; // Found the student
-            }
+            // Compare the search input with the student's name and id
+            int nameComparison = studName.compareToIgnoreCase(search); // get name in table
+            int IdComparison = studID.compareToIgnoreCase(search); // get id in table
 
-            // Adjust search range based on the comparison of the chosen field
-            if (isSearchingById) {
-                int idComparison = studId.compareToIgnoreCase(search);
-                if (idComparison < 0) {
-                    left = mid + 1;
-                } else {
-                    right = mid - 1;
-                }
+            if (nameComparison == 0 || IdComparison == 0) {
+                return midRow; // Student found
+            } else if (nameComparison < 0) {
+                left = mid + 1; // Search in the right half
             } else {
-                int nameComparison = studName.compareToIgnoreCase(search);
-                if (nameComparison < 0) {
-                    left = mid + 1;
-                } else {
-                    right = mid - 1;
-                }
+                right = mid - 1; // Search in the left half
             }
         }
         return null; // Student not found
     }
+
 
     
     private void moveStudentToTop(Object[] studentRow) {
@@ -1312,8 +1299,5 @@ public class Grade_Class extends JFrame implements ActionListener{
         DbToTable(); 
         updateTableModel();
     }
-    
    
-
-
 }

@@ -3,6 +3,7 @@ package com.mycompany.student_management_system;
 import java.awt.Color;
 import java.awt.Font;
 import static java.awt.Frame.MAXIMIZED_BOTH;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -25,10 +26,10 @@ import java.util.List;
 
 public class Student_Class extends JFrame implements ActionListener {
     
-    private JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch;
+    private JLabel lblTitle, lblName, lblId, lblSem, lblC1, lblC2, lblC3, lblC4, lblC5, lblC6, lblC7, lblC8, lblSearch, lblLogo;
     private JTextField txtName, txtId, txtSearch;
     private JComboBox<String> cmbSem, cmbC1, cmbC2, cmbC3, cmbC4, cmbC5, cmbC6, cmbC7, cmbC8;
-    private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu;
+    private JButton btnAdd, btnDelete, btnUpdate, btnClear, btnEditRow, btnSearch, btnRefresh, btnMenu, btnInfo;
     private JTable studList;
     private JScrollPane pane;
     private DefaultTableModel model;
@@ -69,17 +70,25 @@ public class Student_Class extends JFrame implements ActionListener {
     Student_Class(){
         
         //Main Frame
+        setTitle("Student Management System - Student");
         setExtendedState(MAXIMIZED_BOTH);     
         setLayout(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //Labels
-        lblTitle = new JLabel("Student Management System");
-        lblTitle.setBounds(30, 20, 350, 30);
-        lblTitle.setForeground(new Color(125,5,4));
-        lblTitle.setFont(new Font("Serif", Font.BOLD, 25));
-        add(lblTitle);
+        //GUI components
+        lblTitle = new JLabel ("Student Management System");
+        lblTitle.setBounds(90, 20, 600, 30);
+        lblTitle.setFont(new Font("Arial Black", Font.BOLD, 25));
+        lblTitle.setForeground(Color.decode("#7d0504"));
+        add (lblTitle);
+        
+        ImageIcon studentIcn = new ImageIcon("studentl.jpg");
+        Image scale = studentIcn.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+        ImageIcon logoicon = new ImageIcon(scale);
+        lblLogo = new JLabel(logoicon);
+        lblLogo.setBounds(20, 10, 60, 60);
+        add(lblLogo);
 
         lblId = new JLabel("Student's ID: ");
         lblId.setBounds(50, 150, 150, 40);
@@ -96,7 +105,6 @@ public class Student_Class extends JFrame implements ActionListener {
         lblSem.setFont(new Font("Arial", Font.BOLD, 16));
         add(lblSem );
 
-        //Text Fields
         txtName = new JTextField();
         txtName.setBounds(200, 205, 250, 25);
         add(txtName);
@@ -639,54 +647,70 @@ public class Student_Class extends JFrame implements ActionListener {
         studList.clearSelection();
     }
     
+    private void updateTableModel() {
+        model.setRowCount(0); // Clear the JTable
+        for (Object[] row : storeStudent) {
+            model.addRow(row); // Add rows from sorted dataRows
+        }
+    }
+    
     //to search student
     private void searchStudent() {
-        bubbleSort(1, true);
-        String crs = txtSearch.getText().toLowerCase(); //Get the searched student name 
-        boolean found = false;
-        for (int i = 0; i < model.getRowCount(); i++) {
-           String courseId = model.getValueAt(i, 0).toString().toLowerCase();
-           String courseName = model.getValueAt(i, 1).toString().toLowerCase();
-           
-        if (courseId.contains(crs) || courseName.contains(crs)) {
-               studList.setRowSelectionInterval(i, i); 
-               found = true;
-               break;
-           }
-       } 
-        
-        if(!found) {
-           int index = binarySearch(crs);//binary search 
+         String search = txtSearch.getText().trim();
 
-        if(index != -1) {
-               studList.setRowSelectionInterval(index, index); 
-               found = true;
-           }
+        if (!search.isEmpty()) {
+        Object[] result = binarySearchStudent(search); // Search student name by using binary
         
-       }if (!found) {
-           JOptionPane.showMessageDialog(this, "No matching student found.");
-       }
-   }
+            if (result != null) {
+            // Move the found student to the top of the JTable
+            moveStudentToTop (result);
+            txtSearch.setText("");
+            JOptionPane.showMessageDialog(this, "Student found and moved to the top.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+        
+            } else {
+            JOptionPane.showMessageDialog(this, "Student not found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+        }
+    } else {
+            JOptionPane.showMessageDialog(this, "Please enter a name or ID to search.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        
+        }
+    }
     
     //binary search method
-    private int binarySearch(String crs) {
-        int left = 0;
-        int right = model.getRowCount() - 1;
-
+    private Object[] binarySearchStudent(String search) {
+        int left = 0; // left pointer
+        int right = storeStudent.size() - 1; // right pointer
+        
+        // Continue searching while the left pointer is less than or equal to the right pointer
         while (left <= right) {
-            int mid = (left + right) / 2;
-            String courseName = model.getValueAt(mid, 1).toString().toLowerCase(); 
+            int mid = left + (right - left) / 2;  // Calculate the middle index
+            Object[] midRow = storeStudent.get(mid); // Retrieve the row at the middle index
 
-            if (courseName.equalsIgnoreCase(crs)) {
-                return mid; //found
-            }
-            if (courseName.compareToIgnoreCase(crs) < 0) {
-                left = mid + 1; //Searching in the right half
+            String studName = midRow[1].toString().toLowerCase(); // Get student name
+            String studID = midRow[0].toString().toLowerCase(); // Get student id 
+
+            // Compare the search input with the student's name and id
+            int nameComparison = studName.compareToIgnoreCase(search); // get name in table
+            int IdComparison = studID.compareToIgnoreCase(search); // get id in table
+
+            if (nameComparison == 0 || IdComparison == 0) {
+                return midRow; // Student found
+            } else if (nameComparison < 0) {
+                left = mid + 1; // Search in the right half
             } else {
-                right = mid - 1; //Searching in the left half
+                right = mid - 1; // Search in the left half
             }
         }
-        return -1; // Course not found!
+        return null; // Student not found
+    }
+    
+     private void moveStudentToTop(Object[] studentRow) {
+        
+        storeStudent.remove(studentRow);
+        storeStudent.add(0, studentRow);
+
+        // Update the table model to reflect the change
+        updateTableModel();
     }
     
     //to fetch a added course from other class
@@ -775,7 +799,7 @@ public class Student_Class extends JFrame implements ActionListener {
                 
         ResultSet rs = stmt.executeQuery("SELECT * FROM student")) {
         
-        model.setRowCount(0);
+        storeStudent.clear(); // Clear dataRows to ensure fresh data is loaded
 
         while (rs.next()) {
             Object[] row = { rs.getString("ID"), rs.getString("Name"), rs.getString("Semester"),
@@ -784,8 +808,11 @@ public class Student_Class extends JFrame implements ActionListener {
                 rs.getString("Course7"), rs.getString("Course8")};
 
             model.addRow(row);
+            storeStudent.add(row);
        
                 }
+         // Sort the data and update the table
+        bubbleSort(1, true);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error loading data from the database: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -809,7 +836,7 @@ public class Student_Class extends JFrame implements ActionListener {
      
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
+        
             if (e.getSource() == btnAdd) {
                 addStudent();
                 
@@ -836,11 +863,7 @@ public class Student_Class extends JFrame implements ActionListener {
                 dispose();
                 
             }
-                
-        } catch (Exception e1) {
-            JOptionPane.showMessageDialog(this, "There is something wrong.", "Error", JOptionPane.ERROR_MESSAGE);
-            
-        }
+          
     }
     
 }
