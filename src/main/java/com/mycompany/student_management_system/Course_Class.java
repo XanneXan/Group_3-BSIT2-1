@@ -491,13 +491,13 @@ public class Course_Class extends JFrame implements ActionListener{
             // Move the found student to the top of the JTable
             moveStudentToTop(result);
             txtSearch.setText("");
-            JOptionPane.showMessageDialog(this, "Student found and moved to the top.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Course found and moved to the top.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
         
             } else {
-            JOptionPane.showMessageDialog(this, "Student not found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Course not found.", "Search Result", JOptionPane.INFORMATION_MESSAGE);
         }
     } else {
-            JOptionPane.showMessageDialog(this, "Please enter a name or ID to search.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a Course Name to search.", "Input Error", JOptionPane.ERROR_MESSAGE);
         
         }
     }
