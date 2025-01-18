@@ -10,7 +10,7 @@ public class Student_Management_System {
         run.setVisible(true);
         
         // username: admin
-        // password: 123
+        // password: 123admin
 
 
     }

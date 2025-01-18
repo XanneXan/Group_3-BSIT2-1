@@ -206,9 +206,27 @@ public class Performance_Reports extends JFrame implements ActionListener {
                            double mid = parseGrade(midValue);
                            double fin = parseGrade(finValue);
                            double grade = (mid + fin) / 2;
-
+                                                   
+                           if(grade>1.00 &&grade<1.50) {                           
+                               grade=1.25;
+                                       
+                           }else if(grade>1.50 && grade <1.20){
+                               grade=1.75;
+                               
+                           }else if(grade>2.00 && grade <2.50){
+                               grade=2.25;
+                               
+                           }else if(grade>2.50 && grade <2.20){
+                               grade=2.75;
+                               
+                           }else if(grade>3.00 && grade <2.50){
+                               grade=3.00;
+                           }   
+   
                            // Determine remarks
                            String remarks = grade == 0.0 ? "Incomplete" : grade <= 3.0 ? "Passed" : "Failed";
+                           
+                           //String gradeCondition = grade ==
 
                            // Add the row to the table model
                            if (!courseName.isEmpty()) {
@@ -229,7 +247,7 @@ public class Performance_Reports extends JFrame implements ActionListener {
         try {
             return Double.parseDouble(gradeStr);
         } catch (NumberFormatException e) {
-            return 0.0;
+            return 0.00;
         }
     }
 }
